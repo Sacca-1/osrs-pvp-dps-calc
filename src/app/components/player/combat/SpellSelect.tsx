@@ -1,6 +1,7 @@
 import React from 'react';
 import { useStore } from '@/state';
 import { observer } from 'mobx-react-lite';
+import { useSide } from '@/sideContext';
 import { getWikiImage } from '@/utils';
 import { Spell, Spellbook, Spellement } from '@/types/Spell';
 import Combobox from '@/app/components/generic/Combobox';
@@ -15,6 +16,7 @@ interface SpellOption {
 
 const SpellSelect: React.FC = observer(() => {
   const store = useStore();
+  const side = useSide();
 
   const options: SpellOption[] = spell.map((e, i) => ({
     label: `${e.name}`,
@@ -39,7 +41,7 @@ const SpellSelect: React.FC = observer(() => {
       onSelectedItemChange={(item) => {
         store.updatePlayer({
           spell: item?.spell,
-        });
+        }, undefined, side);
       }}
       CustomItemComponent={({ item, itemString }) => (
         <div className="flex items-center gap-2">

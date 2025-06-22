@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@/state';
+import { useSide } from '@/sideContext';
 import { IconCircleCheck, IconCircleCheckFilled } from '@tabler/icons-react';
 
 import LazyImage from '@/app/components/generic/LazyImage';
@@ -17,7 +18,8 @@ interface CombatStyleProps {
 
 const CombatStyle: React.FC<CombatStyleProps> = observer((props) => {
   const store = useStore();
-  const { player } = store;
+  const side = useSide();
+  const player = side === 'attacker' ? store.attackerLoadouts[store.selectedAttacker] : store.defenderLoadouts[store.selectedDefender];
   const { style } = props;
 
   const [hovering, setHovering] = useState(false);
@@ -28,7 +30,7 @@ const CombatStyle: React.FC<CombatStyleProps> = observer((props) => {
   useEffect(() => {
     // Import the combat style image dynamically using the path, because there are a lot of them
     const getStyleImage = async () => {
-      let path = CombatStyleMap[store.equipmentData.weapon?.category || EquipmentCategory.NONE][style.name];
+      let path = CombatStyleMap[player.equipment.weapon?.category || EquipmentCategory.NONE][style.name];
 
       if (style.type === 'magic' && style.stance === 'Defensive Autocast') {
         path = { image: 'styles/760' };
@@ -52,13 +54,13 @@ const CombatStyle: React.FC<CombatStyleProps> = observer((props) => {
     };
 
     getStyleImage();
-  }, [style, store.equipmentData.weapon?.category]);
+  }, [style, player.equipment.weapon?.category]);
 
   return (
     <button
       type="button"
       className="flex gap-4 items-center text-sm p-2 px-6 text-left transition-[background] first:border-t border-b text-black border-body-200 dark:border-dark-400 bg-gray-100 dark:bg-dark-500 dark:text-white hover:bg-gray-200 dark:hover:bg-dark-400"
-      onClick={() => store.updatePlayer({ style })}
+      onClick={() => store.updatePlayer({ style }, undefined, side)}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >

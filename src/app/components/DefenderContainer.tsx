@@ -7,34 +7,28 @@ import LoadoutName from '@/app/components/player/LoadoutName';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 import WikiSyncButton from '@/app/components/player/WikiSyncButton';
 
-const PlayerContainer: React.FC = observer(() => {
+const DefenderContainer: React.FC = observer(() => {
   const store = useStore();
   const {
-    attackerLoadouts: loadouts,
-    player,
-    selectedAttacker: selectedLoadout,
-    canCreateLoadout,
-    createLoadout,
-    renameLoadout,
-    deleteLoadout,
+    defenderLoadouts: loadouts,
+    defender: player,
+    selectedDefender,
   } = store;
+
+  const canCreate = loadouts.length < 6;
 
   return (
     <div className="flex flex-col w-[350px]">
-      <div className="text-center font-serif font-bold text-gray-300 dark:text-gray-300 mb-1">Attacker</div>
-      <div
-        className="sm:rounded sm:rounded-b-none text-sm font-bold font-serif flex gap-2 items-center bg-transparent text-white border-b-4 border-orange-300 dark:border-orange-700"
-      >
+      <div className="text-center font-serif font-bold text-gray-300 dark:text-gray-300 mb-1">Defender</div>
+      <div className="sm:rounded sm:rounded-b-none text-sm font-bold font-serif flex gap-2 items-center bg-transparent text-white border-b-4 border-blue-300 dark:border-blue-700">
         <div className="my-1 flex h-full">
           {loadouts.map((l, ix) => (
             <button
               type="button"
               // eslint-disable-next-line react/no-array-index-key
               key={ix}
-              className={`min-w-[40px] text-left first:md:rounded-tl px-4 py-1 border-l-2 first:border-l-0 last:rounded-tr border-body-100 dark:border-dark-300 transition-colors ${selectedLoadout === ix ? 'bg-orange-400 dark:bg-orange-700' : 'bg-btns-400 dark:bg-dark-400'}`}
-              onClick={() => {
-                store.setSelectedLoadout(ix);
-              }}
+              className={`min-w-[40px] text-left first:md:rounded-tl px-4 py-1 border-l-2 first:border-l-0 last:rounded-tr border-body-100 dark:border-dark-300 transition-colors ${selectedDefender === ix ? 'bg-blue-400 dark:bg-blue-700' : 'bg-btns-400 dark:bg-dark-400'}`}
+              onClick={() => store.setSelectedDefender(ix)}
             >
               {ix + 1}
             </button>
@@ -43,35 +37,29 @@ const PlayerContainer: React.FC = observer(() => {
         <div>
           <button
             type="button"
-            disabled={!canCreateLoadout}
-            onClick={() => createLoadout(true, selectedLoadout, 'attacker')}
+            disabled={!canCreate}
+            onClick={() => store.createLoadout(true, selectedDefender, 'defender')}
             className="disabled:cursor-not-allowed text-body-500 dark:text-dark-100 disabled:text-body-200 dark:disabled:text-dark-500 hover:text-green transition-colors"
             data-tooltip-id="tooltip"
-            data-tooltip-content="Add new loadout"
+            data-tooltip-content="Add new defender setup"
           >
             <IconPlus aria-label="Add new loadout" />
           </button>
         </div>
       </div>
-      <div
-        className="bg-tile sm:rounded-b-lg dark:bg-dark-300 text-black dark:text-white shadow-lg flex flex-col"
-      >
-        <div
-          className="px-5 py-3 border-b-body-400 dark:border-b-dark-200 border-b flex justify-between items-center font-serif"
-        >
+      <div className="bg-tile sm:rounded-b-lg dark:bg-dark-300 text-black dark:text-white shadow-lg flex flex-col">
+        <div className="px-5 py-3 border-b-body-400 dark:border-b-dark-200 border-b flex justify-between items-center font-serif">
           <div className="min-w-0">
-            <LoadoutName name={loadouts[selectedLoadout].name} renameLoadout={(i,n)=>renameLoadout(i,n,'attacker')} index={selectedLoadout} />
+            <LoadoutName name={loadouts[selectedDefender].name} renameLoadout={(i, n) => store.renameLoadout(i, n, 'defender')} index={selectedDefender} />
             <div className="text-xs font-bold text-gray-500 dark:text-gray-300">
-              Level
-              {' '}
-              {calculateCombatLevel(player.skills)}
+              Level {calculateCombatLevel(player.skills)}
             </div>
           </div>
           <div className="flex gap-1">
             <WikiSyncButton />
             <button
               type="button"
-              onClick={() => deleteLoadout(selectedLoadout, 'attacker')}
+              onClick={() => store.deleteLoadout(selectedDefender, 'defender')}
               className="disabled:cursor-not-allowed text-body-500 dark:text-dark-100 disabled:text-btns-100 dark:disabled:text-dark-500 hover:text-red transition-colors"
               data-tooltip-id="tooltip"
               data-tooltip-content="Remove loadout"
@@ -80,10 +68,10 @@ const PlayerContainer: React.FC = observer(() => {
             </button>
           </div>
         </div>
-        <PlayerInnerContainer side="attacker" />
+        <PlayerInnerContainer side="defender" />
       </div>
     </div>
   );
 });
 
-export default PlayerContainer;
+export default DefenderContainer; 

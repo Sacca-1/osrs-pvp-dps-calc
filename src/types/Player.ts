@@ -94,6 +94,11 @@ export interface Player extends EquipmentStats {
   equipment: PlayerEquipment;
   attackSpeed: number;
   prayers: Prayer[];
+  /**
+   * Active protection/overhead prayer (Protect from Magic/Missiles/Melee) –
+   * used in PvP calculations to reduce incoming damage.
+   */
+  overheadPrayer: Prayer | null;
   buffs: {
     /**
      * This property should only be used to display the UI state, and should not be used in calculator code.

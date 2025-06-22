@@ -1,6 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@/state';
+import { useSide } from '@/sideContext';
 import AttributeInput from '@/app/components/generic/AttributeInput';
 import dagger from '@/public/img/bonuses/dagger.png';
 import scimitar from '@/public/img/bonuses/scimitar.png';
@@ -11,7 +12,9 @@ import { EquipmentBonuses } from '@/lib/Equipment';
 
 const Offensive: React.FC<{ computedStats: EquipmentBonuses }> = observer(({ computedStats }) => {
   const store = useStore();
-  const { prefs, player } = store;
+  const side = useSide();
+  const prefs = store.prefs;
+  const player = side === 'attacker' ? store.attackerLoadouts[store.selectedAttacker] : store.defenderLoadouts[store.selectedDefender];
 
   return (
     <div className="w-[95px]">
@@ -23,7 +26,7 @@ const Offensive: React.FC<{ computedStats: EquipmentBonuses }> = observer(({ com
           image={dagger}
           value={player.offensive.stab}
           className={`${(player.offensive.stab !== computedStats.offensive.stab) ? 'bg-yellow-200 dark:bg-yellow-500' : ''}`}
-          onChange={(v) => store.updatePlayer({ offensive: { stab: v } })}
+          onChange={(v) => store.updatePlayer({ offensive: { stab: v } }, undefined, side)}
         />
         <AttributeInput
           disabled={!prefs.manualMode}
@@ -31,7 +34,7 @@ const Offensive: React.FC<{ computedStats: EquipmentBonuses }> = observer(({ com
           image={scimitar}
           value={player.offensive.slash}
           className={`${(player.offensive.slash !== computedStats.offensive.slash) ? 'bg-yellow-200 dark:bg-yellow-500' : ''}`}
-          onChange={(v) => store.updatePlayer({ offensive: { slash: v } })}
+          onChange={(v) => store.updatePlayer({ offensive: { slash: v } }, undefined, side)}
         />
         <AttributeInput
           disabled={!prefs.manualMode}
@@ -39,7 +42,7 @@ const Offensive: React.FC<{ computedStats: EquipmentBonuses }> = observer(({ com
           image={warhammer}
           value={player.offensive.crush}
           className={`${(player.offensive.crush !== computedStats.offensive.crush) ? 'bg-yellow-200 dark:bg-yellow-500' : ''}`}
-          onChange={(v) => store.updatePlayer({ offensive: { crush: v } })}
+          onChange={(v) => store.updatePlayer({ offensive: { crush: v } }, undefined, side)}
         />
         <AttributeInput
           disabled={!prefs.manualMode}
@@ -47,7 +50,7 @@ const Offensive: React.FC<{ computedStats: EquipmentBonuses }> = observer(({ com
           image={magic}
           value={player.offensive.magic}
           className={`${(player.offensive.magic !== computedStats.offensive.magic) ? 'bg-yellow-200 dark:bg-yellow-500' : ''}`}
-          onChange={(v) => store.updatePlayer({ offensive: { magic: v } })}
+          onChange={(v) => store.updatePlayer({ offensive: { magic: v } }, undefined, side)}
         />
         <AttributeInput
           disabled={!prefs.manualMode}
@@ -55,7 +58,7 @@ const Offensive: React.FC<{ computedStats: EquipmentBonuses }> = observer(({ com
           image={ranged}
           value={player.offensive.ranged}
           className={`${(player.offensive.ranged !== computedStats.offensive.ranged) ? 'bg-yellow-200 dark:bg-yellow-500' : ''}`}
-          onChange={(v) => store.updatePlayer({ offensive: { ranged: v } })}
+          onChange={(v) => store.updatePlayer({ offensive: { ranged: v } }, undefined, side)}
         />
       </div>
     </div>

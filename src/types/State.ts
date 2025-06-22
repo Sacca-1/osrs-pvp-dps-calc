@@ -34,6 +34,7 @@ export interface Preferences {
   hitDistsHideZeros: boolean; // legacy name
   hitDistShowSpec: boolean;
   resultsExpanded: boolean;
+  calcMode: 'pvm' | 'pvp';
 }
 
 export interface ChartEntry {
@@ -99,7 +100,7 @@ export interface Calculator {
  * or any of its subproperties, are updated in a non-backwards-compatible manner,
  * or also in any manner that could affect the migrations required on load.
  */
-export const IMPORT_VERSION = 8 as const;
+export const IMPORT_VERSION = 9 as const;
 
 /**
  * This is the state that can be exported and imported (through shortlinks).
@@ -109,8 +110,13 @@ export interface ImportableData {
   // can be any number <= IMPORT_VERSION
   serializationVersion: number;
 
+  // Attacker loadouts (legacy name remains for backward-compatibility)
   loadouts: PartialDeep<Player>[];
   selectedLoadout: number;
+
+  // NEW – defender loadouts (optional for back-compat)
+  defenderLoadouts?: PartialDeep<Player>[];
+  selectedDefender?: number;
 
   monster: Monster;
 }

@@ -12,28 +12,30 @@ import feet from '@/public/img/slots/feet.png';
 import ring from '@/public/img/slots/ring.png';
 import EquipmentGridSlot from '@/app/components/player/equipment/EquipmentGridSlot';
 
-const EquipmentGrid: React.FC = () => (
+interface EquipmentGridProps { side: 'attacker' | 'defender' }
+
+const EquipmentGrid: React.FC<EquipmentGridProps> = ({ side }) => (
   <>
     <div className="flex justify-center">
-      <EquipmentGridSlot slot="head" placeholder={head.src} />
+      <EquipmentGridSlot slot="head" placeholder={head.src} side={side} />
     </div>
     <div className="mt-1 flex justify-center gap-2">
-      <EquipmentGridSlot slot="cape" placeholder={cape.src} />
-      <EquipmentGridSlot slot="neck" placeholder={neck.src} />
-      <EquipmentGridSlot slot="ammo" placeholder={ammo.src} />
+      <EquipmentGridSlot slot="cape" placeholder={cape.src} side={side} />
+      <EquipmentGridSlot slot="neck" placeholder={neck.src} side={side} />
+      <EquipmentGridSlot slot="ammo" placeholder={ammo.src} side={side} />
     </div>
     <div className="mt-1 flex justify-center gap-6">
-      <EquipmentGridSlot slot="weapon" placeholder={weapon.src} />
-      <EquipmentGridSlot slot="body" placeholder={body.src} />
-      <EquipmentGridSlot slot="shield" placeholder={shield.src} />
+      <EquipmentGridSlot slot="weapon" placeholder={weapon.src} side={side} />
+      <EquipmentGridSlot slot="body" placeholder={body.src} side={side} />
+      <EquipmentGridSlot slot="shield" placeholder={shield.src} side={side} />
     </div>
     <div className="mt-1 flex justify-center">
-      <EquipmentGridSlot slot="legs" placeholder={legs.src} />
+      <EquipmentGridSlot slot="legs" placeholder={legs.src} side={side} />
     </div>
     <div className="mt-1 flex justify-center gap-6">
-      <EquipmentGridSlot slot="hands" placeholder={hands.src} />
-      <EquipmentGridSlot slot="feet" placeholder={feet.src} />
-      <EquipmentGridSlot slot="ring" placeholder={ring.src} />
+      <EquipmentGridSlot slot="hands" placeholder={hands.src} side={side} />
+      <EquipmentGridSlot slot="feet" placeholder={feet.src} side={side} />
+      <EquipmentGridSlot slot="ring" placeholder={ring.src} side={side} />
     </div>
   </>
 );

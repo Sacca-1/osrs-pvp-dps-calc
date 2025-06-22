@@ -498,3 +498,23 @@ ABYSSAL_SIRE_TRANSITION_IDS.forEach((id) => { MONSTER_PHASES_BY_ID[id] = ABYSSAL
 export const YAMA_IDS = [14176];
 export const YAMA_PHASES = ['Tank using magic', 'Tank not using magic'];
 YAMA_IDS.forEach((id) => { MONSTER_PHASES_BY_ID[id] = YAMA_PHASES; });
+
+// -------------------------------
+// PvP-specific constants
+// -------------------------------
+
+/**
+ * Names of weapons that cannot be used in PvP calculations (blocked or deprecated).
+ * This list can be extended easily without code changes elsewhere.
+ */
+export const BLOCKED_PVP_WEAPONS: string[] = [
+  'Toxic trident',
+  'Trident of the swamp',
+  'Toxic staff of the dead',
+];
+
+/**
+ * Factor applied to final damage when a correct overhead protection prayer is active in PvP.
+ * 40 % of damage is taken, i.e. damage is multiplied by 0.6.
+ */
+export const PROTECTION_PRAYER_DAMAGE_REDUCTION: [number, number] = [60, 100]; // multiply by 60/100

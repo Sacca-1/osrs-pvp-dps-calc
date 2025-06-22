@@ -3,13 +3,16 @@ import LazyImage from '@/app/components/generic/LazyImage';
 import { getWikiImage } from '@/utils';
 import { IconTrash } from '@tabler/icons-react';
 import { useStore } from '@/state';
+import { useSide } from '@/sideContext';
 import { getSpellMaxHit } from '@/types/Spell';
 import { toJS } from 'mobx';
 
 const SpellContainer: React.FC = () => {
   const store = useStore();
-  const { spell } = store.player;
-  const jsPlayer = toJS(store.player);
+  const side = useSide();
+  const player = side === 'attacker' ? store.attackerLoadouts[store.selectedAttacker] : store.defenderLoadouts[store.selectedDefender];
+  const { spell } = player;
+  const jsPlayer = toJS(player);
 
   const spellMaxHit: number = useMemo(() => {
     if (!jsPlayer.spell) {
@@ -48,7 +51,7 @@ const SpellContainer: React.FC = () => {
             className="disabled:cursor-not-allowed text-body-500 dark:text-dark-100 disabled:text-btns-100 dark:disabled:text-dark-500 hover:text-red transition-colors"
             data-tooltip-id="tooltip"
             data-tooltip-content="Remove spell"
-            onClick={() => store.updatePlayer({ spell: null })}
+            onClick={() => store.updatePlayer({ spell: null }, undefined, side)}
           >
             <IconTrash aria-label="Remove spell" />
           </button>

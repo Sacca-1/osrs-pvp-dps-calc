@@ -9,16 +9,21 @@ import { BLOWPIPE_IDS } from '@/lib/constants';
 interface EquipmentGridSlotProps {
   slot: keyof PlayerEquipment;
   placeholder?: string;
+  side: 'attacker' | 'defender';
 }
 
 const EquipmentGridSlot: React.FC<EquipmentGridSlotProps> = observer((props) => {
   const store = useStore();
-  const { slot, placeholder } = props;
-  const currentSlot = store.equipmentData[slot];
+  const { slot, placeholder, side } = props;
+
+  const player = side === 'attacker'
+    ? store.attackerLoadouts[store.selectedAttacker]
+    : store.defenderLoadouts[store.selectedDefender];
+  const currentSlot = player.equipment[slot];
   const isEmpty = !currentSlot;
 
   // Determine whether there's any issues with this element
-  const issues = store.userIssues.filter((i) => i.type.startsWith(`equipment_slot_${slot}`) && i.loadout === `${store.selectedLoadout + 1}`);
+  const issues = store.userIssues.filter((i) => i.type.startsWith(`equipment_slot_${slot}`) && i.loadout === `${side === 'attacker' ? store.selectedAttacker + 1 : store.selectedDefender + 1}`);
 
   const getTooltipContent = () => {
     if (currentSlot !== null) {
@@ -45,7 +50,7 @@ const EquipmentGridSlot: React.FC<EquipmentGridSlotProps> = observer((props) => 
         data-tooltip-id="tooltip"
         data-tooltip-content={getTooltipContent()}
         onMouseDown={() => {
-          if (!isEmpty) store.clearEquipmentSlot(slot);
+          if (!isEmpty) store.clearEquipmentSlot(slot, side);
         }}
       >
         {currentSlot?.image ? (

@@ -22,6 +22,10 @@ export interface CalcOpts {
   detailedOutput?: boolean,
   disableMonsterScaling?: boolean,
   usingSpecialAttack?: boolean,
+  /**
+   * Calculation context – 'pvm' (player vs monster) or 'pvp' (player vs player). Defaults to 'pvm'.
+   */
+  mode?: 'pvm' | 'pvp',
   overrides?: {
     accuracy?: number,
     attackRoll?: number,
@@ -42,6 +46,7 @@ const DEFAULT_OPTS: Required<InternalOpts> = {
   detailedOutput: false,
   disableMonsterScaling: false,
   usingSpecialAttack: false,
+  mode: 'pvm',
   noInit: false,
   overrides: {},
 };

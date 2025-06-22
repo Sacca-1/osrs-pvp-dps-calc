@@ -33,10 +33,15 @@ const InitialLoad: React.FC = observer(() => {
         } catch (e) {
           // If state couldn't be loaded (or there wasn't any), then try to load the username and lookup stats, at least
           try {
-            const username = await localforage.getItem('dps-calc-username');
-            store.updateUIState({ username: username as string });
-            if (username) {
-              store.fetchCurrentPlayerSkills();
+            // Load saved usernames for both panels (attacker + defender)
+            const attackerUsername = await localforage.getItem<string>('dps-calc-username-attacker');
+            if (attackerUsername) {
+              await store.fetchCurrentPlayerSkills(attackerUsername, 'attacker');
+            }
+
+            const defenderUsername = await localforage.getItem<string>('dps-calc-username-defender');
+            if (defenderUsername) {
+              await store.fetchCurrentPlayerSkills(defenderUsername, 'defender');
             }
           } catch (e2) { /* do nothing */ }
         }

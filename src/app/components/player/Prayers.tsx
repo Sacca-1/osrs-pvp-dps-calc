@@ -2,11 +2,14 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { Prayer, SortedPrayers } from '@/enums/Prayer';
 import { useStore } from '@/state';
+import { useSide } from '@/sideContext';
 import GridItem from '@/app/components/generic/GridItem';
 
 const Prayers: React.FC = observer(() => {
   const store = useStore();
-  const { prayers } = store.player;
+  const side = useSide();
+  const player = side === 'attacker' ? store.attackerLoadouts[store.selectedAttacker] : store.defenderLoadouts[store.selectedDefender];
+  const { prayers } = player;
 
   return (
     <div className="px-4 mb-8">
@@ -19,7 +22,7 @@ const Prayers: React.FC = observer(() => {
               name={v.name}
               image={v.image}
               active={prayers.includes(parseInt(k))}
-              onClick={(p: Prayer) => store.togglePlayerPrayer(p)}
+              onClick={(p: Prayer) => store.togglePlayerPrayer(p, side)}
             />
           ))
         }

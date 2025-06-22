@@ -3,6 +3,7 @@ import Image, { StaticImageData } from 'next/image';
 import React, { useId } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@/state';
+import { useSide } from '@/sideContext';
 import NumberInput from '@/app/components/generic/NumberInput';
 
 interface SkillInputProps {
@@ -13,9 +14,12 @@ interface SkillInputProps {
 
 const SkillInput: React.FC<SkillInputProps> = observer((props) => {
   const store = useStore();
-  const { player } = store;
+  const side = useSide();
+  const player = side === 'attacker' ? store.attackerLoadouts[store.selectedAttacker] : store.defenderLoadouts[store.selectedDefender];
   const { name, field, image } = props;
   const id = useId();
+
+  const currentLevel = (player.skills[field] ?? 0) + (player.boosts[field] ?? 0);
 
   return (
     <>
@@ -33,20 +37,22 @@ const SkillInput: React.FC<SkillInputProps> = observer((props) => {
                 min={1}
                 max={255}
                 title={`Your current ${name} level`}
-                value={player.skills[field] + player.boosts[field]}
+                value={currentLevel}
                 onChange={(v) => {
-                  store.updatePlayer({
-                    boosts: {
-                      [field]: v - player.skills[field],
-                    },
-                  });
+                  if (!Number.isNaN(v)) {
+                    store.updatePlayer({
+                      boosts: {
+                        [field]: v - (player.skills[field] ?? 0),
+                      },
+                    }, undefined, side);
+                  }
                 }}
               />
               /
             </div>
           ) : (
             <span title={`Your current ${name} level`}>
-              {player.skills[field] + player.boosts[field]}
+              {currentLevel}
               /
             </span>
           )}
@@ -65,7 +71,7 @@ const SkillInput: React.FC<SkillInputProps> = observer((props) => {
                 skills: {
                   [field]: v,
                 },
-              });
+              }, undefined, side);
             }}
           />
         </div>

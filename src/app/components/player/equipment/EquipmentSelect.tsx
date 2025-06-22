@@ -36,7 +36,9 @@ const DARTS: EquipmentPiece[] = [
   findDart('Amethyst dart'),
 ].filter(isDefined);
 
-const EquipmentSelect: React.FC = observer(() => {
+interface EquipmentSelectProps { side: 'attacker' | 'defender' }
+
+const EquipmentSelect: React.FC<EquipmentSelectProps> = observer(({ side }) => {
   const store = useStore();
 
   const options: EquipmentOption[] = useMemo(() => {
@@ -109,7 +111,7 @@ const EquipmentSelect: React.FC = observer(() => {
             equipment: {
               [item.equipment.slot]: item.equipment,
             },
-          });
+          }, undefined, side);
         }
       }}
       CustomItemComponent={({ item, itemString }) => (

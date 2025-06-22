@@ -19,6 +19,9 @@ import Augury from '@/public/img/prayers/Augury.png';
 import ThickSkin from '@/public/img/prayers/Thick Skin.png';
 import RockSkin from '@/public/img/prayers/Rock Skin.png';
 import SteelSkin from '@/public/img/prayers/Steel Skin.png';
+import ProtectMagic from '@/public/img/prayers/Protect_from_Magic.png';
+import ProtectMelee from '@/public/img/prayers/Protect_from_Melee.png';
+import ProtectRanged from '@/public/img/prayers/Protect_from_Missiles.png';
 // import ProtectMagic from '@/public/img/prayers/Protect_from_Magic.png';
 // import ProtectMelee from '@/public/img/prayers/Protect_from_Melee.png';
 // import ProtectRanged from '@/public/img/prayers/Protect_from_Missiles.png';
@@ -50,6 +53,9 @@ export enum Prayer {
   STEEL_SKIN = 18,
   DEADEYE = 19,
   MYSTIC_VIGOUR = 20,
+  PROTECT_MAGIC = 21,
+  PROTECT_MISSILES = 22,
+  PROTECT_MELEE = 23,
   // PROTECT_MAGIC,
   // PROTECT_RANGED,
   // PROTECT_MELEE,
@@ -78,6 +84,7 @@ export const ARM_PRAYERS: Prayer[] = [
 ];
 
 export const OVERHEAD_PRAYERS: Prayer[] = [
+  Prayer.PROTECT_MAGIC, Prayer.PROTECT_MISSILES, Prayer.PROTECT_MELEE,
   // Prayer.PROTECT_MAGIC, Prayer.PROTECT_RANGED, Prayer.PROTECT_MELEE,
   // Prayer.RETRIBUTION, Prayer.REDEMPTION, Prayer.SMITE,
 ];
@@ -277,15 +284,32 @@ export const PrayerMap: { [k in Prayer]: PrayerData } = {
     factorDefence: [105, 100],
   },
   [Prayer.MYSTIC_VIGOUR]: {
-    renderOrder: 16,
+    renderOrder: 21,
     name: 'Mystic Vigour',
     image: MysticVigour,
-    drainRate: 12,
+    drainRate: 24,
     combatStyle: 'magic',
-    magicDamageBonus: 30,
-    factorAccuracy: [118, 100],
-    factorDefenceMagic: [118, 100],
-    factorDefence: [105, 100],
+    magicDamageBonus: 50,
+    factorAccuracy: [125, 100],
+    factorDefenceMagic: [125, 100],
+  },
+  [Prayer.PROTECT_MAGIC]: {
+    renderOrder: 90,
+    name: 'Protect from Magic',
+    image: ProtectMagic,
+    drainRate: 20,
+  },
+  [Prayer.PROTECT_MISSILES]: {
+    renderOrder: 91,
+    name: 'Protect from Missiles',
+    image: ProtectRanged,
+    drainRate: 20,
+  },
+  [Prayer.PROTECT_MELEE]: {
+    renderOrder: 92,
+    name: 'Protect from Melee',
+    image: ProtectMelee,
+    drainRate: 20,
   },
   // [Prayer.PROTECT_MAGIC]: {
   //   name: 'Protect from Magic',

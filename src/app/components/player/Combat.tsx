@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@/state';
+import { useSide } from '@/sideContext';
 import React, { useMemo } from 'react';
 import CombatStyle from '@/app/components/player/combat/CombatStyle';
 import SpellSelect from '@/app/components/player/combat/SpellSelect';
@@ -8,15 +9,23 @@ import SpellContainer from '@/app/components/player/combat/SpellContainer';
 import UserIssueWarning from '@/app/components/generic/UserIssueWarning';
 import { canUseSunfireRunes } from '@/types/Spell';
 import sunfire_rune from '@/public/img/misc/sunfire_rune.webp';
+import { getCombatStylesForCategory } from '@/utils';
+import { EquipmentCategory } from '@/enums/EquipmentCategory';
 
 const Combat: React.FC = observer(() => {
   const store = useStore();
-  const { spell, buffs, style } = store.player;
+  const side = useSide();
+  const player = side === 'attacker' ? store.attackerLoadouts[store.selectedAttacker] : store.defenderLoadouts[store.selectedDefender];
+  const { spell, buffs, style } = player;
   // eslint-disable-next-line react/no-array-index-key
-  const styles = useMemo(() => store.availableCombatStyles.map((s, i) => <CombatStyle key={i} style={s} />), [store.availableCombatStyles]);
+  const styles = useMemo(() => {
+    const cat = player.equipment.weapon?.category || EquipmentCategory.NONE;
+    return getCombatStylesForCategory(cat).map((s, i) => <CombatStyle key={i} style={s} />);
+  }, [player.equipment.weapon?.category]);
 
   // Determine whether there's any issues with spells
-  const spellIssues = useMemo(() => store.userIssues.filter((i) => i.type.startsWith('spell_') && i.loadout === `${store.selectedLoadout + 1}`), [store.userIssues, store.selectedLoadout]);
+  const spellIssues = useMemo(() => store.userIssues.filter((i) => i.type.startsWith('spell_')
+    && i.loadout === `${side === 'attacker' ? store.selectedAttacker + 1 : store.selectedDefender + 1}`), [store.userIssues, store.selectedAttacker, store.selectedDefender, side]);
 
   return (
     <div>
@@ -44,7 +53,7 @@ const Combat: React.FC = observer(() => {
                   <Toggle
                     checked={buffs.usingSunfireRunes}
                     setChecked={(v) => {
-                      store.updatePlayer({ buffs: { usingSunfireRunes: v } });
+                      store.updatePlayer({ buffs: { usingSunfireRunes: v } }, undefined, side);
                     }}
                     label={(
                       <>
@@ -69,7 +78,7 @@ const Combat: React.FC = observer(() => {
                   <Toggle
                     checked={buffs.chargeSpell}
                     setChecked={(v) => {
-                      store.updatePlayer({ buffs: { chargeSpell: v } });
+                      store.updatePlayer({ buffs: { chargeSpell: v } }, undefined, side);
                     }}
                     label="Using the Charge spell"
                   />
@@ -80,7 +89,7 @@ const Combat: React.FC = observer(() => {
                   <Toggle
                     checked={buffs.markOfDarknessSpell}
                     setChecked={(v) => {
-                      store.updatePlayer({ buffs: { markOfDarknessSpell: v } });
+                      store.updatePlayer({ buffs: { markOfDarknessSpell: v } }, undefined, side);
                     }}
                     label="Using Mark of Darkness"
                   />

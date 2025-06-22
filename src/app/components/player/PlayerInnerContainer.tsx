@@ -10,10 +10,13 @@ import Combat from './Combat';
 import Skills from './Skills';
 import Prayers from './Prayers';
 import ExtraOptions from './ExtraOptions';
+import { SideContext } from '@/sideContext';
 
 type SelectedInputType = 'combat' | 'skills' | 'equipment' | 'options' | 'prayer' | 'league';
 
-const PlayerInnerContainer: React.FC = () => {
+interface PlayerInnerContainerProps { side: 'attacker' | 'defender' }
+
+const PlayerInnerContainer: React.FC<PlayerInnerContainerProps> = ({ side }) => {
   const [selected, setSelected] = useState<SelectedInputType>('equipment');
 
   const renderSelected = () => {
@@ -23,7 +26,7 @@ const PlayerInnerContainer: React.FC = () => {
       case 'skills':
         return <Skills />;
       case 'equipment':
-        return <Equipment />;
+        return <Equipment side={side} />;
       case 'prayer':
         return <Prayers />;
       case 'options':
@@ -36,6 +39,7 @@ const PlayerInnerContainer: React.FC = () => {
   };
 
   return (
+    <SideContext.Provider value={side}>
     <div className="grow flex flex-col">
       <div className="flex justify-center text-center items-center bg-body-100 dark:bg-dark-400 dark:border-dark-200 px-4 py-[1.25em] gap-1 border-b border-body-400">
         <PlayerTab name="Combat" isActive={selected === 'combat'} image={combat} onClick={() => setSelected('combat')} />
@@ -46,6 +50,7 @@ const PlayerInnerContainer: React.FC = () => {
       </div>
       {renderSelected()}
     </div>
+    </SideContext.Provider>
   );
 };
 

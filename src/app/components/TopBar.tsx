@@ -23,6 +23,19 @@ const TopBar: React.FC = observer(() => {
             >
               Beta
             </span>
+            {/* Mode toggle */}
+            <div className="ml-2 flex rounded overflow-hidden border border-white/30">
+              {(['pvm', 'pvp'] as const).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  className={`text-xs font-semibold px-2 py-0.5 transition-colors ${store.prefs.calcMode === m ? 'bg-white/90 text-black' : 'bg-body-100/20 hover:bg-body-100/40 text-white'} dark:${store.prefs.calcMode === m ? 'bg-dark-100 text-black' : 'bg-dark-300/40 hover:bg-dark-300/60'}`}
+                  onClick={() => store.updatePreferences({ calcMode: m })}
+                >
+                  {m.toUpperCase()}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="block ml-6">
             <div className="flex text-body-200 text-xs font-medium space-x-2">

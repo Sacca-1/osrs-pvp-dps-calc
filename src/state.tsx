@@ -51,6 +51,8 @@ import {
 } from './enums/Prayer';
 import Potion from './enums/Potion';
 import { startPollingForRuneLite, WikiSyncer } from './wikisync/WikiSyncer';
+import { sum, max } from 'd3-array';
+import PlayerVsPlayerCalc from '@/lib/PlayerVsPlayerCalc';
 
 const EMPTY_CALC_LOADOUT = {} as CalculatedLoadout;
 
@@ -97,6 +99,7 @@ export const generateEmptyPlayer = (name?: string): Player => ({
     herblore: 0,
   },
   equipment: generateInitialEquipment(),
+  overheadPrayer: null,
   attackSpeed: DEFAULT_ATTACK_SPEED,
   prayers: [],
   bonuses: {
@@ -210,11 +213,19 @@ class GlobalState implements State {
     inputs: { ...INITIAL_MONSTER_INPUTS },
   };
 
-  loadouts: Player[] = [
-    generateEmptyPlayer(),
+  attackerLoadouts: Player[] = [
+    generateEmptyPlayer('Attacker 1'),
   ];
 
-  selectedLoadout = 0;
+  defenderLoadouts: Player[] = [
+    generateEmptyPlayer('Defender 1'),
+  ];
+
+  // Attacker tab index
+  selectedAttacker = 0;
+
+  // Defender tab index
+  selectedDefender = 0;
 
   ui: UI = {
     showPreferencesModal: false,
@@ -233,6 +244,7 @@ class GlobalState implements State {
     hitDistsHideZeros: false,
     hitDistShowSpec: false,
     resultsExpanded: false,
+    calcMode: 'pvp',
   };
 
   calc: Calculator = {
@@ -269,6 +281,13 @@ class GlobalState implements State {
   wikisync: Map<number, WikiSyncer> = new Map();
 
   private storageUpdater?: IReactionDisposer;
+
+  /**
+   * Which side (attacker or defender) should be affected by user interactions coming from the UI.
+   * Set by Player/Defender containers on mouse-enter so that all child components automatically
+   * act on the correct loadout without needing to thread a `side` prop through every component.
+   */
+  activeSide: 'attacker' | 'defender' = 'attacker';
 
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
@@ -338,7 +357,11 @@ class GlobalState implements State {
    * Get the currently selected player (loadout)
    */
   get player() {
-    return this.loadouts[this.selectedLoadout];
+    return this.attackerLoadouts[this.selectedAttacker];
+  }
+
+  get defender() {
+    return this.defenderLoadouts[this.selectedDefender];
   }
 
   /**
@@ -412,17 +435,18 @@ class GlobalState implements State {
     this.calcWorker = worker;
   }
 
-  updateEquipmentBonuses(loadoutIx?: number) {
-    loadoutIx = loadoutIx !== undefined ? loadoutIx : this.selectedLoadout;
+  updateEquipmentBonuses(loadoutIx?: number, side: 'attacker' | 'defender' = this.activeSide) {
+    const list = side === 'attacker' ? this.attackerLoadouts : this.defenderLoadouts;
+    loadoutIx = loadoutIx !== undefined ? loadoutIx : (side === 'attacker' ? this.selectedAttacker : this.selectedDefender);
 
-    this.loadouts[loadoutIx] = merge(
-      this.loadouts[loadoutIx],
-      calculateEquipmentBonusesFromGear(this.loadouts[loadoutIx], this.monster),
+    list[loadoutIx] = merge(
+      list[loadoutIx],
+      calculateEquipmentBonusesFromGear(list[loadoutIx], this.monster),
     );
   }
 
   recalculateEquipmentBonusesFromGearAll() {
-    this.loadouts.forEach((_, i) => this.updateEquipmentBonuses(i));
+    this.attackerLoadouts.forEach((_, i) => this.updateEquipmentBonuses(i));
   }
 
   updateUIState(ui: PartialDeep<UI>) {
@@ -545,12 +569,12 @@ class GlobalState implements State {
 
     // manually recompute equipment in case their metadata has changed since the shortlink was created
     loadouts.forEach((p, ix) => {
-      if (this.loadouts[ix] === undefined) this.loadouts.push(generateEmptyPlayer());
+      if (this.attackerLoadouts[ix] === undefined) this.attackerLoadouts.push(generateEmptyPlayer());
       this.updatePlayer(p, ix);
     });
     this.recalculateEquipmentBonusesFromGearAll();
 
-    this.selectedLoadout = data.selectedLoadout || 0;
+    this.selectedAttacker = data.selectedLoadout || 0;
   }
 
   loadPreferences() {
@@ -562,8 +586,8 @@ class GlobalState implements State {
     });
   }
 
-  async fetchCurrentPlayerSkills() {
-    const { username } = this.ui;
+  async fetchCurrentPlayerSkills(usernameOverride?: string, side: 'attacker' | 'defender' = this.activeSide) {
+    const username = usernameOverride ?? this.ui.username;
 
     try {
       const res = await toast.promise(
@@ -578,7 +602,7 @@ class GlobalState implements State {
         },
       );
 
-      if (res) this.updatePlayer({ skills: res });
+      if (res) this.updatePlayer({ skills: res }, undefined, side);
     } catch (e) {
       console.error(e);
     }
@@ -606,27 +630,46 @@ class GlobalState implements State {
    * Toggle a potion, with logic to remove from or add to the potions array depending on if it is already in there.
    * @param potion
    */
-  togglePlayerPotion(potion: Potion) {
-    const isToggled = this.player.buffs.potions.includes(potion);
+  togglePlayerPotion(potion: Potion, side: 'attacker' | 'defender' = this.activeSide) {
+    const list = side === 'attacker' ? this.attackerLoadouts : this.defenderLoadouts;
+    const tgt = list[side === 'attacker' ? this.selectedAttacker : this.selectedDefender];
+
+    const isToggled = tgt.buffs.potions.includes(potion);
     if (isToggled) {
-      this.player.buffs.potions = this.player.buffs.potions.filter((p) => p !== potion);
+      tgt.buffs.potions = tgt.buffs.potions.filter((p) => p !== potion);
     } else {
-      this.player.buffs.potions = [...this.player.buffs.potions, potion];
+      tgt.buffs.potions = [...tgt.buffs.potions, potion];
     }
+
+    // Recompute boosts for this loadout
+    const boosts: Partial<PlayerSkills> = {
+      atk: 0, def: 0, magic: 0, prayer: 0, ranged: 0, str: 0, mining: 0, herblore: 0,
+    };
+    for (const p of tgt.buffs.potions) {
+      const result = PotionMap[p].calculateFn(tgt.skills);
+      for (const k of Object.keys(result) as (keyof PlayerSkills)[]) {
+        boosts[k] = Math.max(boosts[k] ?? 0, result[k] ?? 0);
+      }
+    }
+
+    tgt.boosts = { ...tgt.boosts, ...boosts } as PlayerSkills;
   }
 
   /**
    * Toggle a prayer, with logic to remove from or add to the prayers array depending on if it is already in there.
    * @param prayer
    */
-  togglePlayerPrayer(prayer: Prayer) {
-    const isToggled = this.player.prayers.includes(prayer);
+  togglePlayerPrayer(prayer: Prayer, side: 'attacker' | 'defender' = this.activeSide) {
+    const list = side === 'attacker' ? this.attackerLoadouts : this.defenderLoadouts;
+    const tgt = list[side === 'attacker' ? this.selectedAttacker : this.selectedDefender];
+
+    const isToggled = tgt.prayers.includes(prayer);
     if (isToggled) {
       // If we're toggling off an existing prayer, just filter it out from the array
-      this.player.prayers = this.player.prayers.filter((p) => p !== prayer);
+      tgt.prayers = tgt.prayers.filter((p) => p !== prayer);
     } else {
       // If we're toggling on a new prayer, let's do some checks to ensure that some prayers cannot be enabled alongside it
-      let newPrayers = [...this.player.prayers];
+      let newPrayers = [...tgt.prayers];
 
       // If this is a defensive prayer, disable all other defensive prayers
       if (DEFENSIVE_PRAYERS.includes(prayer)) newPrayers = newPrayers.filter((p) => !DEFENSIVE_PRAYERS.includes(p));
@@ -646,7 +689,7 @@ class GlobalState implements State {
         });
       }
 
-      this.player.prayers = [...newPrayers, prayer];
+      tgt.prayers = [...newPrayers, prayer];
     }
   }
 
@@ -668,12 +711,16 @@ class GlobalState implements State {
    * @param player
    * @param loadoutIx Which loadout to update. Defaults to the current selected loadout.
    */
-  updatePlayer(player: PartialDeep<Player>, loadoutIx?: number) {
-    loadoutIx = loadoutIx !== undefined ? loadoutIx : this.selectedLoadout;
+  updatePlayer(player: PartialDeep<Player>, loadoutIx?: number, side?: 'attacker' | 'defender') {
+    side = side || this.activeSide;
+
+    const list = side === 'attacker' ? this.attackerLoadouts : this.defenderLoadouts;
+
+    loadoutIx = loadoutIx !== undefined ? loadoutIx : (side === 'attacker' ? this.selectedAttacker : this.selectedDefender);
 
     const eq = player.equipment;
     if (eq && (Object.hasOwn(eq, 'weapon') || Object.hasOwn(eq, 'shield'))) {
-      const currentWeapon = this.loadouts[loadoutIx].equipment.weapon;
+      const currentWeapon = list[loadoutIx].equipment.weapon;
       const newWeapon = player.equipment?.weapon;
 
       if (newWeapon !== undefined) {
@@ -693,7 +740,7 @@ class GlobalState implements State {
         }
       }
 
-      const currentShield = this.loadouts[loadoutIx].equipment.shield;
+      const currentShield = list[loadoutIx].equipment.shield;
       const newShield = player.equipment?.shield;
 
       // Special handling for if a shield is equipped, and we're using a two-handed weapon
@@ -706,9 +753,11 @@ class GlobalState implements State {
       }
     }
 
-    this.loadouts[loadoutIx] = merge(this.loadouts[loadoutIx], player);
+    list[loadoutIx] = merge(list[loadoutIx], player);
     if (!this.prefs.manualMode) {
-      this.updateEquipmentBonuses(loadoutIx);
+      // Recalculate equipment bonuses for whichever side was updated
+      const updatedBonuses = calculateEquipmentBonusesFromGear(list[loadoutIx], this.monster);
+      list[loadoutIx] = merge(list[loadoutIx], updatedBonuses);
     }
   }
 
@@ -745,34 +794,42 @@ class GlobalState implements State {
    * Clear an equipment slot, removing the item that was inside of it.
    * @param slot
    */
-  clearEquipmentSlot(slot: keyof PlayerEquipment) {
+  clearEquipmentSlot(slot: keyof PlayerEquipment, side: 'attacker' | 'defender' = this.activeSide) {
     this.updatePlayer({
       equipment: {
         [slot]: null,
       },
-    });
+    }, undefined, side);
   }
 
   setSelectedLoadout(ix: number) {
-    this.selectedLoadout = ix;
+    this.selectedAttacker = ix;
   }
 
-  deleteLoadout(ix: number) {
-    if (this.loadouts.length === 1) {
-      // If there is only one loadout, clear it instead of deleting it
-      this.loadouts[0] = generateEmptyPlayer();
+  setSelectedDefender(ix: number) {
+    this.selectedDefender = ix;
+  }
+
+  deleteLoadout(ix: number, side: 'attacker' | 'defender' = 'attacker') {
+    const list = side === 'attacker' ? this.attackerLoadouts : this.defenderLoadouts;
+    if (list.length === 1) {
+      list[0] = generateEmptyPlayer();
       return;
     }
 
-    this.loadouts = this.loadouts.filter((p, i) => i !== ix);
-    // If the selected loadout index is equal to or over the index we just remove, shift it down by one, else add one
-    if ((this.selectedLoadout >= ix) && ix !== 0) {
-      this.selectedLoadout -= 1;
+    const newList = list.filter((_, i) => i !== ix);
+    if (side === 'attacker') this.attackerLoadouts = newList;
+    else this.defenderLoadouts = newList;
+
+    if (side === 'attacker') {
+      if ((this.selectedAttacker >= ix) && ix !== 0) this.selectedAttacker -= 1;
+    } else if ((this.selectedDefender >= ix) && ix !== 0) {
+      this.selectedDefender -= 1;
     }
   }
 
-  renameLoadout(ix: number, name: string) {
-    const loadout = this.loadouts[ix];
+  renameLoadout(ix: number, name: string, side: 'attacker' | 'defender' = 'attacker') {
+    const loadout = (side === 'attacker' ? this.attackerLoadouts[ix] : this.defenderLoadouts[ix]);
 
     const trimmedName = name.trim();
     if (loadout) {
@@ -782,21 +839,41 @@ class GlobalState implements State {
         loadout.name = `Loadout ${ix + 1}`;
       }
     }
+
+    if (side === 'attacker') {
+      this.attackerLoadouts[ix] = {
+        ...loadout,
+        name: trimmedName,
+      };
+    } else {
+      this.defenderLoadouts[ix] = {
+        ...loadout,
+        name: trimmedName,
+      };
+    }
   }
 
   get canCreateLoadout() {
-    return this.loadouts.length < NUMBER_OF_LOADOUTS;
+    return this.attackerLoadouts.length < NUMBER_OF_LOADOUTS;
   }
 
-  createLoadout(selected?: boolean, cloneIndex?: number) {
-    // Do not allow creating a loadout if we're over the limit
-    if (!this.canCreateLoadout) return;
+  createLoadout(selected?: boolean, cloneIndex?: number, side: 'attacker' | 'defender' = 'attacker') {
+    const list = side === 'attacker' ? this.attackerLoadouts : this.defenderLoadouts;
+    if (list.length >= NUMBER_OF_LOADOUTS) return;
 
-    const newLoadout = (cloneIndex !== undefined) ? toJS(this.loadouts[cloneIndex]) : generateEmptyPlayer();
-    newLoadout.name = `Loadout ${this.loadouts.length + 1}`;
+    const indexToClone = cloneIndex ?? 0;
+    const deepClone = JSON.parse(JSON.stringify(list[indexToClone])) as Player;
+    list.push({
+      ...deepClone,
+      name: `${side === 'attacker' ? 'Attacker' : 'Defender'} ${list.length + 1}`,
+    });
 
-    this.loadouts.push(newLoadout);
-    if (selected) this.selectedLoadout = (this.loadouts.length - 1);
+    this.recalculateEquipmentBonusesFromGearAll();
+
+    if (selected) {
+      if (side === 'attacker') this.setSelectedLoadout(list.length - 1);
+      else this.selectedDefender = list.length - 1;
+    }
   }
 
   async doWorkerRecompute() {
@@ -807,11 +884,11 @@ class GlobalState implements State {
 
     // clear existing loadout data
     const calculatedLoadouts: CalculatedLoadout[] = [];
-    this.loadouts.forEach(() => calculatedLoadouts.push(EMPTY_CALC_LOADOUT));
+    this.attackerLoadouts.forEach(() => calculatedLoadouts.push(EMPTY_CALC_LOADOUT));
     this.calc.loadouts = calculatedLoadouts;
 
     const data: Extract<ComputeBasicRequest['data'], ComputeReverseRequest['data']> = {
-      loadouts: toJS(this.loadouts),
+      loadouts: toJS(this.attackerLoadouts),
       monster: toJS(this.monster),
       calcOpts: {
         hitDistHideMisses: this.prefs.hitDistsHideZeros,
@@ -852,6 +929,38 @@ class GlobalState implements State {
     }
 
     await Promise.all(promises);
+  }
+
+  get pvpCalc() {
+    if (this.attackerLoadouts.length === 0 || this.defenderLoadouts.length === 0) return null;
+    const attacker = this.attackerLoadouts[this.selectedAttacker];
+    const defender = this.defenderLoadouts[this.selectedDefender];
+    const calc = new PlayerVsPlayerCalc(attacker, defender, { detailedOutput: false, mode: 'pvp' });
+    const reverse = new PlayerVsPlayerCalc(defender, attacker, { detailedOutput: false, mode: 'pvp' });
+    return {
+      attackerDps: calc.getDps?.() ?? 0,
+      defenderDps: reverse.getDps?.() ?? 0,
+      calc,
+      reverse,
+    };
+  }
+
+  get isPvpMode() {
+    return this.prefs.calcMode === 'pvp';
+  }
+
+  get loadouts() {
+    // Temporary alias for backward compatibility; maps to attacker loadouts in PvP mode
+    return this.attackerLoadouts;
+  }
+
+  // Backwards-compatibility alias. Many existing components still reference `selectedLoadout`.
+  get selectedLoadout() {
+    return this.selectedAttacker;
+  }
+
+  setActiveSide(side: 'attacker' | 'defender') {
+    this.activeSide = side;
   }
 }
 
