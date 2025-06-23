@@ -1,8 +1,6 @@
 import Select from '@/app/components/generic/Select';
-import React, { useCallback, useState } from 'react';
-import EquipmentPreset from '@/enums/EquipmentPreset';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from '@/state';
-import { PartialDeep } from 'type-fest';
 import { Player } from '@/types/Player';
 import { availableEquipment } from '@/lib/Equipment';
 import { EquipmentCategory } from '@/enums/EquipmentCategory';
@@ -13,62 +11,119 @@ interface EquipmentPresetsProps { side: 'attacker' | 'defender' }
 const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
   const store = useStore();
 
-  type PresetCategory = 'pure' | 'zerk' | 'medMax';
+  type TierCategory = 'pure' | 'zerk' | 'medMax';
+  type StyleCategory = 'melee' | 'ranged' | 'magic' | 'spec' | 'tank';
 
-  const [category, setCategory] = useState<PresetCategory | 'all'>('all');
+  const [tier, setTier] = useState<TierCategory | 'all'>('all');
+  const [style, setStyle] = useState<StyleCategory | 'all'>('all');
 
-  const basePresets = [
-    {
-      label: 'Eclipse Atlatl',
-      value: EquipmentPreset.ECLIPSE_ATLATL,
-      tags: ['medMax'] as PresetCategory[],
-      attackerOnly: true,
-    },
-  ];
+  interface RawPreset {
+    label: string;
+    tierTags: TierCategory[];
+    style: StyleCategory;
+    attackerOnly?: boolean;
+    defenderOnly?: boolean;
+    equipment: Record<string, number>; // slot -> id
+  }
 
-  const presets = basePresets.filter((p) => !(p.attackerOnly && side !== 'attacker'));
+  const [parsedPresets, setParsedPresets] = useState<RawPreset[]>([]);
 
-  const filteredPresets = presets.filter((p) => category === 'all' || p.tags.includes(category));
+  // Fetch and parse presets text once on mount
+  useEffect(() => {
+    const fetchPresets = async () => {
+      try {
+        const resp = await fetch('/gearpresets.txt');
+        if (!resp.ok) throw new Error('Failed fetching presets');
+        const txt = await resp.text();
+
+        const presets: RawPreset[] = [];
+        const blocks = txt.split(/\n\n+/);
+        for (const block of blocks) {
+          const lines = block.trim().split(/\n/);
+          if (lines.length === 0) continue;
+
+          const header = lines[0];
+          const headerMatch = /^(.*?) \((.*?)\)(?: \((.*?)\))?/.exec(header);
+          if (!headerMatch) continue;
+          const label = headerMatch[1].trim();
+          const tierStr = headerMatch[2]?.toLowerCase() ?? '';
+          const styleStr = (headerMatch[3]?.toLowerCase() ?? '') as StyleCategory;
+
+          const tierTags: TierCategory[] = [];
+          if (tierStr.includes('pure')) tierTags.push('pure');
+          if (tierStr.includes('zerk')) tierTags.push('zerk');
+          if (tierStr.includes('med') || tierStr.includes('max')) tierTags.push('medMax');
+
+          if (tierTags.length === 0) tierTags.push('medMax'); // default
+
+          const equipment: Record<string, number> = {};
+
+          // skip the Slot header row, start after first row containing "Slot"
+          const slotLines = lines.slice(lines.findIndex((l) => l.startsWith('Slot')) + 1);
+          for (const sl of slotLines) {
+            const [slotRaw, idRaw] = sl.split(/\s+/);
+            if (!slotRaw || !idRaw) continue;
+            equipment[slotRaw] = parseInt(idRaw, 10);
+          }
+
+          presets.push({ label, tierTags, style: styleStr || 'melee', equipment });
+        }
+
+        setParsedPresets(presets);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchPresets();
+  }, []);
+
+  // Map to Select options once equipment data loaded
+  const basePresets = useMemo(() => parsedPresets.map((p, idx) => ({
+    label: p.label,
+    value: idx, // index acts as value, we'll look up
+    tierTags: p.tierTags,
+    style: p.style,
+    attackerOnly: p.attackerOnly,
+    defenderOnly: p.defenderOnly,
+  })), [parsedPresets]);
+
+  const presets = basePresets.filter((p) => {
+    if (p.attackerOnly && side !== 'attacker') return false;
+    if (p.defenderOnly && side !== 'defender') return false;
+    return true;
+  });
+
+  const filteredPresets = presets.filter((p) => {
+    const tierOk = tier === 'all' || p.tierTags.includes(tier);
+    const styleOk = style === 'all' || p.style === style;
+    return tierOk && styleOk;
+  });
 
   // Build item list with a category selector header (non-selectable)
   type ItemType = typeof filteredPresets[number] | { header: true };
 
   const items: ItemType[] = [{ header: true, label: 'header' }, ...filteredPresets];
 
-  const onSelect = useCallback((v: { label?: string, value?: EquipmentPreset } | null | undefined) => {
+  const onSelect = useCallback((v: { label?: string, value?: number } | null | undefined) => {
     if (!v) return;
-    let newPlayer: Partial<Player> = {};
+    const idx = v.value as number;
+    const preset = parsedPresets[idx];
+    if (!preset) return;
 
-    const findItemById = (id: number) => availableEquipment.find((eq) => eq.id === id);
-
-    switch (v.value) {
-      case EquipmentPreset.ECLIPSE_ATLATL: {
-        newPlayer = {
-          name: v.label,
-          equipment: {
-            ammo: findItemById(28991) ?? null,
-            body: findItemById(29004) ?? null,
-            cape: findItemById(21295) ?? null,
-            feet: findItemById(29806) ?? null,
-            hands: findItemById(7462) ?? null,
-            head: findItemById(29010) ?? null,
-            legs: findItemById(29007) ?? null,
-            neck: findItemById(6585) ?? null,
-            ring: findItemById(25975) ?? null,
-            shield: null,
-            weapon: findItemById(29000) ?? null,
-          },
-        };
-        break;
-      }
-      default:
-        break;
+    const findItemById = (id: number) => availableEquipment.find((eq) => eq.id === id) ?? null;
+    const equipment: Partial<Player['equipment']> = {};
+    for (const [slot, id] of Object.entries(preset.equipment)) {
+      // @ts-ignore
+      equipment[slot] = findItemById(id);
     }
 
-    if (Object.keys(newPlayer).length > 0) {
-      store.updatePlayer(newPlayer, undefined, side);
-    }
-  }, [store, side]);
+    const newPlayer: Partial<Player> = {
+      name: preset.label,
+      equipment,
+    };
+
+    store.updatePlayer(newPlayer, undefined, side);
+  }, [store, side, parsedPresets]);
 
   return (
     <Select<any>
@@ -82,20 +137,37 @@ const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
         // @ts-ignore
         if (item.header) {
           return (
-            <div className="flex gap-1 text-xs">
-              {['all', 'pure', 'zerk', 'medMax'].map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  className={`px-2 py-0.5 rounded border ${category === c ? 'bg-btns-400 text-white' : 'bg-body-100 dark:bg-dark-300'}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCategory(c as any);
-                  }}
-                >
-                  {c === 'all' ? 'All' : (c === 'medMax' ? 'Med/Max' : c.charAt(0).toUpperCase() + c.slice(1))}
-                </button>
-              ))}
+            <div className="flex flex-col gap-1 text-xs">
+              <div className="flex gap-1">
+                {['all', 'pure', 'zerk', 'medMax'].map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    className={`px-2 py-0.5 rounded border ${tier === c ? 'bg-btns-400 text-white' : 'bg-body-100 dark:bg-dark-300'}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setTier(c as any);
+                    }}
+                  >
+                    {c === 'all' ? 'All' : (c === 'medMax' ? 'Med/Max' : c.charAt(0).toUpperCase() + c.slice(1))}
+                  </button>
+                ))}
+              </div>
+              <div className="flex gap-1">
+                {['all', 'melee', 'ranged', 'magic', 'spec', 'tank'].map((c) => (
+                  <button
+                    key={`style-${c}`}
+                    type="button"
+                    className={`px-2 py-0.5 rounded border ${style === c ? 'bg-btns-400 text-white' : 'bg-body-100 dark:bg-dark-300'}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setStyle(c as any);
+                    }}
+                  >
+                    {c === 'all' ? 'All' : c.charAt(0).toUpperCase() + c.slice(1)}
+                  </button>
+                ))}
+              </div>
             </div>
           );
         }
