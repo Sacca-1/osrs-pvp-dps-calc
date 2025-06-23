@@ -16,11 +16,11 @@ const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
   type PresetCategory = 'pure' | 'zerk' | 'medMax' | 'tank' | 'robes';
   type PresetStyle = 'ranged' | 'magic' | 'melee' | 'spec' | 'tank';
 
-  const defaultCategory: PresetCategory | 'all' = side === 'attacker' ? 'medMax' : 'tank';
+  const defaultCategory: PresetCategory | 'all' = 'medMax';
   const [category, setCategory] = useState<PresetCategory | 'all'>(defaultCategory);
 
-  // Style filter only used for attacker UI
-  const [style, setStyle] = useState<PresetStyle | 'all'>('all');
+  const defaultStyle: PresetStyle | 'all' = side === 'attacker' ? 'all' : 'tank';
+  const [style, setStyle] = useState<PresetStyle | 'all'>(defaultStyle);
 
   // Helper so we don't write "both" everywhere
   type SideFlag = 'attacker' | 'defender' | 'both';
@@ -217,9 +217,7 @@ const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
     }
   }, [store, side]);
 
-  const categories = side === 'attacker'
-    ? (['medMax', 'zerk', 'pure', 'all'] as const)
-    : (['tank', 'robes'] as const);
+  const categories = ['medMax', 'zerk', 'pure', 'all'] as const;
 
   return (
     <Select<any>
@@ -251,23 +249,21 @@ const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
                 ))}
               </div>
               {/* Style buttons (only attacker) */}
-              {side === 'attacker' && (
-                <div className="flex gap-1 mt-1">
-                  {['all','ranged','magic','melee','spec','tank'].map((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      className={`px-2 py-0.5 rounded border ${style === s ? 'bg-btns-400 text-white' : 'bg-body-100 dark:bg-dark-300'}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setStyle(s as any);
-                      }}
-                    >
-                      {s === 'all' ? 'All' : (s === 'magic' ? 'Robes' : s.charAt(0).toUpperCase() + s.slice(1))}
-                    </button>
-                  ))}
-                </div>
-              )}
+              <div className="flex gap-1 mt-1">
+                {(side === 'attacker' ? ['all','ranged','magic','melee','spec'] : ['tank','robes']).map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    className={`px-2 py-0.5 rounded border ${style === s ? 'bg-btns-400 text-white' : 'bg-body-100 dark:bg-dark-300'}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setStyle(s as any);
+                    }}
+                  >
+                    {s === 'all' ? 'All' : (s === 'magic' ? 'Robes' : s.charAt(0).toUpperCase() + s.slice(1))}
+                  </button>
+                ))}
+              </div>
             </div>
           );
         }
