@@ -250,7 +250,7 @@ const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
               </div>
               {/* Style buttons (only attacker) */}
               <div className="flex gap-1 mt-1">
-                {(side === 'attacker' ? ['all','ranged','magic','melee','spec'] : ['tank','robes']).map((s) => (
+                {(side === 'attacker' ? ['ranged','magic','melee','spec','all'] : ['tank','robes']).map((s) => (
                   <button
                     key={s}
                     type="button"
