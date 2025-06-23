@@ -19,7 +19,7 @@ const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
   const defaultCategory: PresetCategory | 'all' = 'medMax';
   const [category, setCategory] = useState<PresetCategory | 'all'>(defaultCategory);
 
-  const defaultStyle: PresetStyle | 'all' = side === 'attacker' ? 'all' : 'tank';
+  const defaultStyle: PresetStyle | 'all' = side === 'attacker' ? 'ranged' : 'tank';
   const [style, setStyle] = useState<PresetStyle | 'all'>(defaultStyle);
 
   // Helper so we don't write "both" everywhere
@@ -238,7 +238,7 @@ const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
                   <button
                     key={c}
                     type="button"
-                    className={`px-2 py-0.5 rounded border ${category === c ? 'bg-btns-400 text-white font-bold ring-2 ring-btns-400' : 'bg-body-100 dark:bg-dark-300'}`}
+                    className={`px-2 py-0.5 rounded border ${category === c ? 'bg-btns-500 text-white font-bold ring-2 ring-btns-500 ring-offset-2' : 'bg-body-100 dark:bg-dark-300'}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       setCategory(c as any);
@@ -254,7 +254,7 @@ const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
                   <button
                     key={s}
                     type="button"
-                    className={`px-2 py-0.5 rounded border ${style === s ? 'bg-btns-400 text-white font-bold ring-2 ring-btns-400' : 'bg-body-100 dark:bg-dark-300'}`}
+                    className={`px-2 py-0.5 rounded border ${style === s ? 'bg-btns-500 text-white font-bold ring-2 ring-btns-500 ring-offset-2' : 'bg-body-100 dark:bg-dark-300'}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       setStyle(s as any);
