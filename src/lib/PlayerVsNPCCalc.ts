@@ -159,7 +159,7 @@ export default class PlayerVsNPCCalc extends BaseCalc {
 
     let bonus: number;
     if (defenceStyle === 'ranged') {
-      const rangedType = getRangedDamageType(this.player.equipment.weapon!.category);
+      const rangedType = getRangedDamageType(this.player.equipment.weapon?.category || EquipmentCategory.UNARMED);
       bonus = rangedType === 'mixed'
         ? Math.trunc((this.monster.defensive.light + this.monster.defensive.standard + this.monster.defensive.heavy) / 3)
         : this.monster.defensive[rangedType];
