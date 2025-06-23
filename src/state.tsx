@@ -721,36 +721,27 @@ class GlobalState implements State {
     const eq = player.equipment;
     if (eq && (Object.hasOwn(eq, 'weapon') || Object.hasOwn(eq, 'shield'))) {
       const currentWeapon = list[loadoutIx].equipment.weapon;
-      const newWeapon = player.equipment?.weapon;
+      const newWeapon = player.equipment?.weapon !== undefined ? player.equipment.weapon : currentWeapon;
 
-      if (newWeapon !== undefined) {
+      // Reset combat style if weapon category actually changes
+      if (player.equipment?.weapon !== undefined) {
         const oldWeaponCat = currentWeapon?.category || EquipmentCategory.NONE;
-        const newWeaponCat = newWeapon?.category || EquipmentCategory.NONE;
-        if ((newWeaponCat !== undefined) && (newWeaponCat !== oldWeaponCat) && !player.style) {
-          // If the weapon slot category was changed, we should reset the player's selected combat style to the first one that exists.
+        const newWeaponCat = player.equipment.weapon?.category || EquipmentCategory.NONE;
+        if (newWeaponCat !== oldWeaponCat && !player.style) {
           const styles = getCombatStylesForCategory(newWeaponCat);
-          const rapid = styles.find((e) => e.stance === 'Rapid');
-          if (rapid !== undefined) {
-            player.style = rapid;
-          } else {
-            // Would perhaps be worth it to make a similar thing for looking up
-            // aggressive?
-            player.style = styles[0];
-          }
+          player.style = styles.find((s) => s.stance === 'Rapid') ?? styles[0];
         }
       }
 
-      const currentShield = list[loadoutIx].equipment.shield;
-      const newShield = player.equipment?.shield;
+      // After prospective merge, ensure we don't end up with 2h weapon + shield simultaneously
+      const prospective = { ...list[loadoutIx].equipment, ...player.equipment } as PlayerEquipment;
+      if (prospective.weapon?.isTwoHanded && prospective.shield) {
+        // Prefer keeping the weapon, drop shield
+        prospective.shield = null;
+      }
 
-      // Special handling for if a shield is equipped, and we're using a two-handed weapon
-      if (player.equipment?.shield && newShield !== undefined && currentWeapon?.isTwoHanded) {
-        player = { ...player, equipment: { ...player.equipment, weapon: null } };
-      }
-      // ...and vice-versa
-      if (player.equipment?.weapon && newWeapon?.isTwoHanded && currentShield?.name !== '') {
-        player = { ...player, equipment: { ...player.equipment, shield: null } };
-      }
+      // write back prospective equipment into patch
+      player.equipment = prospective;
     }
 
     list[loadoutIx] = merge(list[loadoutIx], player);
