@@ -39,14 +39,14 @@ const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
     { label: "DCB Barrows", value: EquipmentPreset.DCB_BARROWS, tags: ['medMax'], styles: ['ranged'], side: 'attacker' },
     { label: "RCB D'hide", value: EquipmentPreset.RCB_DHIDE, tags: ['medMax'], styles: ['ranged'], side: 'attacker' },
     { label: "Bowfa Crystal", value: EquipmentPreset.BOWFA_CRYSTAL, tags: ['medMax'], styles: ['ranged'], side: 'attacker' },
-    { label: "Virtus Ancients", value: EquipmentPreset.VIRTUS_ANCIENTS, tags: ['medMax'], styles: ['magic'], side: 'attacker' },
-    { label: "Ahrim's Ancients", value: EquipmentPreset.AHRIMS_ANCIENTS, tags: ['medMax'], styles: ['magic'], side: 'attacker' },
-    { label: "Bloodbark Ancients", value: EquipmentPreset.BLOODBARK_ANCIENTS, tags: ['medMax'], styles: ['magic'], side: 'attacker' },
-    { label: "Mystics Ancients", value: EquipmentPreset.MYSTICS_ANCIENTS, tags: ['medMax'], styles: ['magic'], side: 'attacker' },
-    { label: "Mystics Normals", value: EquipmentPreset.MYSTICS_NORMALS, tags: ['medMax'], styles: ['magic'], side: 'attacker' },
-    { label: "Bloodbark Normals", value: EquipmentPreset.BLOODBARK_NORMALS, tags: ['medMax'], styles: ['magic'], side: 'attacker' },
-    { label: "Ahrim's Normals", value: EquipmentPreset.AHRIMS_NORMALS, tags: ['medMax'], styles: ['magic'], side: 'attacker' },
-    { label: "Ancestral Normals", value: EquipmentPreset.ANCESTRAL_NORMALS, tags: ['medMax'], styles: ['magic'], side: 'attacker' },
+    { label: "Virtus Ancients", value: EquipmentPreset.VIRTUS_ANCIENTS, tags: ['medMax'], styles: ['magic'], side: 'both' },
+    { label: "Ahrim's Ancients", value: EquipmentPreset.AHRIMS_ANCIENTS, tags: ['medMax'], styles: ['magic'], side: 'both' },
+    { label: "Bloodbark Ancients", value: EquipmentPreset.BLOODBARK_ANCIENTS, tags: ['medMax'], styles: ['magic'], side: 'both' },
+    { label: "Mystics Ancients", value: EquipmentPreset.MYSTICS_ANCIENTS, tags: ['medMax'], styles: ['magic'], side: 'both' },
+    { label: "Mystics Normals", value: EquipmentPreset.MYSTICS_NORMALS, tags: ['medMax'], styles: ['magic'], side: 'both' },
+    { label: "Bloodbark Normals", value: EquipmentPreset.BLOODBARK_NORMALS, tags: ['medMax'], styles: ['magic'], side: 'both' },
+    { label: "Ahrim's Normals", value: EquipmentPreset.AHRIMS_NORMALS, tags: ['medMax'], styles: ['magic'], side: 'both' },
+    { label: "Ancestral Normals", value: EquipmentPreset.ANCESTRAL_NORMALS, tags: ['medMax'], styles: ['magic'], side: 'both' },
     { label: "Noxious Halberd", value: EquipmentPreset.NOXIOUS_HALBERD, tags: ['medMax'], styles: ['melee'], side: 'attacker' },
     { label: "Osmumten's Fang", value: EquipmentPreset.OSMUMTENS_FANG, tags: ['medMax'], styles: ['melee'], side: 'attacker' },
     { label: "Zombie Axe", value: EquipmentPreset.ZOMBIE_AXE, tags: ['medMax'], styles: ['melee'], side: 'attacker' },
@@ -233,24 +233,26 @@ const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
         // @ts-ignore
         if (item.header) {
           return (
-            <div className="flex gap-1 text-xs">
-              {/* Category buttons */}
-              {categories.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  className={`px-2 py-0.5 rounded border ${category === c ? 'bg-btns-400 text-white' : 'bg-body-100 dark:bg-dark-300'}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCategory(c as any);
-                  }}
-                >
-                  {c === 'all' ? 'All' : (c === 'medMax' ? 'Med/Max' : c.charAt(0).toUpperCase() + c.slice(1))}
-                </button>
-              ))}
+            <div className="flex flex-col gap-1 text-xs">
+              <div className="flex gap-1">
+                {/* Category buttons */}
+                {categories.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    className={`px-2 py-0.5 rounded border ${category === c ? 'bg-btns-400 text-white' : 'bg-body-100 dark:bg-dark-300'}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCategory(c as any);
+                    }}
+                  >
+                    {c === 'all' ? 'All' : (c === 'medMax' ? 'Med/Max' : c.charAt(0).toUpperCase() + c.slice(1))}
+                  </button>
+                ))}
+              </div>
               {/* Style buttons (only attacker) */}
               {side === 'attacker' && (
-                <div className="flex flex-wrap gap-1 mt-1">
+                <div className="flex gap-1 mt-1">
                   {['all','ranged','magic','melee','spec','tank'].map((s) => (
                     <button
                       key={s}
