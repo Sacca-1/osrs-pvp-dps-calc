@@ -729,7 +729,10 @@ class GlobalState implements State {
         const newWeaponCat = player.equipment.weapon?.category || EquipmentCategory.NONE;
         if (newWeaponCat !== oldWeaponCat && !player.style) {
           const styles = getCombatStylesForCategory(newWeaponCat);
-          player.style = styles.find((s) => s.stance === 'Rapid') ?? styles[0];
+          player.style =
+            styles.find((s) => s.stance === 'Aggressive')
+            ?? styles.find((s) => s.stance === 'Rapid')
+            ?? styles[0];
         }
       }
 
