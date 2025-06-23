@@ -64,20 +64,20 @@ const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
 
   const presets = basePresets.filter((p) => (p.side === 'both' || p.side === side));
 
-  const categoryFilterFn = () => {
-    if (side === 'attacker') {
-      return (p: PresetDef) => (category === 'all' || p.tags.includes(category));
-    }
-    // defender: category represents style 'tank' or 'robes'
-    if (category === 'tank') return (p: PresetDef) => p.styles.includes('tank');
-    if (category === 'robes') return (p: PresetDef) => p.styles.includes('magic');
-    return () => true;
-  };
-
   const filteredPresets = presets.filter((p) => {
-    if (!categoryFilterFn()(p)) return false;
-    if (side === 'attacker') return (style === 'all' || p.styles.includes(style));
-    return true; // defender doesn't use secondary style filter
+    // category pass
+    const catOk = category === 'all' || p.tags.includes(category as PresetCategory);
+
+    // style pass
+    let styleOk = true;
+    if (side === 'attacker') {
+      styleOk = style === 'all' || p.styles.includes(style as PresetStyle);
+    } else {
+      // defender: tank or robes filter
+      styleOk = (style === 'tank' && p.styles.includes('tank')) || (style === 'robes' && p.styles.includes('magic'));
+    }
+
+    return catOk && styleOk;
   });
 
   // Build item list with a category selector header (non-selectable)
@@ -238,7 +238,7 @@ const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
                   <button
                     key={c}
                     type="button"
-                    className={`px-2 py-0.5 rounded border ${category === c ? 'bg-btns-400 text-white' : 'bg-body-100 dark:bg-dark-300'}`}
+                    className={`px-2 py-0.5 rounded border ${category === c ? 'bg-btns-400 text-white font-bold ring-2 ring-btns-400' : 'bg-body-100 dark:bg-dark-300'}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       setCategory(c as any);
@@ -254,13 +254,21 @@ const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
                   <button
                     key={s}
                     type="button"
-                    className={`px-2 py-0.5 rounded border ${style === s ? 'bg-btns-400 text-white' : 'bg-body-100 dark:bg-dark-300'}`}
+                    className={`px-2 py-0.5 rounded border ${style === s ? 'bg-btns-400 text-white font-bold ring-2 ring-btns-400' : 'bg-body-100 dark:bg-dark-300'}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       setStyle(s as any);
                     }}
                   >
-                    {s === 'all' ? 'All' : (s === 'magic' ? 'Robes' : s.charAt(0).toUpperCase() + s.slice(1))}
+                    {(() => {
+                      if (s === 'all') return 'All';
+                      if (side === 'attacker') {
+                        return s.charAt(0).toUpperCase() + s.slice(1); // Magic shown as Magic
+                      }
+                      // defender: rename magic->Robes
+                      if (s === 'robes') return 'Robes';
+                      return s.charAt(0).toUpperCase() + s.slice(1);
+                    })()}
                   </button>
                 ))}
               </div>
