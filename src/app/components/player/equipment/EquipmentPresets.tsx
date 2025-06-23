@@ -13,10 +13,13 @@ interface EquipmentPresetsProps { side: 'attacker' | 'defender' }
 const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
   const store = useStore();
 
-  type PresetCategory = 'pure' | 'zerk' | 'medMax';
+  type PresetCategory = 'pure' | 'zerk' | 'medMax' | 'tank' | 'robes';
   type PresetStyle = 'ranged' | 'magic' | 'melee' | 'spec' | 'tank';
 
-  const [category, setCategory] = useState<PresetCategory | 'all'>('all');
+  const defaultCategory: PresetCategory | 'all' = side === 'attacker' ? 'medMax' : 'tank';
+  const [category, setCategory] = useState<PresetCategory | 'all'>(defaultCategory);
+
+  // Style filter only used for attacker UI
   const [style, setStyle] = useState<PresetStyle | 'all'>('all');
 
   // Helper so we don't write "both" everywhere
@@ -48,10 +51,10 @@ const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
     { label: "Osmumten's Fang", value: EquipmentPreset.OSMUMTENS_FANG, tags: ['medMax'], styles: ['melee'], side: 'attacker' },
     { label: "Zombie Axe", value: EquipmentPreset.ZOMBIE_AXE, tags: ['medMax'], styles: ['melee'], side: 'attacker' },
     { label: "Leaf-bladed Battleaxe", value: EquipmentPreset.LEAF_BLADED_BATTLEAXE, tags: ['medMax'], styles: ['melee'], side: 'attacker' },
-    { label: "Abyssal Dagger (Spec)", value: EquipmentPreset.ABYSSAL_DAGGER_SPEC, tags: ['medMax'], styles: ['spec'], side: 'attacker' },
-    { label: "Dragon Dagger (Spec)", value: EquipmentPreset.DRAGON_DAGGER_SPEC, tags: ['medMax'], styles: ['spec'], side: 'attacker' },
-    { label: "Voidwaker (Spec)", value: EquipmentPreset.VOIDWAKER_SPEC, tags: ['medMax'], styles: ['spec'], side: 'attacker' },
-    { label: "Armadyl Godsword (Spec)", value: EquipmentPreset.ARMADYL_GODSWORD_SPEC, tags: ['medMax'], styles: ['spec'], side: 'attacker' },
+    { label: "Abyssal Dagger", value: EquipmentPreset.ABYSSAL_DAGGER_SPEC, tags: ['medMax'], styles: ['spec'], side: 'attacker' },
+    { label: "Dragon Dagger", value: EquipmentPreset.DRAGON_DAGGER_SPEC, tags: ['medMax'], styles: ['spec'], side: 'attacker' },
+    { label: "Voidwaker", value: EquipmentPreset.VOIDWAKER_SPEC, tags: ['medMax'], styles: ['spec'], side: 'attacker' },
+    { label: "Armadyl Godsword", value: EquipmentPreset.ARMADYL_GODSWORD_SPEC, tags: ['medMax'], styles: ['spec'], side: 'attacker' },
     // --- Defender presets ---
     { label: "Karil's Tank", value: EquipmentPreset.KARILS_TANK, tags: ['medMax'], styles: ['tank'], side: 'defender' },
     { label: "Crystal Tank", value: EquipmentPreset.CRYSTAL_TANK, tags: ['medMax'], styles: ['tank'], side: 'defender' },
@@ -61,7 +64,21 @@ const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
 
   const presets = basePresets.filter((p) => (p.side === 'both' || p.side === side));
 
-  const filteredPresets = presets.filter((p) => (category === 'all' || p.tags.includes(category)) && (style === 'all' || p.styles.includes(style)));
+  const categoryFilterFn = () => {
+    if (side === 'attacker') {
+      return (p: PresetDef) => (category === 'all' || p.tags.includes(category));
+    }
+    // defender: category represents style 'tank' or 'robes'
+    if (category === 'tank') return (p: PresetDef) => p.styles.includes('tank');
+    if (category === 'robes') return (p: PresetDef) => p.styles.includes('magic');
+    return () => true;
+  };
+
+  const filteredPresets = presets.filter((p) => {
+    if (!categoryFilterFn()(p)) return false;
+    if (side === 'attacker') return (style === 'all' || p.styles.includes(style));
+    return true; // defender doesn't use secondary style filter
+  });
 
   // Build item list with a category selector header (non-selectable)
   type ItemType = typeof filteredPresets[number] | { header: true };
@@ -200,6 +217,10 @@ const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
     }
   }, [store, side]);
 
+  const categories = side === 'attacker'
+    ? (['medMax', 'zerk', 'pure', 'all'] as const)
+    : (['tank', 'robes'] as const);
+
   return (
     <Select<any>
       id="presets"
@@ -213,8 +234,8 @@ const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
         if (item.header) {
           return (
             <div className="flex gap-1 text-xs">
-              {/* Primary category buttons */}
-              {['all', 'pure', 'zerk', 'medMax'].map((c) => (
+              {/* Category buttons */}
+              {categories.map((c) => (
                 <button
                   key={c}
                   type="button"
@@ -227,21 +248,24 @@ const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
                   {c === 'all' ? 'All' : (c === 'medMax' ? 'Med/Max' : c.charAt(0).toUpperCase() + c.slice(1))}
                 </button>
               ))}
-              {/* Style buttons */}
-              <span className="ml-2">|</span>
-              {['all','ranged','magic','melee','spec','tank'].map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  className={`px-2 py-0.5 rounded border ${style === s ? 'bg-btns-400 text-white' : 'bg-body-100 dark:bg-dark-300'}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setStyle(s as any);
-                  }}
-                >
-                  {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
-                </button>
-              ))}
+              {/* Style buttons (only attacker) */}
+              {side === 'attacker' && (
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {['all','ranged','magic','melee','spec','tank'].map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      className={`px-2 py-0.5 rounded border ${style === s ? 'bg-btns-400 text-white' : 'bg-body-100 dark:bg-dark-300'}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setStyle(s as any);
+                      }}
+                    >
+                      {s === 'all' ? 'All' : (s === 'magic' ? 'Robes' : s.charAt(0).toUpperCase() + s.slice(1))}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           );
         }
