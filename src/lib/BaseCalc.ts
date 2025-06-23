@@ -618,7 +618,7 @@ export default class BaseCalc {
         return isDefined(this.player.spell);
 
       case 'ranged':
-        return getRangedDamageType(this.player.equipment.weapon!.category) === 'heavy';
+        return this.player.equipment.weapon ? (getRangedDamageType(this.player.equipment.weapon.category) === 'heavy') : false;
 
       case 'crush':
         return true;
