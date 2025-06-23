@@ -238,7 +238,7 @@ const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
                   <button
                     key={c}
                     type="button"
-                    className={`px-2 py-0.5 rounded border ${category === c ? 'bg-btns-500 text-white font-bold ring-2 ring-btns-500 ring-offset-2' : 'bg-body-100 dark:bg-dark-300'}`}
+                    className={`px-2 py-0.5 rounded border ${category === c ? 'bg-btns-500 text-white font-bold ring ring-white' : 'bg-body-100 dark:bg-dark-300 text-gray-300 border-gray-500'}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       setCategory(c as any);
@@ -254,7 +254,7 @@ const EquipmentPresets: React.FC<EquipmentPresetsProps> = ({ side }) => {
                   <button
                     key={s}
                     type="button"
-                    className={`px-2 py-0.5 rounded border ${style === s ? 'bg-btns-500 text-white font-bold ring-2 ring-btns-500 ring-offset-2' : 'bg-body-100 dark:bg-dark-300'}`}
+                    className={`px-2 py-0.5 rounded border ${style === s ? 'bg-btns-500 text-white font-bold ring ring-white' : 'bg-body-100 dark:bg-dark-300 text-gray-300 border-gray-500'}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       setStyle(s as any);
