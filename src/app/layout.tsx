@@ -4,6 +4,7 @@ import '../globals.css';
 import { Metadata } from 'next';
 import { ibm, pts } from '@/fonts';
 import ClientProviders from '@/app/components/ClientProviders';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || ''),
@@ -27,6 +28,7 @@ const RootLayout: React.FC<PropsWithChildren> = (props) => {
       <body>
         <ClientProviders>
           {children}
+          <Analytics />
         </ClientProviders>
       </body>
     </html>
