@@ -12,35 +12,66 @@ const ExtraOptions: React.FC = observer(() => {
   const side = useSide();
   const player = side === 'attacker' ? store.attackerLoadouts[store.selectedAttacker] : store.defenderLoadouts[store.selectedDefender];
 
+  // Remote images for the new defender toggles
+  const iceBarrageImg = 'https://oldschool.runescape.wiki/images/thumb/Ice_Barrage.png/32px-Ice_Barrage.png';
+  const antifireImg = 'https://oldschool.runescape.wiki/images/thumb/Antifire_potion%284%29.png/32px-Antifire_potion%284%29.png';
+
   return (
     <div className="px-6 my-4">
       <div className="mt-2 mb-4">
-        <Toggle
-          checked={player.buffs.kandarinDiary}
-          setChecked={(c) => store.updatePlayer({ buffs: { kandarinDiary: c } }, undefined, side)}
-          label={(<>
-            <img src={diary.src} width={18} className="inline-block" alt="" />
-            {' '}
-            Kandarin Hard Diary
-            {' '}
-          </>)}
-        />
-        <div className="w-full mt-2">
-          <NumberInput
-            className="form-control w-12"
-            required
-            min={0}
-            max={5}
-            value={player.buffs.soulreaperStacks}
-            onChange={(v) => store.updatePlayer({ buffs: { soulreaperStacks: v } }, undefined, side)}
-          />
-          <span className="ml-1 text-sm select-none">
-            <img src={soulreaper_axe.src} width={18} className="inline-block" alt="" />
-            {' '}
-            Soul stacks
-            {' '}
-          </span>
-        </div>
+        {side === 'attacker' ? (
+          <>
+            <Toggle
+              checked={player.buffs.kandarinDiary}
+              setChecked={(c) => store.updatePlayer({ buffs: { kandarinDiary: c } }, undefined, side)}
+              label={(<>
+                <img src={diary.src} width={18} className="inline-block" alt="" />
+                {' '}
+                Kandarin Hard Diary
+                {' '}
+              </>)}
+            />
+            <div className="w-full mt-2">
+              <NumberInput
+                className="form-control w-12"
+                required
+                min={0}
+                max={5}
+                value={player.buffs.soulreaperStacks}
+                onChange={(v) => store.updatePlayer({ buffs: { soulreaperStacks: v } }, undefined, side)}
+              />
+              <span className="ml-1 text-sm select-none">
+                <img src={soulreaper_axe.src} width={18} className="inline-block" alt="" />
+                {' '}
+                Soul stacks
+                {' '}
+              </span>
+            </div>
+          </>
+        ) : (
+          <>
+            <Toggle
+              checked={player.buffs.frozen}
+              setChecked={(c) => store.updatePlayer({ buffs: { frozen: c } }, undefined, side)}
+              label={(<>
+                <img src={iceBarrageImg} width={18} className="inline-block" alt="" />
+                {' '}
+                Frozen
+                {' '}
+              </>)}
+            />
+            <Toggle
+              checked={player.buffs.antifire}
+              setChecked={(c) => store.updatePlayer({ buffs: { antifire: c } }, undefined, side)}
+              label={(<>
+                <img src={antifireImg} width={18} className="inline-block" alt="" />
+                {' '}
+                Antifire
+                {' '}
+              </>)}
+            />
+          </>
+        )}
       </div>
     </div>
   );

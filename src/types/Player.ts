@@ -146,6 +146,14 @@ export interface Player extends EquipmentStats {
      * @see https://oldschool.runescape.wiki/w/Sunfire_rune
      */
     usingSunfireRunes: boolean;
+    /**
+     * Whether the player is currently frozen (cannot move). Used primarily in PvP for hit chance adjustments.
+     */
+    frozen: boolean;
+    /**
+     * Whether the player has an active antifire potion effect (reduces dragonfire damage).
+     */
+    antifire: boolean;
   };
   spell: Spell | null;
 }
