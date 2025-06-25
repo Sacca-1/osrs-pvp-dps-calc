@@ -133,4 +133,21 @@ export default class PlayerVsPlayerCalc extends PlayerVsNPCCalc {
     }
     return super.getAttackSpeed();
   }
+
+  /**
+   * Override to add Ice ancient sceptre accuracy effect.
+   */
+  public getMaxAttackRoll() {
+    let atkRoll = super.getMaxAttackRoll();
+
+    // Apply +10% accuracy for Ice ancient sceptre with ice spell when defender is not frozen
+    if (this.player.style.type === 'magic'
+        && this.player.equipment.weapon?.name === 'Ice ancient sceptre'
+        && this.player.spell?.name.startsWith('Ice ')
+        && !this.defender.buffs.frozen) {
+      atkRoll = this.trackFactor('ICE_SCEPTRE_BONUS', atkRoll, [11, 10]);
+    }
+
+    return atkRoll;
+  }
 } 
