@@ -7,6 +7,7 @@ import { AttackDistribution } from '@/lib/HitDist';
 import { Prayer } from '@/enums/Prayer';
 import { PrayerMap } from '@/enums/Prayer';
 import { PROTECTION_PRAYER_DAMAGE_REDUCTION } from '@/lib/constants';
+import { MonsterAttribute } from '@/enums/MonsterAttribute';
 
 /**
  * Helper to convert a Player object into a Monster-like structure so we can
@@ -42,6 +43,15 @@ function playerToMonster(p: Player): Monster {
     magicLevel = Math.floor(magicLevel * defMagicFactor[0] / defMagicFactor[1]);
   }
 
+  // Determine dragonfire protection (antifire potion or shield)
+  const dragonfireShieldNames = [
+    'Anti-dragon shield',
+    'Shield left half',
+    'Dragonfire shield',
+    'Dragonfire ward',
+  ];
+  const dragonfireProtected = p.buffs.antifire || (p.equipment.shield && dragonfireShieldNames.some((n) => p.equipment.shield?.name?.includes(n)));
+
   return {
     id: -100 - Math.random(), // arbitrary negative ID
     name: p.name,
@@ -76,7 +86,7 @@ function playerToMonster(p: Player): Monster {
       standard: p.defensive.ranged,
       heavy: p.defensive.ranged,
     },
-    attributes: [],
+    attributes: dragonfireProtected ? [MonsterAttribute.FIERY] : [],
     weakness: null,
     immunities: { burn: BurnImmunity.NORMAL },
     inputs: { ...INITIAL_MONSTER_INPUTS },
