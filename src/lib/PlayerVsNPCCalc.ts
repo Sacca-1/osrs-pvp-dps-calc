@@ -992,7 +992,8 @@ export default class PlayerVsNPCCalc extends BaseCalc {
     if ((this.wearing('Tome of fire') && this.player.equipment.shield?.version === 'Charged' && this.player.spell?.element === 'fire')
       || (this.wearing('Tome of water') && this.player.equipment.shield?.version === 'Charged' && this.player.spell?.element === 'water')
        || (this.wearing('Tome of earth') && this.player.equipment.shield?.version === 'Charged' && this.player.spell?.element === 'earth')) {
-      maxHit = this.trackFactor(DetailKey.MAX_HIT_TOME, maxHit, [11, 10]);
+      const tomeFactor = (this.opts.mode === 'pvp') ? ([3, 2] as [number, number]) : ([11, 10] as [number, number]);
+      maxHit = this.trackFactor(DetailKey.MAX_HIT_TOME, maxHit, tomeFactor);
     }
 
     if (P2_WARDEN_IDS.includes(this.monster.id)) {
