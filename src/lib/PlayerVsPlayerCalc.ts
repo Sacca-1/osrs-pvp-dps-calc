@@ -43,6 +43,23 @@ function playerToMonster(p: Player): Monster {
     magicLevel = Math.floor(magicLevel * defMagicFactor[0] / defMagicFactor[1]);
   }
 
+  // Apply stance-based defence bonuses (Defensive/Longrange: +3, Controlled: +1).
+  // These bonuses are applied after prayer modifiers, mirroring the in-game effective level formula.
+  let stanceBonus = 0;
+  switch (p.style.stance) {
+    case 'Defensive':
+    case 'Defensive Autocast':
+    case 'Longrange':
+      stanceBonus = 3;
+      break;
+    case 'Controlled':
+      stanceBonus = 1;
+      break;
+    default:
+      break;
+  }
+  defLevel += stanceBonus;
+
   // Determine dragonfire protection (antifire potion or shield)
   const dragonfireShieldNames = [
     'Anti-dragon shield',

@@ -349,9 +349,14 @@ class GlobalState implements State {
   get asImportableData(): ImportableData {
     return {
       serializationVersion: IMPORT_VERSION,
-      loadouts: toJS(this.loadouts),
+      loadouts: toJS(this.attackerLoadouts),
+      selectedLoadout: this.selectedAttacker,
+
+      // NEW – defender side persistence
+      defenderLoadouts: toJS(this.defenderLoadouts),
+      selectedDefender: this.selectedDefender,
+
       monster: toJS(this.monster),
-      selectedLoadout: this.selectedLoadout,
     };
   }
 
@@ -448,7 +453,9 @@ class GlobalState implements State {
   }
 
   recalculateEquipmentBonusesFromGearAll() {
-    this.attackerLoadouts.forEach((_, i) => this.updateEquipmentBonuses(i));
+    // Recalculate for both attacker and defender loadouts
+    this.attackerLoadouts.forEach((_, i) => this.updateEquipmentBonuses(i, 'attacker'));
+    this.defenderLoadouts.forEach((_, i) => this.updateEquipmentBonuses(i, 'defender'));
   }
 
   updateUIState(ui: PartialDeep<UI>) {
@@ -577,6 +584,34 @@ class GlobalState implements State {
     this.recalculateEquipmentBonusesFromGearAll();
 
     this.selectedAttacker = data.selectedLoadout || 0;
+
+    // Handle defender loadouts if present (backwards-compatible)
+    if (data.defenderLoadouts && data.defenderLoadouts.length > 0) {
+      const defLoadouts = data.defenderLoadouts.map((l, i) => ({ ...l, name: `Defender ${i + 1}` })) as typeof data.loadouts;
+      // Expand metadata same as attacker path
+      defLoadouts.forEach((loadout) => {
+        if (loadout.equipment) {
+          for (const [slot, v] of Object.entries(loadout.equipment)) {
+            if (v === null) continue;
+            let item;
+            if (Object.hasOwn(v, 'id')) {
+              item = availableEquipment.find((eq) => eq.id === (v as any).id);
+              if (item && Object.hasOwn(v, 'itemVars')) {
+                item = { ...item, itemVars: (v as any).itemVars } as any;
+              }
+            }
+            (loadout.equipment as any)[slot] = item || null;
+          }
+        }
+      });
+
+      defLoadouts.forEach((p, ix) => {
+        if (this.defenderLoadouts[ix] === undefined) this.defenderLoadouts.push(generateEmptyPlayer());
+        this.updatePlayer(p, ix, 'defender');
+      });
+
+      this.selectedDefender = data.selectedDefender || 0;
+    }
   }
 
   loadPreferences() {
