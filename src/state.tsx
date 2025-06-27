@@ -728,6 +728,10 @@ class GlobalState implements State {
 
       tgt.prayers = [...newPrayers, prayer];
     }
+
+    // Sync the dedicated overheadPrayer field used for PvP damage reduction logic
+    const activeOverhead = tgt.prayers.find((p) => OVERHEAD_PRAYERS.includes(p)) || null;
+    tgt.overheadPrayer = activeOverhead;
   }
 
   /**
