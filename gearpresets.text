@@ -1,0 +1,336 @@
+Attacker setups
+
+Eclipse Atlatl (max/med + zerk) (ranged)
+Slot	ID	Name	Version
+ammo	28991	Atlatl dart	
+body	29004	Eclipse moon chestplate	New
+cape	21295	Infernal cape	Normal
+feet	29806	Aranea boots	
+hands	7462	Barrows gloves	
+head	29010	Eclipse moon helm	New
+legs	29007	Eclipse moon tassets	New
+neck	6585	Amulet of fury	
+ring	25975	Lightbearer	
+weapon	29000	Eclipse atlatl	
+
+DCB Barrows (max/med) (ranged)
+Slot	ID	Name	Version
+ammo	21932	Opal dragon bolts (e)	
+body	4736	Karil's leathertop	Undamaged
+cape	21295	Infernal cape	Normal
+feet	29806	Aranea boots	
+hands	7462	Barrows gloves	
+head	12931	Serpentine helm	Charged
+legs	4738	Karil's leatherskirt	Undamaged
+neck	6585	Amulet of fury	
+ring	25975	Lightbearer	
+shield	11283	Dragonfire shield	Charged
+weapon	21902	Dragon crossbow	
+
+RCB D'hide (max/med) (ranged)
+Slot	ID	Name	Version
+ammo	9244	Dragonstone bolts (e)	
+body	2503	Black d'hide body	
+cape	21791	Imbued saradomin cape	Normal
+feet	11840	Dragon boots	
+hands	7462	Barrows gloves	
+head	10828	Helm of neitiznot	
+legs	2497	Black d'hide chaps	
+neck	1704	Amulet of glory	Uncharged
+ring	28329	Ring of shadows	Uncharged
+shield	23991	Crystal shield	Active
+weapon	9185	Rune crossbow
+
+Bowfa Crystal (max/med) (ranged)
+Slot	ID	Name	Version
+ammo	22947	Rada's blessing 4	
+body	23975	Crystal body	Active
+cape	21295	Infernal cape	Normal
+feet	29806	Aranea boots	
+hands	7462	Barrows gloves	
+head	24271	Neitiznot faceguard	
+legs	23979	Crystal legs	Active
+neck	6585	Amulet of fury	
+ring	25975	Lightbearer	
+weapon	25865	Bow of faerdhinen	Charged
+
+Virtus Ancients (max/med) (magic)
+Slot	ID	Name	Version
+ammo	22947	Rada's blessing 4	
+body	26243	Virtus robe top	
+cape	21791	Imbued saradomin cape	Normal
+feet	29806	Aranea boots	
+hands	7462	Barrows gloves	
+head	24271	Neitiznot faceguard	
+legs	26245	Virtus robe bottom	
+neck	6585	Amulet of fury	
+ring	25975	Lightbearer	
+shield	27251	Elidinis' ward (f)	
+weapon	29594	Purging staff
+
+Ahrim's Ancients (max/med) (magic)
+Slot	ID	Name	Version
+ammo	21932	Opal dragon bolts (e)	
+body	4712	Ahrim's robetop	Undamaged
+cape	21791	Imbued saradomin cape	Normal
+feet	29806	Aranea boots	
+hands	7462	Barrows gloves	
+head	12931	Serpentine helm	Charged
+legs	4714	Ahrim's robeskirt	Undamaged
+neck	6585	Amulet of fury	
+ring	25975	Lightbearer	
+shield	6889	Mage's book	
+weapon	12904	Toxic staff of the dead	Charged
+
+Bloodbark Ancients (max/med) (magic)
+Slot	ID	Name	Version
+ammo	21932	Opal dragon bolts (e)	
+body	25404	Bloodbark body	
+cape	21791	Imbued saradomin cape	Normal
+feet	11840	Dragon boots	
+hands	7462	Barrows gloves	
+head	10828	Helm of neitiznot	
+legs	25416	Bloodbark legs	
+neck	1704	Amulet of glory	Uncharged
+ring	25975	Lightbearer	
+shield	12612	Book of darkness	
+weapon	28262	Ice ancient sceptre	Normal
+
+Mystics Ancients (max/med) (magic)
+Slot	ID	Name	Version
+ammo	9244	Dragonstone bolts (e)	
+body	4091	Mystic robe top	
+cape	2412	Saradomin cape	
+feet	3105	Climbing boots	
+hands	7462	Barrows gloves	
+head	10828	Helm of neitiznot	
+legs	4093	Mystic robe bottom	
+neck	1704	Amulet of glory	Uncharged
+ring	28329	Ring of shadows	Uncharged
+shield	12612	Book of darkness	
+weapon	4675	Ancient staff	
+
+Mystics Normals (max/med) (magic)
+Slot	ID	Name	Version
+ammo	9244	Dragonstone bolts (e)	
+body	4091	Mystic robe top	
+cape	2412	Saradomin cape	
+feet	3105	Climbing boots	
+hands	7462	Barrows gloves	
+head	10828	Helm of neitiznot	
+legs	4093	Mystic robe bottom	
+neck	1704	Amulet of glory	Uncharged
+ring	28329	Ring of shadows	Uncharged
+shield	20714	Tome of fire	Charged
+weapon	1405	Mystic air staff	
+
+Bloodbark Normals (max/med) (magic)
+Slot	ID	Name	Version
+ammo	21932	Opal dragon bolts (e)	
+body	25404	Bloodbark body	
+cape	21791	Imbued saradomin cape	Normal
+feet	11840	Dragon boots	
+hands	7462	Barrows gloves	
+head	10828	Helm of neitiznot	
+legs	25416	Bloodbark legs	
+neck	1704	Amulet of glory	Uncharged
+ring	25975	Lightbearer	
+shield	20714	Tome of fire	Charged
+weapon	12000	Mystic smoke staff	
+
+Ahrim's Normals (max/med) (magic)
+Slot	ID	Name	Version
+ammo	21932	Opal dragon bolts (e)	
+body	4712	Ahrim's robetop	Undamaged
+cape	21791	Imbued saradomin cape	Normal
+feet	29806	Aranea boots	
+hands	7462	Barrows gloves	
+head	12931	Serpentine helm	Charged
+legs	4714	Ahrim's robeskirt	Undamaged
+neck	6585	Amulet of fury	
+ring	25975	Lightbearer	
+shield	20714	Tome of fire	Charged
+weapon	12904	Toxic staff of the dead	Charged
+
+Ancestral Normals (max/med) (magic)
+Slot	ID	Name	Version
+ammo	22947	Rada's blessing 4	
+body	21021	Ancestral robe top	
+cape	21791	Imbued saradomin cape	Normal
+feet	29806	Aranea boots	
+hands	7462	Barrows gloves	
+head	24271	Neitiznot faceguard	
+legs	21024	Ancestral robe bottom	
+neck	6585	Amulet of fury	
+ring	25975	Lightbearer	
+shield	20714	Tome of fire	Charged
+weapon	29594	Purging staff	
+
+Noxious Halberd (max/med) (melee)
+Slot	ID	Name	Version
+ammo	22947	Rada's blessing 4	
+body	23975	Crystal body	Active
+cape	21295	Infernal cape	Normal
+feet	29806	Aranea boots	
+hands	7462	Barrows gloves	
+head	24271	Neitiznot faceguard	
+legs	23979	Crystal legs	Active
+neck	6585	Amulet of fury	
+ring	25975	Lightbearer	
+weapon	29796	Noxious halberd
+
+Osmumten's Fang (max/med) (melee)
+Slot	ID	Name	Version
+ammo	21932	Opal dragon bolts (e)	
+body	4736	Karil's leathertop	Undamaged
+cape	21295	Infernal cape	Normal
+feet	29806	Aranea boots	
+hands	7462	Barrows gloves	
+head	12931	Serpentine helm	Charged
+legs	4738	Karil's leatherskirt	Undamaged
+neck	6585	Amulet of fury	
+ring	25975	Lightbearer	
+shield	22322	Avernic defender	Normal
+weapon	26219	Osmumten's fang	
+
+Zombie Axe (max/med) (melee)
+Slot	ID	Name	Version
+ammo	21932	Opal dragon bolts (e)	
+body	10386	Saradomin d'hide body	
+cape	21295	Infernal cape	Normal
+feet	11840	Dragon boots	
+hands	7462	Barrows gloves	
+head	10828	Helm of neitiznot	
+legs	10388	Saradomin chaps	
+neck	1704	Amulet of glory	Uncharged
+ring	25975	Lightbearer	
+shield	22322	Avernic defender	Normal
+weapon	28810	Zombie axe	
+
+Leaf-bladed Battleaxe (max/med) (melee)
+Slot	ID	Name	Version
+ammo	9244	Dragonstone bolts (e)	
+body	2503	Black d'hide body	
+cape	2412	Saradomin cape	
+feet	3105	Climbing boots	
+hands	7462	Barrows gloves	
+head	10828	Helm of neitiznot	
+legs	2497	Black d'hide chaps	
+neck	1704	Amulet of glory	Uncharged
+ring	28329	Ring of shadows	Uncharged
+shield	3842	Unholy book	
+weapon	20727	Leaf-bladed battleaxe
+
+Abyssal Dagger (max/med) (spec)
+Slot	ID	Name	Version
+ammo	21932	Opal dragon bolts (e)	
+body	4736	Karil's leathertop	Undamaged
+cape	21295	Infernal cape	Normal
+feet	29806	Aranea boots	
+hands	7462	Barrows gloves	
+head	12931	Serpentine helm	Charged
+legs	4738	Karil's leatherskirt	Undamaged
+neck	6585	Amulet of fury	
+ring	25975	Lightbearer	
+shield	22322	Avernic defender	Normal
+weapon	13265	Abyssal dagger	Unpoisoned
+
+Dragon Dagger (max/med) (spec)
+Slot	ID	Name	Version
+ammo	21932	Opal dragon bolts (e)	
+body	4736	Karil's leathertop	Undamaged
+cape	21295	Infernal cape	Normal
+feet	29806	Aranea boots	
+hands	7462	Barrows gloves	
+head	12931	Serpentine helm	Charged
+legs	4738	Karil's leatherskirt	Undamaged
+neck	6585	Amulet of fury	
+ring	25975	Lightbearer	
+shield	22322	Avernic defender	Normal
+weapon	1215	Dragon dagger	Unpoisoned
+
+Voidwaker (max/med) (spec)
+Slot	ID	Name	Version
+ammo	21932	Opal dragon bolts (e)	
+body	4736	Karil's leathertop	Undamaged
+cape	21295	Infernal cape	Normal
+feet	29806	Aranea boots	
+hands	7462	Barrows gloves	
+head	12931	Serpentine helm	Charged
+legs	4738	Karil's leatherskirt	Undamaged
+neck	6585	Amulet of fury	
+ring	25975	Lightbearer	
+shield	22322	Avernic defender	Normal
+weapon	27690	Voidwaker
+
+Armadyl Godsword (max/med) (spec)
+Slot	ID	Name	Version
+ammo	21932	Opal dragon bolts (e)	
+body	4736	Karil's leathertop	Undamaged
+cape	21295	Infernal cape	Normal
+feet	29806	Aranea boots	
+hands	7462	Barrows gloves	
+head	12931	Serpentine helm	Charged
+legs	4738	Karil's leatherskirt	Undamaged
+neck	6585	Amulet of fury	
+ring	25975	Lightbearer	
+weapon	11802	Armadyl godsword
+
+Defender setups
+
+Karil's (Tank) (max/med)
+Slot	ID	Name	Version
+ammo	21932	Opal dragon bolts (e)	
+body	4736	Karil's leathertop	Undamaged
+cape	21295	Infernal cape	Normal
+feet	29806	Aranea boots	
+hands	7462	Barrows gloves	
+head	12931	Serpentine helm	Charged
+legs	4738	Karil's leatherskirt	Undamaged
+neck	6585	Amulet of fury	
+ring	25975	Lightbearer	
+shield	11283	Dragonfire shield	Charged
+weapon	12904	Toxic staff of the dead	Charged
+
+Crystal (Tank) (max/med)
+Slot	ID	Name	Version
+ammo	21932	Opal dragon bolts (e)	
+body	23975	Crystal body	Active
+cape	21295	Infernal cape	Normal
+feet	29806	Aranea boots	
+hands	7462	Barrows gloves	
+head	24271	Neitiznot faceguard	
+legs	23979	Crystal legs	Active
+neck	6585	Amulet of fury	
+ring	25975	Lightbearer	
+shield	11283	Dragonfire shield	Charged
+weapon	29594	Purging staff	
+
+Blessed D'hide (Tank) (max/med)
+Slot	ID	Name	Version
+ammo	21932	Opal dragon bolts (e)	
+body	10386	Saradomin d'hide body	
+cape	21295	Infernal cape	Normal
+feet	11840	Dragon boots	
+hands	7462	Barrows gloves	
+head	10828	Helm of neitiznot	
+legs	10388	Saradomin chaps	
+neck	1704	Amulet of glory	Uncharged
+ring	25975	Lightbearer	
+shield	23991	Crystal shield	Active
+weapon	28262	Ice ancient sceptre	Normal
+
+Black D'hide (Tank) (max/med)
+Slot	ID	Name	Version
+ammo	9244	Dragonstone bolts (e)	
+body	2503	Black d'hide body	
+cape	2412	Saradomin cape	
+feet	3105	Climbing boots	
+hands	7462	Barrows gloves	
+head	10828	Helm of neitiznot	
+legs	2497	Black d'hide chaps	
+neck	1704	Amulet of glory	Uncharged
+ring	28329	Ring of shadows	Uncharged
+shield	12829	Spirit shield	
+weapon	4675	Ancient staff
+

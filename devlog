@@ -106,3 +106,68 @@ Import trace for requested module:
 
  ✓ Starting...
  ✓ Ready in 1518ms
+ ○ Compiling /_not-found ...
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ Compiled /_not-found in 6.3s (1222 modules)
+ GET /osrs-dps 404 in 196ms
+ GET /osrs-dps 404 in 27ms
+ ○ Compiling / ...
+ ✓ Compiled / in 3.3s (2626 modules)
+ GET / 200 in 4623ms
+ ✓ Compiled in 1009ms (2621 modules)
+ ✓ Compiled in 1373ms (2621 modules)
+ ✓ Compiled in 559ms (2621 modules)
+ ✓ Compiled in 602ms (2621 modules)
+ GET / 200 in 992ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 832ms (2624 modules)
+ GET /_next/static/css/app/layout.css?v=1750675294558 404 in 1325ms
+ GET /_next/static/chunks/main-app.js?v=1750675294558 404 in 1312ms
+ GET /_next/static/chunks/app/page.js 404 in 1312ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 1313ms
+ GET /_next/static/chunks/webpack.js?v=1750675294558 404 in 1316ms
+ GET /_next/static/chunks/app/layout.js 404 in 1314ms
+ GET /_next/static/chunks/app/error.js 404 in 28ms
+ GET / 200 in 463ms
+ GET /_next/static/css/app/layout.css?v=1750675300468 404 in 22ms
+ GET /_next/static/chunks/main-app.js?v=1750675300468 404 in 41ms
+ GET /_next/static/chunks/app/page.js 404 in 39ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 39ms
+ GET /_next/static/chunks/app/error.js 404 in 33ms
+ ✓ Compiled in 1771ms (2623 modules)
+ ✓ Compiled in 1042ms (2623 modules)
+ ✓ Compiled in 719ms (2623 modules)
+ ✓ Compiled in 974ms (2623 modules)
+ ✓ Compiled in 980ms (2623 modules)
+ ✓ Compiled in 1042ms (2623 modules)
+ ✓ Compiled in 1378ms (2623 modules)
+ ✓ Compiled in 1006ms (2623 modules)
+ ✓ Compiled in 974ms (2623 modules)
+ GET / 200 in 1206ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 859ms (2626 modules)
+ GET /_next/static/chunks/app/error.js 404 in 1321ms
+ GET /_next/static/chunks/main-app.js?v=1750677427034 404 in 1324ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 1323ms
+ ✓ Compiled in 1405ms (2623 modules)
+ ✓ Compiled in 235ms (1293 modules)
+ ✓ Compiled in 964ms (2623 modules)
+ ✓ Compiled in 982ms (2623 modules)
+ ✓ Compiled in 1077ms (2623 modules)
+ ✓ Compiled in 1216ms (2623 modules)
+ ✓ Compiled in 1181ms (2623 modules)
+ ✓ Compiled in 931ms (2623 modules)
+ ✓ Compiled in 2.1s (2623 modules)
+ ✓ Compiled in 271ms (1293 modules)
+ ✓ Compiled in 2.4s (2623 modules)
+ ✓ Compiled in 970ms (2623 modules)
+ GET / 200 in 1207ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 723ms (2626 modules)
+ GET /_next/static/chunks/app-pages-internals.js 404 in 1159ms
+ GET /_next/static/chunks/main-app.js?v=1750684136920 404 in 1158ms
+ GET /_next/static/chunks/app/error.js 404 in 1155ms
+ ✓ Compiled in 961ms (2623 modules)
+ ✓ Compiled in 1562ms (2623 modules)

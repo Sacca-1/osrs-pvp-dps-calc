@@ -416,6 +416,10 @@ export default class BaseCalc {
     return this.wearingAll(['Dual macuahuitl', 'Blood moon helm', 'Blood moon chestplate', 'Blood moon tassets']);
   }
 
+  protected isWearingEclipseMoonSet(): boolean {
+    return this.wearingAll(['Eclipse atlatl', 'Eclipse moon helm', 'Eclipse moon chestplate', 'Eclipse moon tassets']);
+  }
+
   /**
    * Whether the player is wearing a silver weapon.
    * @see https://oldschool.runescape.wiki/w/Silver_weaponry

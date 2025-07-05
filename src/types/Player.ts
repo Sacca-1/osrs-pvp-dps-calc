@@ -154,6 +154,10 @@ export interface Player extends EquipmentStats {
      * Whether the player has an active antifire potion effect (reduces dragonfire damage).
      */
     antifire: boolean;
+    /**
+     * Number of burn stacks currently active on the target that would be consumed by the Eclipse atlatl special attack (0-5).
+     */
+    atlatlBurnStacks?: number;
   };
   spell: Spell | null;
 }

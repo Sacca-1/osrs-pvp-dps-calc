@@ -90,7 +90,6 @@ const UNIMPLEMENTED_SPECS: string[] = [
   'Dragon hasta',
   'Dragon spear',
   'Dragon thrownaxe',
-  'Eclipse atlatl',
   'Excalibur',
   'Granite hammer',
   'Granite maul',
@@ -146,6 +145,8 @@ export default class PlayerVsNPCCalc extends BaseCalc {
         defenceStyle = 'magic';
       } else if (this.wearing('Dragon mace')) {
         defenceStyle = 'crush';
+      } else if (this.wearing('Eclipse atlatl')) {
+        defenceStyle = 'magic';
       }
     }
 
@@ -722,6 +723,13 @@ export default class PlayerVsNPCCalc extends BaseCalc {
         maxHit = this.trackAdd(DetailKey.MAX_HIT_SPEC, maxHit, -maxReduction);
       } else if (this.wearing(['Heavy ballista', 'Light ballista'])) {
         maxHit = this.trackFactor(DetailKey.MAX_HIT_SPEC, maxHit, [5, 4]);
+      } else if (this.wearing('Eclipse atlatl')) {
+        // Consume remaining burn stacks: +burn to max, +burn/2 to min (capped at 50).
+        const stacks = Math.max(0, Math.min(5, this.player.buffs.atlatlBurnStacks ?? 0));
+        const burnBonus = Math.min(stacks * 10, 50);
+        const minBonus = Math.trunc(burnBonus / 2);
+        minHit = this.trackAdd(DetailKey.MIN_HIT_SPEC, minHit, minBonus);
+        maxHit = this.trackAdd(DetailKey.MAX_HIT_SPEC, maxHit, burnBonus);
       }
     }
 
@@ -1155,6 +1163,14 @@ export default class PlayerVsNPCCalc extends BaseCalc {
 
     if (this.opts.usingSpecialAttack && this.wearing(['Voidwaker', 'Dawnbringer'])) {
       return 1.0;
+    }
+
+    if (this.opts.usingSpecialAttack && this.wearing('Eclipse atlatl')) {
+      const baseAtk = this.getPlayerMaxMagicAttackRoll();
+      const boostedAtk = this.trackFactor(DetailKey.PLAYER_ACCURACY_SPEC, baseAtk, [3, 2]);
+      const def = this.getNPCDefenceRoll();
+      const specHitChance = BaseCalc.getNormalAccuracyRoll(boostedAtk, def);
+      return this.track(DetailKey.PLAYER_ACCURACY_FINAL, specHitChance);
     }
 
     if (this.opts.usingSpecialAttack && (this.wearing('Seercull') || this.isWearingMlb())) {
@@ -1654,6 +1670,8 @@ export default class PlayerVsNPCCalc extends BaseCalc {
     let styleType = this.player.style.type;
     if (this.opts.usingSpecialAttack && this.wearing('Voidwaker')) {
       styleType = 'magic';
+    } else if (this.opts.usingSpecialAttack && this.wearing('Eclipse atlatl')) {
+      styleType = 'magic';
     }
 
     if (this.monster.name === 'Zulrah') {
@@ -1762,6 +1780,8 @@ export default class PlayerVsNPCCalc extends BaseCalc {
     let styleType = this.player.style.type;
 
     if (this.opts.usingSpecialAttack && this.wearing('Voidwaker')) {
+      styleType = 'magic';
+    } else if (this.opts.usingSpecialAttack && this.wearing('Eclipse atlatl')) {
       styleType = 'magic';
     }
 
