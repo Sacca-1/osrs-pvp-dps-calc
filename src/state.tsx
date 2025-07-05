@@ -136,6 +136,7 @@ export const generateEmptyPlayer = (name?: string): Player => ({
     usingSunfireRunes: false,
     frozen: true,
     antifire: false,
+    atlatlBurnStacks: 0,
   },
   spell: null,
 });

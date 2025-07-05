@@ -7,6 +7,9 @@ import soulreaper_axe from '@/public/img/misc/soulreaper_axe.png';
 import NumberInput from '@/app/components/generic/NumberInput';
 import Toggle from '../generic/Toggle';
 
+// Using remote image for burn hitsplat icon as there is no local asset yet
+const burnHitsplatImg = 'https://oldschool.runescape.wiki/images/9/96/Hitsplat_burn.png';
+
 const ExtraOptions: React.FC = observer(() => {
   const store = useStore();
   const side = useSide();
@@ -44,6 +47,22 @@ const ExtraOptions: React.FC = observer(() => {
                 <img src={soulreaper_axe.src} width={18} className="inline-block" alt="" />
                 {' '}
                 Soul stacks
+                {' '}
+              </span>
+            </div>
+            <div className="w-full mt-2">
+              <NumberInput
+                className="form-control w-12"
+                required
+                min={0}
+                max={5}
+                value={player.buffs.atlatlBurnStacks ?? 0}
+                onChange={(v) => store.updatePlayer({ buffs: { atlatlBurnStacks: v } }, undefined, side)}
+              />
+              <span className="ml-1 text-sm select-none">
+                <img src={burnHitsplatImg} width={18} className="inline-block" alt="" />
+                {' '}
+                Atlatl burn stacks
                 {' '}
               </span>
             </div>
