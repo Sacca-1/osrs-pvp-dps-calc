@@ -8,7 +8,7 @@ import NumberInput from '@/app/components/generic/NumberInput';
 import Toggle from '../generic/Toggle';
 
 // Using remote image for burn hitsplat icon as there is no local asset yet
-const burnHitsplatImg = 'https://oldschool.runescape.wiki/images/9/96/Hitsplat_burn.png';
+const burnHitsplatImg = 'https://oldschool.runescape.wiki/images/thumb/Hitsplat_burn.png/32px-Hitsplat_burn.png';
 
 const ExtraOptions: React.FC = observer(() => {
   const store = useStore();
