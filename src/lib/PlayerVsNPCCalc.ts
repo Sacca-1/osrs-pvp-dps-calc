@@ -1166,9 +1166,10 @@ export default class PlayerVsNPCCalc extends BaseCalc {
     }
 
     if (this.opts.usingSpecialAttack && this.wearing('Eclipse atlatl')) {
-      const baseAtk = this.getPlayerMaxMagicAttackRoll();
-      const boostedAtk = this.trackFactor(DetailKey.PLAYER_ACCURACY_SPEC, baseAtk, [3, 2]);
-      const def = this.getNPCDefenceRoll();
+      // Special attack: use Ranged attack roll, but still checks against NPC's MAGIC defence roll.
+      const baseAtk = this.getPlayerMaxRangedAttackRoll();
+      const boostedAtk = this.trackFactor(DetailKey.PLAYER_ACCURACY_SPEC, baseAtk, [3, 2]); // +50% accuracy
+      const def = this.getNPCDefenceRoll(); // This is forced to magic via earlier override.
       const specHitChance = BaseCalc.getNormalAccuracyRoll(boostedAtk, def);
       return this.track(DetailKey.PLAYER_ACCURACY_FINAL, specHitChance);
     }
