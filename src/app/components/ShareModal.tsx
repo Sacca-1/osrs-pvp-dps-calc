@@ -11,7 +11,8 @@ const ShareModal: React.FC = observer(() => {
   const { ui, debug } = store;
   const inputRef = createRef<HTMLInputElement>();
 
-  const domain = process.env.NEXT_PUBLIC_SHORTLINK_URL;
+  // Destination site where shared loadouts open. Allows env override but defaults to live Vercel deployment.
+  const domain = process.env.NEXT_PUBLIC_SHORTLINK_URL || 'https://pvp-dps-calc.vercel.app/osrs-dps';
   const [shareId, setShareId] = useState('');
   const [error, setError] = useState(false);
 
