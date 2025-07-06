@@ -7,8 +7,8 @@ import soulreaper_axe from '@/public/img/misc/soulreaper_axe.png';
 import NumberInput from '@/app/components/generic/NumberInput';
 import Toggle from '../generic/Toggle';
 
-// Using remote image for burn hitsplat icon as there is no local asset yet
-const burnHitsplatImg = 'https://oldschool.runescape.wiki/images/thumb/Hitsplat_burn.png/32px-Hitsplat_burn.png';
+// Direct image path for burn hitsplat icon.
+const burnHitsplatImg = 'https://oldschool.runescape.wiki/images/9/96/Burn_hitsplat.png';
 
 const ExtraOptions: React.FC = observer(() => {
   const store = useStore();
