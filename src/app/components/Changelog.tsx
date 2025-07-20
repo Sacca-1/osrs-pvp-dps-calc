@@ -155,7 +155,7 @@ const Changelog: React.FC = () => {
         <div className="flex justify-center text-xs mt-3 gap-1">
           <span>Weekly data updates not displayed here.</span>
           <a
-            href="https://github.com/weirdgloop/osrs-dps-calc/commits/main/"
+            href="https://github.com/Sacca-1/osrs-pvp-dps-calc/commits/main/"
             target="_blank"
             aria-label="Visit the GitHub repo"
           >
