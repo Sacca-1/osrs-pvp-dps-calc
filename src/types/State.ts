@@ -1,8 +1,8 @@
-import { PartialDeep } from 'type-fest';
-import { Player } from '@/types/Player';
-import { Monster } from '@/types/Monster';
-import UserIssueType from '@/enums/UserIssueType';
-import { DetailEntry } from '@/lib/CalcDetails';
+import { PartialDeep } from "type-fest";
+import { Player } from "@/types/Player";
+import { Monster } from "@/types/Monster";
+import UserIssueType from "@/enums/UserIssueType";
+import { DetailEntry } from "@/lib/CalcDetails";
 
 export interface UserIssue {
   type: UserIssueType;
@@ -34,63 +34,63 @@ export interface Preferences {
   hitDistsHideZeros: boolean; // legacy name
   hitDistShowSpec: boolean;
   resultsExpanded: boolean;
-  calcMode: 'pvm' | 'pvp';
+  calcMode: "pvm" | "pvp";
 }
 
 export interface ChartEntry {
-  name: string | number,
-  [k: string]: string | number,
+  name: string | number;
+  [k: string]: string | number;
 }
 
 export interface ChartAnnotation {
-  value: number,
-  label: string
+  value: number;
+  label: string;
 }
 
 /**
  * The result of running the calculator on a specific player loadout.
  */
 export interface CalculatedLoadout {
-  userIssues?: UserIssue[],
+  userIssues?: UserIssue[];
 }
 
 export interface PlayerVsNPCCalculatedLoadout extends CalculatedLoadout {
-  details?: DetailEntry[],
-  specDetails?: DetailEntry[],
+  details?: DetailEntry[];
+  specDetails?: DetailEntry[];
 
   // Player vs NPC metrics
-  npcDefRoll?: number,
-  maxHit?: number,
-  expectedHit?: number,
-  maxAttackRoll?: number,
-  accuracy?: number,
-  dps?: number,
-  ttk?: number,
-  hitDist?: ChartEntry[],
-  ttkDist?: Map<number, number>,
+  npcDefRoll?: number;
+  maxHit?: number;
+  expectedHit?: number;
+  maxAttackRoll?: number;
+  accuracy?: number;
+  dps?: number;
+  ttk?: number;
+  hitDist?: ChartEntry[];
+  ttkDist?: Map<number, number>;
 
-  specAccuracy?: number,
-  specMaxHit?: number,
-  specExpected?: number,
-  specMomentDps?: number,
-  specFullDps?: number,
-  specHitDist?: ChartEntry[],
+  specAccuracy?: number;
+  specMaxHit?: number;
+  specExpected?: number;
+  specMomentDps?: number;
+  specFullDps?: number;
+  specHitDist?: ChartEntry[];
 }
 
 // NPC vs Player metrics
 export interface NPCVsPlayerCalculatedLoadout extends CalculatedLoadout {
-  npcDetails?: DetailEntry[],
+  npcDetails?: DetailEntry[];
 
-  playerDefRoll?: number,
-  npcMaxAttackRoll?: number,
-  npcMaxHit?: number,
-  npcDps?: number,
-  npcAccuracy?: number,
-  avgDmgTaken?: number,
+  playerDefRoll?: number;
+  npcMaxAttackRoll?: number;
+  npcMaxHit?: number;
+  npcDps?: number;
+  npcAccuracy?: number;
+  avgDmgTaken?: number;
 }
 
 export interface Calculator {
-  loadouts: (PlayerVsNPCCalculatedLoadout & NPCVsPlayerCalculatedLoadout)[]
+  loadouts: (PlayerVsNPCCalculatedLoadout & NPCVsPlayerCalculatedLoadout)[];
 }
 
 /**
@@ -100,7 +100,7 @@ export interface Calculator {
  * or any of its subproperties, are updated in a non-backwards-compatible manner,
  * or also in any manner that could affect the migrations required on load.
  */
-export const IMPORT_VERSION = 9 as const;
+export const IMPORT_VERSION = 10 as const;
 
 /**
  * This is the state that can be exported and imported (through shortlinks).
@@ -133,5 +133,5 @@ export interface State extends ImportableData {
   /**
    * All monsters that a player can fight.
    */
-  availableMonsters: Omit<Monster, 'inputs'>[];
+  availableMonsters: Omit<Monster, "inputs">[];
 }

@@ -1,8 +1,8 @@
-import { EquipmentCategory } from '@/enums/EquipmentCategory';
-import { Prayer } from '@/enums/Prayer';
-import Potion from '@/enums/Potion';
-import { Spell } from '@/types/Spell';
-import { PlayerCombatStyle } from '@/types/PlayerCombatStyle';
+import { EquipmentCategory } from "@/enums/EquipmentCategory";
+import { Prayer } from "@/enums/Prayer";
+import Potion from "@/enums/Potion";
+import { Spell } from "@/types/Spell";
+import { PlayerCombatStyle } from "@/types/PlayerCombatStyle";
 
 export interface PlayerSkills {
   atk: number;
@@ -73,9 +73,9 @@ export interface PlayerOffensive {
 }
 
 export interface EquipmentStats {
-  bonuses: PlayerBonuses,
-  offensive: PlayerOffensive,
-  defensive: PlayerDefensive,
+  bonuses: PlayerBonuses;
+  offensive: PlayerOffensive;
+  defensive: PlayerDefensive;
 }
 
 export interface Player extends EquipmentStats {
@@ -158,6 +158,14 @@ export interface Player extends EquipmentStats {
      * Number of burn stacks currently active on the target that would be consumed by the Eclipse atlatl special attack (0-5).
      */
     atlatlBurnStacks?: number;
+    /**
+     * Confliction gauntlets previous magic attack state.
+     * @see https://oldschool.runescape.wiki/w/Confliction_gauntlets
+     */
+    conflictionGauntletsPreviousMagicAttack:
+      | "average"
+      | "splashed"
+      | "not_splashed";
   };
   spell: Spell | null;
 }
