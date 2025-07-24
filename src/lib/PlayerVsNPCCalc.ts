@@ -151,6 +151,7 @@ export default class PlayerVsNPCCalc extends BaseCalc {
           "Crystal halberd",
           "Abyssal dagger",
           "Saradomin sword",
+          "Arkan blade",
         ]) ||
         this.isWearingGodsword()
       ) {
@@ -510,6 +511,12 @@ export default class PlayerVsNPCCalc extends BaseCalc {
           attackRoll,
           [2, 1]
         );
+      } else if (this.wearing("Arkan blade")) {
+        attackRoll = this.trackFactor(
+          DetailKey.PLAYER_ACCURACY_SPEC,
+          attackRoll,
+          [3, 2]
+        );
       }
     }
 
@@ -799,6 +806,8 @@ export default class PlayerVsNPCCalc extends BaseCalc {
           100 + 6 * stacks,
           100,
         ]);
+      } else if (this.wearing("Arkan blade")) {
+        maxHit = this.trackFactor(DetailKey.MAX_HIT_SPEC, maxHit, [3, 2]);
       }
     }
 
