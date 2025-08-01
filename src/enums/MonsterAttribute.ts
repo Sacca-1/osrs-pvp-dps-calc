@@ -7,6 +7,7 @@ export enum MonsterAttribute {
   KALPHITE = 'kalphite',
   LEAFY = 'leafy',
   PENANCE = 'penance',
+  PVP = 'pvp',
   RAT = 'rat',
   SHADE = 'shade',
   SPECTRAL = 'spectral',

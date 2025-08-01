@@ -103,7 +103,7 @@ function playerToMonster(p: Player): Monster {
       standard: p.defensive.ranged,
       heavy: p.defensive.ranged,
     },
-    attributes: dragonfireProtected ? [MonsterAttribute.FIERY] : [],
+    attributes: dragonfireProtected ? [MonsterAttribute.FIERY, MonsterAttribute.PVP] : [MonsterAttribute.PVP],
     weakness: null,
     immunities: { burn: BurnImmunity.NORMAL },
     inputs: { ...INITIAL_MONSTER_INPUTS },

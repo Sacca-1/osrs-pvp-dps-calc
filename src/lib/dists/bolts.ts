@@ -49,7 +49,9 @@ export const pearlBolts: BoltTransformer = (ctx) => {
 
 export const diamondBolts: BoltTransformer = (ctx) => {
   const { maxHit, zcb, spec } = ctx;
-  const chance = 0.1 * kandarinFactor(ctx);
+  // In PvP, diamond bolts have 5% proc chance instead of 10%
+  const baseChance = ctx.monster.attributes.includes(MonsterAttribute.PVP) ? 0.05 : 0.1;
+  const chance = baseChance * kandarinFactor(ctx);
   const effectMax = Math.trunc(maxHit * (zcb ? 126 : 115) / 100);
 
   const effectDist = HitDistribution.linear(1.0, 0, effectMax);
