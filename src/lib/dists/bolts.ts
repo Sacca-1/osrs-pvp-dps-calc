@@ -12,10 +12,11 @@ export interface BoltContext {
   spec: boolean;
   kandarinDiary: boolean;
   monster: Monster;
+  chanceMultiplier?: number;
 }
 export type BoltTransformer = (ctx: BoltContext) => HitTransformer;
 
-const kandarinFactor = ({ kandarinDiary }: BoltContext): number => (kandarinDiary ? 1.1 : 1.0);
+const kandarinFactor = ({ kandarinDiary, chanceMultiplier }: BoltContext): number => (kandarinDiary ? 1.1 : 1.0) * (chanceMultiplier ?? 1.0);
 
 const bonusDamageTransform = ({ zcb, spec }: BoltContext, chance: number, bonusDmg: number, accurateOnly: boolean): HitTransformer => (h) => {
   if (h.accurate && zcb && spec) {

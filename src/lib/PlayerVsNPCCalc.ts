@@ -2511,6 +2511,58 @@ export default class PlayerVsNPCCalc extends BaseCalc {
     }
 
     if (
+      this.player.style.type === "ranged" &&
+      this.player.equipment.weapon?.name.includes("rossbow") &&
+      this.wearing("Aquanite hopper")
+    ) {
+      // 10% chance to duplicate a shot from a crossbow, with 67% reduced accuracy, damage, and chance of triggering a special effect from an enchanted bolt
+      const acc = this.getHitChance();
+      const [min, max] = this.getMinAndMax();
+
+      const secondHitAcc = acc * 0.33;
+      
+      // Start with full damage range, then scale down after applying bolt effects
+      let secondHitDist = HitDistribution.linear(secondHitAcc, min, max);
+
+      // Apply bolt effects to second hit with reduced chance
+      const reducedBoltContext = { ...boltContext, chanceMultiplier: 0.33 };
+
+      if (this.wearing(["Opal bolts (e)", "Opal dragon bolts (e)"])) {
+        secondHitDist = secondHitDist.transform(opalBolts(reducedBoltContext));
+      } else if (this.wearing(["Pearl bolts (e)", "Pearl dragon bolts (e)"])) {
+        secondHitDist = secondHitDist.transform(pearlBolts(reducedBoltContext));
+      } else if (this.wearing(["Diamond bolts (e)", "Diamond dragon bolts (e)"])) {
+        secondHitDist = secondHitDist.transform(diamondBolts(reducedBoltContext));
+      } else if (this.wearing(["Dragonstone bolts (e)", "Dragonstone dragon bolts (e)"])) {
+        secondHitDist = secondHitDist.transform(dragonstoneBolts(reducedBoltContext));
+      } else if (
+        this.wearing(["Onyx bolts (e)", "Onyx dragon bolts (e)"]) &&
+        !mattrs.includes(MonsterAttribute.UNDEAD)
+      ) {
+        secondHitDist = secondHitDist.transform(onyxBolts(reducedBoltContext));
+      } else if (
+        this.wearing(["Ruby bolts (e)", "Ruby dragon bolts (e)"]) &&
+        (this.player.skills.hp + this.player.boosts.hp) >= 10
+      ) {
+        secondHitDist = secondHitDist.transform(rubyBolts(reducedBoltContext));
+      }
+
+      // Scale damage by 0.33
+      secondHitDist = secondHitDist.scaleDamage(33, 100);
+
+      // Combine with first hit
+      // 90% chance: [h1]
+      // 10% chance: [h1, h2]
+      dist = dist.transform((h1) => {
+        const noProc = new WeightedHit(0.9, [h1]);
+        const procHits = secondHitDist.hits.map(wh2 => {
+           return new WeightedHit(0.1 * wh2.probability, [h1, ...wh2.hitsplats]);
+        });
+        return new HitDistribution([noProc, ...procHits]);
+      }, { transformInaccurate: true });
+    }
+
+    if (
       this.player.style.type === "magic" &&
       this.wearing("Brimstone ring") &&
       !this.opts.overrides.defenceRoll
