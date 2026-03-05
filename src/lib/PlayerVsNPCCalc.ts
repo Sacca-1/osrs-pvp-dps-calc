@@ -75,6 +75,7 @@ import {
   rubyBolts,
 } from "@/lib/dists/bolts";
 import { burningClawDoT, burningClawSpec, dClawDist } from "@/lib/dists/claws";
+import { crimsonBludgeonSpec } from "@/lib/dists/crimsonBludgeon";
 
 const PARTIALLY_IMPLEMENTED_SPECS: string[] = ["Ancient godsword"];
 
@@ -1786,6 +1787,13 @@ export default class PlayerVsNPCCalc extends BaseCalc {
 
   public getHitChance() {
     if (this.opts.overrides?.accuracy) {
+      if (this.opts.usingSpecialAttack && this.wearing("Crimson bludgeon")) {
+        return this.track(
+          DetailKey.PLAYER_ACCURACY_FINAL,
+          1 - (1 - this.opts.overrides.accuracy) ** 4
+        );
+      }
+
       return this.track(
         DetailKey.PLAYER_ACCURACY_FINAL,
         this.opts.overrides.accuracy
@@ -1944,6 +1952,13 @@ export default class PlayerVsNPCCalc extends BaseCalc {
         );
       }
       // If previousAttack === "not_splashed", no bonus is applied (normal accuracy)
+    }
+
+    if (this.opts.usingSpecialAttack && this.wearing("Crimson bludgeon")) {
+      return this.track(
+        DetailKey.PLAYER_ACCURACY_FINAL,
+        1 - (1 - hitChance) ** 4
+      );
     }
 
     return this.track(DetailKey.PLAYER_ACCURACY_FINAL, hitChance);
@@ -2170,6 +2185,16 @@ export default class PlayerVsNPCCalc extends BaseCalc {
       } else if (this.wearing(["Bone claws", "Burning claws"])) {
         accurateZeroApplicable = false;
         dist = burningClawSpec(acc, max);
+      } else if (this.wearing("Crimson bludgeon")) {
+        accurateZeroApplicable = false;
+        const singleRollAccuracy = this.opts.overrides?.accuracy ?? this.track(
+          DetailKey.PLAYER_ACCURACY_BASE,
+          BaseCalc.getNormalAccuracyRoll(
+            this.getMaxAttackRoll(),
+            this.getNPCDefenceRoll()
+          )
+        );
+        dist = crimsonBludgeonSpec(singleRollAccuracy, max);
       }
     }
 

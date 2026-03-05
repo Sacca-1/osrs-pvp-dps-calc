@@ -1,5 +1,6 @@
 import { EquipmentPiece, Player, PlayerEquipment } from "@/types/Player";
 import { Monster } from "@/types/Monster";
+import { EquipmentCategory } from "@/enums/EquipmentCategory";
 import { keys } from "@/utils";
 import {
   BLOWPIPE_IDS,
@@ -19,7 +20,43 @@ export type EquipmentBonuses = Pick<
 /**
  * All available equipment that a player can equip.
  */
-export const availableEquipment = equipment as EquipmentPiece[];
+const manualEquipment: EquipmentPiece[] = [
+  {
+    name: "Crimson bludgeon",
+    id: 300001,
+    version: "",
+    slot: "weapon",
+    image: "Abyssal bludgeon.png",
+    speed: 4,
+    category: EquipmentCategory.BLUDGEON,
+    bonuses: {
+      str: 56,
+      ranged_str: 0,
+      magic_str: 0,
+      prayer: 0,
+    },
+    offensive: {
+      stab: 0,
+      slash: 0,
+      crush: 80,
+      magic: 0,
+      ranged: 0,
+    },
+    defensive: {
+      stab: 0,
+      slash: 0,
+      crush: 0,
+      magic: 0,
+      ranged: 0,
+    },
+    isTwoHanded: true,
+  },
+];
+
+export const availableEquipment = [
+  ...(equipment as EquipmentPiece[]),
+  ...manualEquipment,
+];
 
 export const noStatExceptions = [
   "Castle wars bracelet",
@@ -572,6 +609,7 @@ export const WEAPON_SPEC_COSTS: { [canonicalName: string]: number } = {
   "Toxic blowpipe": 50,
   "Blazing blowpipe": 50,
   "Webweaver bow": 50,
+  "Crimson bludgeon": 50,
   "Magic shortbow (i)": 50,
   "Ancient godsword": 50,
   "Armadyl godsword": 50,

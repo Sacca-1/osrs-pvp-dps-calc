@@ -9,6 +9,7 @@ enum UserIssueType {
   MONSTER_UNIQUE_EFFECTS = 'monster_overall_unique_effects',
   RING_RECOIL_UNSUPPORTED = 'equipment_slot_ring_recoil',
   FEET_RECOIL_UNSUPPORTED = 'equipment_slot_feet_recoil',
+  WEAPON_PRERELEASE = 'equipment_slot_weapon_prerelease',
 }
 
 export default UserIssueType;

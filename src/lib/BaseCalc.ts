@@ -774,5 +774,11 @@ export default class BaseCalc {
     if (this.wearing('Echo boots')) {
       this.addIssue(UserIssueType.FEET_RECOIL_UNSUPPORTED, 'The calculator does not account for recoil damage.');
     }
+    if (this.wearing('Crimson bludgeon')) {
+      this.addIssue(
+        UserIssueType.WEAPON_PRERELEASE,
+        'Crimson bludgeon is a pre-release addition to the calculator and may change before the item is released.'
+      );
+    }
   }
 }

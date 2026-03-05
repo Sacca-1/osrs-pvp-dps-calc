@@ -12,7 +12,7 @@ import NPCVsPlayerCalc from '@/lib/NPCVsPlayerCalc';
 import { getCombatStylesForCategory } from '@/utils';
 import { EquipmentCategory } from '@/enums/EquipmentCategory';
 import { CalcOpts } from '@/lib/BaseCalc';
-import eq from '../../../cdn/json/equipment.json';
+import { availableEquipment } from '@/lib/Equipment';
 
 const monsters = getMonsters().map((m) => ({
   ...m,
@@ -35,7 +35,7 @@ const monsters = getMonsters().map((m) => ({
     },
   },
 }));
-const equipment = eq as EquipmentPiece[];
+const equipment = availableEquipment as EquipmentPiece[];
 
 function find<T>(arr: T[], pred: (_: T) => boolean, failMsg?: string): T {
   const opt = arr.find(pred);
