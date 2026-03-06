@@ -4,8 +4,7 @@ import { Monster, BurnImmunity } from '@/types/Monster';
 import { INITIAL_MONSTER_INPUTS } from '@/lib/Monsters';
 import PlayerVsNPCCalc from '@/lib/PlayerVsNPCCalc';
 import { AttackDistribution } from '@/lib/HitDist';
-import { Prayer } from '@/enums/Prayer';
-import { PrayerMap } from '@/enums/Prayer';
+import { Prayer, PrayerMap } from '@/enums/Prayer';
 import { PROTECTION_PRAYER_DAMAGE_REDUCTION } from '@/lib/constants';
 import { MonsterAttribute } from '@/enums/MonsterAttribute';
 
@@ -152,6 +151,19 @@ export default class PlayerVsPlayerCalc extends PlayerVsNPCCalc {
   }
 
   /**
+   * Probability that this attack deals enough damage to KO the defender at the given HP.
+   */
+  public getKoChance(targetHp: number): number {
+    if (targetHp <= 0) {
+      return 1;
+    }
+
+    return this.getDistribution().singleHitsplat.hits.reduce((acc, hit) => (
+      hit.getSum() >= targetHp ? acc + hit.probability : acc
+    ), 0);
+  }
+
+  /**
    * Blowpipe PvP attack speed fix.
    */
   public getAttackSpeed(): number {
@@ -177,4 +189,4 @@ export default class PlayerVsPlayerCalc extends PlayerVsNPCCalc {
 
     return atkRoll;
   }
-} 
+}

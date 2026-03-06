@@ -14,6 +14,7 @@ const fmt = (key:string, value:number): string => {
   switch(key){
     case 'accuracy':
     case 'specAccuracy':
+    case 'specKoChance':
       return `${(value*100).toFixed(ACCURACY_PRECISION)}%`;
     case 'dps':
     case 'specMomentDps':
@@ -36,9 +37,10 @@ const PvpResultsTable:React.FC<PvpResultsTableProps> = observer(({ defenderIndex
   const defender = store.defenderLoadouts[defenderIndex];
   const attackers = store.attackerLoadouts;
 
-  type CalcKey = 'maxHit'|'expectedHit'|'dps'|'ttk'|'accuracy'|'maxAttackRoll'|'npcDefRoll'|'specAccuracy'|'specMomentDps'|'specFullDps'|'specMaxHit'|'specExpected';
+  type CalcKey = 'maxHit'|'expectedHit'|'dps'|'ttk'|'accuracy'|'maxAttackRoll'|'npcDefRoll'|'specAccuracy'|'specMomentDps'|'specFullDps'|'specMaxHit'|'specExpected'|'specKoChance';
 
   const expanded = prefs.resultsExpanded;
+  const defenderCurrentHp = Math.max(0, defender.skills.hp + (defender.boosts.hp || 0));
 
   const rowDefs: {key: CalcKey, label: string, title?: string, group?: string}[] = [
     {key:'maxHit', label:'Max hit', title:'The maximum hit that you will deal to the opponent'},
@@ -59,6 +61,7 @@ const PvpResultsTable:React.FC<PvpResultsTableProps> = observer(({ defenderIndex
     rowDefs.push({key:'specFullDps', label:'Spec-only DPS', title:'DPS of special attack including regen'});
     rowDefs.push({key:'specMaxHit', label:'Max hit', title:'Max hit of your special attack'});
     rowDefs.push({key:'specExpected', label:'Expected hit', title:'Expected hit of your special attack'});
+    rowDefs.push({key:'specKoChance', label:'KO chance', title:`Chance that your special attack deals at least ${defenderCurrentHp} damage, based on the defender's configured HP.`});
   }
 
   const calcs = attackers.map((a)=> new PlayerVsPlayerCalc(a as Player, defender as Player, {mode:'pvp'}));
@@ -119,6 +122,7 @@ const PvpResultsTable:React.FC<PvpResultsTableProps> = observer(({ defenderIndex
                 case 'specFullDps': return undefined;
                 case 'specMaxHit': return specCalc.getMax();
                 case 'specExpected': return specCalc.getExpectedDamage();
+                case 'specKoChance': return specCalc.getKoChance(defenderCurrentHp);
                 default: return undefined;
               }
             })() : getValue(c, row.key as any);
@@ -139,6 +143,7 @@ const PvpResultsTable:React.FC<PvpResultsTableProps> = observer(({ defenderIndex
                     case 'specFullDps': return undefined;
                     case 'specMaxHit': return specCalc.getMax();
                     case 'specExpected': return specCalc.getExpectedDamage();
+                    case 'specKoChance': return specCalc.getKoChance(defenderCurrentHp);
                     default: return undefined;
                   }
                 })() : getValue(c, row.key as any);
@@ -154,4 +159,4 @@ const PvpResultsTable:React.FC<PvpResultsTableProps> = observer(({ defenderIndex
   );
 });
 
-export default PvpResultsTable; 
+export default PvpResultsTable;
