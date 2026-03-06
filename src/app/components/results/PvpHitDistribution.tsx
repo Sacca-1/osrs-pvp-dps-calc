@@ -13,6 +13,8 @@ import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipCont
 import PlayerVsPlayerCalc from '@/lib/PlayerVsPlayerCalc';
 import { Player } from '@/types/Player';
 import { max } from 'd3-array';
+import { FeatureStatus } from '@/utils';
+import { ChartEntry } from '@/types/State';
 
 const CustomTooltip: React.FC<TooltipProps<ValueType, NameType>> = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -40,6 +42,50 @@ const CustomTooltip: React.FC<TooltipProps<ValueType, NameType>> = ({ active, pa
   return null;
 };
 
+interface HitDistributionChartProps {
+  data: ChartEntry[];
+  title: string;
+}
+
+const HitDistributionChart: React.FC<HitDistributionChartProps> = ({ data, title }) => {
+  const [tickCount, domainMax] = useMemo(() => {
+    const highest = max(data, (d) => d.value as number) ?? 0;
+    if (highest <= 0) {
+      return [2, 1];
+    }
+
+    const step = 10 ** Math.floor(Math.log10(highest) - 1);
+    const ceil = Math.ceil(highest / step) * step;
+    const count = 1 + Math.ceil(highest / step);
+    return [count, ceil];
+  }, [data]);
+
+  return (
+    <div>
+      <h4 className="font-serif font-bold mb-2">{title}</h4>
+      <ResponsiveContainer width="100%" height={225}>
+        <BarChart data={data} margin={{ top: 11, left: 25, bottom: 20 }}>
+          <XAxis dataKey="name" stroke="#777777" interval="equidistantPreserveStart" label={{ value: 'Hitsplat', position: 'insideBottom', offset: -15 }} />
+          <YAxis
+            stroke="#777777"
+            domain={[0, domainMax]}
+            tickCount={tickCount}
+            tickFormatter={(v: number) => `${parseFloat((v * 100).toFixed(2))}%`}
+            width={35}
+            interval="equidistantPreserveStart"
+            label={{
+              value: 'chance', position: 'insideLeft', angle: -90, offset: -20, style: { textAnchor: 'middle' },
+            }}
+          />
+          <CartesianGrid stroke="gray" strokeDasharray="5 5" />
+          <Tooltip content={(props) => <CustomTooltip {...props} />} cursor={{ fill: '#3c3226' }} />
+          <Bar dataKey="value" fill="tan" isAnimationActive={false} />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
+
 const PvpHitDistribution: React.FC = observer(() => {
   const store = useStore();
   const { prefs } = store;
@@ -49,16 +95,22 @@ const PvpHitDistribution: React.FC = observer(() => {
 
   const attacker = store.attackerLoadouts[store.selectedAttacker] as Player;
   const defender = store.defenderLoadouts[store.selectedDefender] as Player;
-  const calc = new PlayerVsPlayerCalc(attacker, defender, { mode: 'pvp' });
-  const dist = calc.getDistribution().asHistogram(prefs.hitDistsHideZeros);
+  const calc = useMemo(() => new PlayerVsPlayerCalc(attacker, defender, { mode: 'pvp' }), [attacker, defender]);
+  const specAvailable = useMemo(() => {
+    const status = calc.isSpecSupported();
+    return status === FeatureStatus.IMPLEMENTED || status === FeatureStatus.PARTIALLY_IMPLEMENTED;
+  }, [calc]);
+  const dist = useMemo(() => calc.getDistribution().asHistogram(prefs.hitDistsHideZeros), [calc, prefs.hitDistsHideZeros]);
+  const specDist = useMemo(() => {
+    if (!specAvailable) {
+      return [];
+    }
 
-  const [tickCount, domainMax] = useMemo(() => {
-    const highest = max(dist, (d) => d.value as number)!;
-    const step = 10 ** Math.floor(Math.log10(highest) - 1);
-    const ceil = Math.ceil(highest / step) * step;
-    const count = 1 + Math.ceil(highest / step);
-    return [count, ceil];
-  }, [dist]);
+    return new PlayerVsPlayerCalc(attacker, defender, {
+      mode: 'pvp',
+      usingSpecialAttack: true,
+    }).getDistribution().asHistogram(prefs.hitDistsHideZeros);
+  }, [attacker, defender, prefs.hitDistsHideZeros, specAvailable]);
 
   return (
     <SectionAccordion
@@ -86,18 +138,15 @@ const PvpHitDistribution: React.FC = observer(() => {
           label="Hide misses"
           className="text-black dark:text-white mb-4"
         />
-        <ResponsiveContainer width="100%" height={225}>
-          <BarChart data={dist} margin={{ top: 11, left: 25, bottom: 20 }}>
-            <XAxis dataKey="name" stroke="#777777" interval="equidistantPreserveStart" label={{ value: 'Hitsplat', position: 'insideBottom', offset: -15 }} />
-            <YAxis stroke="#777777" domain={[0, domainMax]} tickCount={tickCount} tickFormatter={(v: number) => `${parseFloat((v * 100).toFixed(2))}%`} width={35} interval="equidistantPreserveStart" label={{ value: 'chance', position: 'insideLeft', angle: -90, offset: -20, style: { textAnchor: 'middle' } }} />
-            <CartesianGrid stroke="gray" strokeDasharray="5 5" />
-            <Tooltip content={(props) => <CustomTooltip {...props} />} cursor={{ fill: '#3c3226' }} />
-            <Bar dataKey="value" fill="tan" isAnimationActive={false} />
-          </BarChart>
-        </ResponsiveContainer>
+        <div className="flex flex-col gap-6">
+          <HitDistributionChart data={dist} title="Regular attack" />
+          {specAvailable && (
+            <HitDistributionChart data={specDist} title="Special attack" />
+          )}
+        </div>
       </div>
     </SectionAccordion>
   );
 });
 
-export default PvpHitDistribution; 
+export default PvpHitDistribution;
