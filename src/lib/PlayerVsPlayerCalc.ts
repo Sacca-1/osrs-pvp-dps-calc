@@ -13,7 +13,7 @@ import { MonsterAttribute } from '@/enums/MonsterAttribute';
  * reuse existing PvM logic without refactoring the whole stack. Only the
  * fields actually used by PlayerVsNPCCalc are populated.
  */
-function playerToMonster(p: Player): Monster {
+export function playerToMonster(p: Player, id: number = -100): Monster {
   // Determine prayer-based defence multipliers
   let defLevel = p.skills.def + (p.boosts.def || 0);
   let magicLevel = p.skills.magic + (p.boosts.magic || 0);
@@ -69,7 +69,7 @@ function playerToMonster(p: Player): Monster {
   const dragonfireProtected = p.buffs.antifire || (p.equipment.shield && dragonfireShieldNames.some((n) => p.equipment.shield?.name?.includes(n)));
 
   return {
-    id: -100 - Math.random(), // arbitrary negative ID
+    id,
     name: p.name,
     image: undefined,
     version: '',

@@ -1,5 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
-import PlayerVsPlayerCalc from '@/lib/PlayerVsPlayerCalc';
+import PlayerVsPlayerCalc, { playerToMonster } from '@/lib/PlayerVsPlayerCalc';
 import {
   findEquipment,
   getTestMonster,
@@ -7,6 +7,38 @@ import {
 } from '@/tests/utils/TestUtils';
 
 describe('PvP KO chance', () => {
+  test('should convert defenders into stable monster-shaped targets with current stats', () => {
+    const m = getTestMonster();
+    const defender = getTestPlayer(m, {
+      skills: {
+        def: 70,
+        hp: 90,
+        magic: 80,
+      },
+      boosts: {
+        def: 5,
+        hp: -10,
+        magic: 3,
+      },
+      defensive: {
+        stab: 11,
+        slash: 22,
+        crush: 33,
+        magic: 44,
+        ranged: 55,
+      },
+    });
+
+    const target = playerToMonster(defender, -222);
+
+    expect(target.id).toBe(-222);
+    expect(target.skills.def).toBe(75);
+    expect(target.skills.hp).toBe(80);
+    expect(target.skills.magic).toBe(83);
+    expect(target.defensive.stab).toBe(11);
+    expect(target.defensive.standard).toBe(55);
+  });
+
   test('should use the full special attack hit distribution against the defender HP', () => {
     const m = getTestMonster();
     const attacker = getTestPlayer(m, {

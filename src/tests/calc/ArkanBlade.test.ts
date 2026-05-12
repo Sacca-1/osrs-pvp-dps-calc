@@ -1,19 +1,20 @@
-import { Monster } from "@/types/Monster";
-import { Player } from "@/types/Player";
-import PlayerVsNPCCalc from "@/lib/PlayerVsNPCCalc";
+import { describe, expect, test } from '@jest/globals';
+import { Monster } from '@/types/Monster';
+import { Player } from '@/types/Player';
+import PlayerVsNPCCalc from '@/lib/PlayerVsNPCCalc';
 import {
   findEquipment,
   getTestMonster,
   getTestPlayer,
-} from "@/tests/utils/TestUtils";
+} from '@/tests/utils/TestUtils';
 
 const m: Monster = getTestMonster();
 
-describe("Arkan blade special attack (Flames of Ralos)", () => {
-  test("should increase accuracy by 50%", () => {
+describe('Arkan blade special attack (Flames of Ralos)', () => {
+  test('should increase accuracy by 50%', () => {
     const p: Player = getTestPlayer(m, {
       equipment: {
-        weapon: findEquipment("Arkan blade"),
+        weapon: findEquipment('Arkan blade'),
       },
     });
 
@@ -27,10 +28,10 @@ describe("Arkan blade special attack (Flames of Ralos)", () => {
     expect(specAccuracy).toBeGreaterThan(normalAccuracy);
   });
 
-  test("should increase max hit by 50%", () => {
+  test('should increase max hit by 50%', () => {
     const p: Player = getTestPlayer(m, {
       equipment: {
-        weapon: findEquipment("Arkan blade"),
+        weapon: findEquipment('Arkan blade'),
       },
     });
 
@@ -45,10 +46,10 @@ describe("Arkan blade special attack (Flames of Ralos)", () => {
     expect(specMaxHit).toBe(Math.floor(normalMaxHit * 1.5));
   });
 
-  test("should use slash defence style when special attacking", () => {
+  test('should use slash defence style when special attacking', () => {
     const p: Player = getTestPlayer(m, {
       equipment: {
-        weapon: findEquipment("Arkan blade"),
+        weapon: findEquipment('Arkan blade'),
       },
     });
 
@@ -59,10 +60,10 @@ describe("Arkan blade special attack (Flames of Ralos)", () => {
     expect(() => specCalc.getHitChance()).not.toThrow();
   });
 
-  test("should have higher DPS when using special attack", () => {
+  test('should have higher DPS when using special attack', () => {
     const p: Player = getTestPlayer(m, {
       equipment: {
-        weapon: findEquipment("Arkan blade"),
+        weapon: findEquipment('Arkan blade'),
       },
     });
 
