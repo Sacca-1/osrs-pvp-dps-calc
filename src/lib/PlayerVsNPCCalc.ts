@@ -77,6 +77,12 @@ import {
 import { burningClawDoT, burningClawSpec, dClawDist } from "@/lib/dists/claws";
 import { crimsonBludgeonSpec } from "@/lib/dists/crimsonBludgeon";
 
+const VESTAS_LONGSWORDS = [
+  "Vesta's blighted longsword",
+  "Vesta's longsword (Deadman Mode)",
+  "Vesta's longsword (bh)",
+];
+
 const PARTIALLY_IMPLEMENTED_SPECS: string[] = ["Ancient godsword"];
 
 // https://oldschool.runescape.wiki/w/Category:Weapons_with_Special_attacks
@@ -159,6 +165,8 @@ export default class PlayerVsNPCCalc extends BaseCalc {
         defenceStyle = "slash";
       } else if (this.wearing(["Arclight", "Emberlight", "Dragon sword"])) {
         defenceStyle = "stab";
+      } else if (this.wearing(VESTAS_LONGSWORDS)) {
+        defenceStyle = "stab";
       } else if (this.wearing(["Voidwaker", "Saradomin's blessed sword"])) {
         // doesn't really matter for voidwaker since it's 100% accuracy but eh
         defenceStyle = "magic";
@@ -227,6 +235,14 @@ export default class PlayerVsNPCCalc extends BaseCalc {
         DetailKey.NPC_DEFENCE_ROLL_TOA,
         defenceRoll,
         [250 + this.monster.inputs.toaInvocationLevel, 250]
+      );
+    }
+
+    if (this.opts.usingSpecialAttack && this.wearing(VESTAS_LONGSWORDS)) {
+      defenceRoll = this.trackFactor(
+        DetailKey.NPC_DEFENCE_ROLL_SPEC,
+        defenceRoll,
+        [1, 4]
       );
     }
 
@@ -809,6 +825,9 @@ export default class PlayerVsNPCCalc extends BaseCalc {
         ]);
       } else if (this.wearing("Arkan blade")) {
         maxHit = this.trackFactor(DetailKey.MAX_HIT_SPEC, maxHit, [3, 2]);
+      } else if (this.wearing(VESTAS_LONGSWORDS)) {
+        minHit = this.trackFactor(DetailKey.MIN_HIT_SPEC, maxHit, [1, 5]);
+        maxHit = this.trackFactor(DetailKey.MAX_HIT_SPEC, maxHit, [6, 5]);
       }
     }
 

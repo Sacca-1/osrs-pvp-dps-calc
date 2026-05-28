@@ -6,6 +6,7 @@ export enum DetailKey {
   NPC_DEFENCE_STAT_BONUS = "NPC defence stat bonus",
   NPC_DEFENCE_ROLL_BASE = "NPC defence base roll",
   NPC_DEFENCE_ROLL_TOA = "NPC defence ToA roll",
+  NPC_DEFENCE_ROLL_SPEC = "NPC defence spec roll",
   NPC_DEFENCE_BRIMSTONE = "NPC defence brimstone ring",
   NPC_DEFENCE_ROLL_FINAL = "NPC defence roll",
   PLAYER_ACCURACY_LEVEL = "Player accuracy level",
