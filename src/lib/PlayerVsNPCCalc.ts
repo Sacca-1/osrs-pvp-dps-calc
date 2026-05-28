@@ -83,6 +83,8 @@ const VESTAS_LONGSWORDS = [
   "Vesta's longsword (bh)",
 ];
 
+const VOIDWAKERS = ["Voidwaker", "Corrupted voidwaker"];
+
 const PARTIALLY_IMPLEMENTED_SPECS: string[] = ["Ancient godsword"];
 
 // https://oldschool.runescape.wiki/w/Category:Weapons_with_Special_attacks
@@ -167,7 +169,10 @@ export default class PlayerVsNPCCalc extends BaseCalc {
         defenceStyle = "stab";
       } else if (this.wearing(VESTAS_LONGSWORDS)) {
         defenceStyle = "stab";
-      } else if (this.wearing(["Voidwaker", "Saradomin's blessed sword"])) {
+      } else if (
+        this.isWearingVoidwaker() ||
+        this.wearing("Saradomin's blessed sword")
+      ) {
         // doesn't really matter for voidwaker since it's 100% accuracy but eh
         defenceStyle = "magic";
       } else if (this.wearing("Dragon mace")) {
@@ -794,7 +799,7 @@ export default class PlayerVsNPCCalc extends BaseCalc {
         maxHit = this.trackFactor(DetailKey.MAX_HIT_SPEC, maxHit, [5, 4]);
       } else if (this.wearing(["Dragon mace", "Dragon warhammer"])) {
         maxHit = this.trackFactor(DetailKey.MAX_HIT_SPEC, maxHit, [3, 2]);
-      } else if (this.wearing("Voidwaker")) {
+      } else if (this.isWearingVoidwaker()) {
         minHit = this.trackFactor(DetailKey.MIN_HIT_SPEC, maxHit, [1, 2]);
         maxHit = this.trackAdd(DetailKey.MAX_HIT_SPEC, maxHit, minHit);
       } else if (this.wearing(["Dragon halberd", "Crystal halberd"])) {
@@ -1886,7 +1891,7 @@ export default class PlayerVsNPCCalc extends BaseCalc {
 
     if (
       this.opts.usingSpecialAttack &&
-      this.wearing(["Voidwaker", "Dawnbringer"])
+      (this.isWearingVoidwaker() || this.wearing("Dawnbringer"))
     ) {
       return 1.0;
     }
@@ -2666,7 +2671,7 @@ export default class PlayerVsNPCCalc extends BaseCalc {
 
     // todo this comes up in a few places now, it may be good to abstract it into a "getDamageStyle"
     let styleType = this.player.style.type;
-    if (this.opts.usingSpecialAttack && this.wearing("Voidwaker")) {
+    if (this.opts.usingSpecialAttack && this.isWearingVoidwaker()) {
       styleType = "magic";
     } else if (this.opts.usingSpecialAttack && this.wearing("Eclipse atlatl")) {
       styleType = "magic";
@@ -2826,7 +2831,7 @@ export default class PlayerVsNPCCalc extends BaseCalc {
     const mattrs = this.monster.attributes;
     let styleType = this.player.style.type;
 
-    if (this.opts.usingSpecialAttack && this.wearing("Voidwaker")) {
+    if (this.opts.usingSpecialAttack && this.isWearingVoidwaker()) {
       styleType = "magic";
     } else if (this.opts.usingSpecialAttack && this.wearing("Eclipse atlatl")) {
       styleType = "magic";
@@ -3295,6 +3300,10 @@ export default class PlayerVsNPCCalc extends BaseCalc {
     }
 
     return WEAPON_SPEC_COSTS[weaponName];
+  }
+
+  protected isWearingVoidwaker(): boolean {
+    return this.wearing(VOIDWAKERS);
   }
 
   isSpecSupported(): FeatureStatus {

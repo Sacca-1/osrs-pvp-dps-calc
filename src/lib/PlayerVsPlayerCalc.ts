@@ -134,7 +134,10 @@ export default class PlayerVsPlayerCalc extends PlayerVsNPCCalc {
   public getDistribution(): AttackDistribution {
     const dist = super.getDistribution();
 
-    const incomingStyle = this.player.style.type;
+    const incomingStyle =
+      this.opts.usingSpecialAttack && this.isWearingVoidwaker()
+        ? "magic"
+        : this.player.style.type;
     const overhead = this.defender.overheadPrayer;
 
     if (overhead !== undefined && overhead !== null) {

@@ -609,6 +609,7 @@ export const WEAPON_SPEC_COSTS: { [canonicalName: string]: number } = {
   "Tonalztics of ralos": 50,
   "Dragon claws": 50,
   Voidwaker: 50,
+  "Corrupted voidwaker": 50,
   "Toxic blowpipe": 50,
   "Blazing blowpipe": 50,
   "Webweaver bow": 50,
