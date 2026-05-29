@@ -9,11 +9,9 @@ This project is a fork of the [OSRS Wiki DPS calculator](https://github.com/weir
 ## What changed in this fork
 
 - Shows PvP attacker and defender loadouts by default.
-- Removes the PvM/PvP mode switcher.
 - Adds PvP result panels, KO chance metrics, and special attack hit distribution support.
 - Adapts PvP-specific mechanics such as protection prayer damage reduction, diamond bolt proc chance, blowpipe attack speed, and Voidwaker special damage.
-- Updates branding, footer links, feedback contact, changelog, and privacy policy for this fork.
-
+  
 ## Development
 
 ```bash
