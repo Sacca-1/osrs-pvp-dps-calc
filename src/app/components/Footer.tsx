@@ -21,18 +21,18 @@ const Footer: React.FC = observer(() => {
             {' '}
             {new Date().getFullYear()}
             {' '}
-            <a href="https://weirdgloop.org" target="_blank">Weird Gloop</a>
+            <a href="https://github.com/Sacca-1" target="_blank">sacca_1</a>
           </div>
           <a
             className="flex border rounded-full p-0.5 border-gray-400"
-            href="https://github.com/weirdgloop/osrs-dps-calc"
+            href="https://github.com/Sacca-1/osrs-pvp-dps-calc"
             target="_blank"
             aria-label="Visit the GitHub repo"
           >
             <IconBrandGithub size={15} />
           </a>
           {process.env.GIT_SHA && (
-            <a href={`https://github.com/weirdgloop/osrs-dps-calc/tree/${process.env.GIT_SHA}`} target="_blank">
+            <a href={`https://github.com/Sacca-1/osrs-pvp-dps-calc/tree/${process.env.GIT_SHA}`} target="_blank">
               {`${process.env.GIT_SHA_SHORT}${process.env.GIT_DIRTY === 'true' ? '*' : ''}`}
             </a>
           )}
@@ -56,11 +56,7 @@ const Footer: React.FC = observer(() => {
           {' '}
           &#183;
           {' '}
-          <a href="https://weirdgloop.org/privacy" target="_blank">Privacy</a>
-          {' '}
-          &#183;
-          {' '}
-          <a href="https://weirdgloop.org/terms" target="_blank">Terms</a>
+          <a href="/privacy">Privacy</a>
           {' '}
           &#183;
           {' '}

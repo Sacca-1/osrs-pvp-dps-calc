@@ -1,7 +1,6 @@
 'use client';
 
 import type { NextPage } from 'next';
-import MonsterContainer from '@/app/components/monster/MonsterContainer';
 import { Tooltip } from 'react-tooltip';
 import React, { Suspense, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
@@ -9,17 +8,12 @@ import { useStore } from '@/state';
 import { ToastContainer } from 'react-toastify';
 import PlayerContainer from '@/app/components/player/PlayerContainer';
 import DefenderContainer from '@/app/components/DefenderContainer';
-import PlayerVsNPCResultsContainer from '@/app/components/results/PlayerVsNPCResultsContainer';
 import { IReactionPublic, reaction, toJS } from 'mobx';
 import InitialLoad from '@/app/components/InitialLoad';
-import LoadoutComparison from '@/app/components/results/LoadoutComparison';
-import TtkComparison from '@/app/components/results/TtkComparison';
 import ShareModal from '@/app/components/ShareModal';
 import DebugPanels from '@/app/components/results/DebugPanels';
 import { IconAlertTriangle } from '@tabler/icons-react';
-import NPCVersusPlayerResultsContainer from '@/app/components/results/NPCVersusPlayerResultsContainer';
-import { CalcProvider, useCalc } from '@/worker/CalcWorker';
-import PvpResults from '@/app/components/results/PvpResults';
+import { useCalc } from '@/worker/CalcWorker';
 import PvpResultsContainer from '@/app/components/results/PvpResultsContainer';
 
 const Home: NextPage = observer(() => {
@@ -83,9 +77,9 @@ const Home: NextPage = observer(() => {
     // When a calculator input changes, trigger a re-compute on the worker
     const triggers: ((r: IReactionPublic) => unknown)[] = [
       () => toJS(store.loadouts),
-      () => toJS(store.monster),
-      () => store.prefs.showTtkComparison,
-      () => store.prefs.showNPCVersusPlayerResults,
+      () => toJS(store.defenderLoadouts),
+      () => store.selectedAttacker,
+      () => store.selectedDefender,
       () => store.prefs.hitDistsHideZeros,
     ];
     const reactions = triggers.map((t) => reaction(t, recompute, { fireImmediately: true }));
@@ -117,33 +111,12 @@ const Home: NextPage = observer(() => {
       <div className="max-w-[1420px] mx-auto mt-4 md:mb-8">
         <div className="flex gap-2 flex-wrap justify-center">
           <PlayerContainer />
-          {store.isPvpMode && (
-            <>
-              <DefenderContainer />
-              <PvpResultsContainer />
-            </>
-          )}
-          {!store.isPvpMode && (
-            <>
-          <MonsterContainer />
-          <PlayerVsNPCResultsContainer />
-            </>
-          )}
+          <DefenderContainer />
+          <PvpResultsContainer />
         </div>
       </div>
       {/* Additional graphs and stuff */}
       <div className="max-w-[1420px] mx-auto mb-8">
-        {/* PvP loadout comparison graphs disabled for now */}
-        {!store.isPvpMode && (
-          <>
-        {/* LoadoutComparison requires its own calc context */}
-        <CalcProvider>
-          <LoadoutComparison />
-        </CalcProvider>
-        <TtkComparison />
-          </>
-        )}
-        {!store.isPvpMode && <NPCVersusPlayerResultsContainer />}
         <DebugPanels />
       </div>
       <Tooltip id="tooltip" />

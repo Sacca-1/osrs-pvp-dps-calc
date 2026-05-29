@@ -40,6 +40,26 @@ const Changelog: React.FC = () => {
         title="Changelog"
       >
         <div className="text-sm bg-dark-500 rounded p-2 shadow-inner border border-dark-200 overflow-auto max-h-64">
+          <ChangelogEntry date="29 May 2026">
+            <li>
+              Forked into a PvP-focused calculator with attacker and defender loadouts shown by default.
+            </li>
+            <li>
+              Added PvP result panels, KO chance metrics, special attack hit distribution support, and defender-side
+              damage output.
+            </li>
+            <li>
+              Added or fixed PvP-specific mechanics including protection prayer damage reduction, diamond bolt proc
+              chance, blowpipe attack speed, Voidwaker special damage, and stable defender conversion.
+            </li>
+            <li>
+              Added support for PvP-relevant specials and weapons including Vesta&apos;s longsword, Arkan blade, Aquanite
+              crossbow, and Crimson bludgeon.
+            </li>
+            <li>
+              Updated branding, footer links, feedback contact, and removed the PvM/PvP mode switcher for this fork.
+            </li>
+          </ChangelogEntry>
           <ChangelogEntry date="19 November 2024">
             <li>
               Increased maximum number of loadouts to 6, instead of 5.
@@ -155,7 +175,7 @@ const Changelog: React.FC = () => {
         <div className="flex justify-center text-xs mt-3 gap-1">
           <span>Weekly data updates not displayed here.</span>
           <a
-            href="https://github.com/weirdgloop/osrs-dps-calc/commits/main/"
+            href="https://github.com/Sacca-1/osrs-pvp-dps-calc/commits/main/"
             target="_blank"
             aria-label="Visit the GitHub repo"
           >

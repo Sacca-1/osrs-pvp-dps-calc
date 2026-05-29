@@ -1174,7 +1174,7 @@ class GlobalState implements State {
   }
 
   get isPvpMode() {
-    return this.prefs.calcMode === "pvp";
+    return true;
   }
 
   get loadouts() {
