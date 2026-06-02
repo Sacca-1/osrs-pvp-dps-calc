@@ -1668,21 +1668,22 @@ export default class PlayerVsNPCCalc extends BaseCalc {
       minHit = this.trackFactor(DetailKey.MIN_HIT_SUNFIRE, maxHit, [1, 10]);
     }
 
+    const usingChargedTome =
+      this.player.equipment.shield?.version === "Charged";
     if (
-      (this.wearing("Tome of fire") &&
-        this.player.equipment.shield?.version === "Charged" &&
-        this.player.spell?.element === "fire") ||
-      (this.wearing("Tome of water") &&
-        this.player.equipment.shield?.version === "Charged" &&
-        this.player.spell?.element === "water") ||
-      (this.wearing("Tome of earth") &&
-        this.player.equipment.shield?.version === "Charged" &&
-        this.player.spell?.element === "earth")
+      usingChargedTome &&
+      (
+        (this.wearing("Tome of fire") && this.player.spell?.element === "fire") ||
+        (this.wearing("Tome of water") && this.player.spell?.element === "water") ||
+        (this.wearing("Tome of earth") && this.player.spell?.element === "earth")
+      )
     ) {
-      const tomeFactor =
-        this.opts.mode === "pvp"
-          ? ([3, 2] as [number, number])
-          : ([11, 10] as [number, number]);
+      let tomeFactor: [number, number] = [11, 10];
+      if (this.opts.mode === "pvp" && this.wearing("Tome of fire")) {
+        tomeFactor = [3, 2];
+      } else if (this.opts.mode === "pvp" && this.wearing("Tome of water")) {
+        tomeFactor = [6, 5];
+      }
       maxHit = this.trackFactor(DetailKey.MAX_HIT_TOME, maxHit, tomeFactor);
     }
 

@@ -11,7 +11,7 @@ describe('Damage Taken', () => {
       const result = calculateNpcVsPlayer(monster, player);
 
       expect(result.npcMaxHit).toBe(8);
-      expect(result.npcDps).toBeCloseTo(1.596, DPS_PRECISION);
+      expect(result.npcDps).toBeCloseTo(1.640, DPS_PRECISION);
       expect(result.npcMaxAttackRoll).toBe(6784);
       expect(result.playerDefRoll).toBe(576);
       expect(result.npcAccuracy * 100).toBeCloseTo(95.74, ACCURACY_PRECISION);
@@ -22,7 +22,7 @@ describe('Damage Taken', () => {
       const result = calculateNpcVsPlayer(monster, player);
 
       expect(result.npcMaxHit).toBe(8);
-      expect(result.npcDps).toBeCloseTo(0.825, DPS_PRECISION);
+      expect(result.npcDps).toBeCloseTo(0.848, DPS_PRECISION);
       expect(result.npcMaxAttackRoll).toBe(6784);
       expect(result.playerDefRoll).toBe(6848);
       expect(result.npcAccuracy * 100).toBeCloseTo(49.53, ACCURACY_PRECISION);

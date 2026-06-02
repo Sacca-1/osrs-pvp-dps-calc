@@ -7,6 +7,42 @@ import { AttackDistribution } from '@/lib/HitDist';
 import { Prayer, PrayerMap } from '@/enums/Prayer';
 import { PROTECTION_PRAYER_DAMAGE_REDUCTION } from '@/lib/constants';
 import { MonsterAttribute } from '@/enums/MonsterAttribute';
+import { Factor } from '@/lib/Math';
+
+function bestPrayerFactor(
+  prayers: Prayer[],
+  key: 'factorDefence' | 'factorDefenceMagic',
+): Factor | null {
+  let factor: Factor | null = null;
+  for (const pr of prayers) {
+    const data = PrayerMap[pr];
+    const candidate = data?.[key];
+    if (
+      candidate &&
+      (!factor || candidate[0] / candidate[1] > factor[0] / factor[1])
+    ) {
+      factor = candidate;
+    }
+  }
+  return factor;
+}
+
+function applyFactor(level: number, factor: Factor | null): number {
+  return factor ? Math.trunc((level * factor[0]) / factor[1]) : level;
+}
+
+function defenceStanceBonus(p: Player): number {
+  switch (p.style.stance) {
+    case 'Defensive':
+    case 'Defensive Autocast':
+    case 'Longrange':
+      return 3;
+    case 'Controlled':
+      return 1;
+    default:
+      return 0;
+  }
+}
 
 /**
  * Helper to convert a Player object into a Monster-like structure so we can
@@ -14,50 +50,20 @@ import { MonsterAttribute } from '@/enums/MonsterAttribute';
  * fields actually used by PlayerVsNPCCalc are populated.
  */
 export function playerToMonster(p: Player, id: number = -100): Monster {
-  // Determine prayer-based defence multipliers
-  let defLevel = p.skills.def + (p.boosts.def || 0);
-  let magicLevel = p.skills.magic + (p.boosts.magic || 0);
+  const baseDefLevel = p.skills.def + (p.boosts.def || 0);
+  const defLevel = applyFactor(
+    baseDefLevel,
+    bestPrayerFactor(p.prayers, 'factorDefence'),
+  );
+  const magicLevel = applyFactor(
+    p.skills.magic + (p.boosts.magic || 0),
+    bestPrayerFactor(p.prayers, 'factorDefenceMagic'),
+  );
+  const stanceBonus = defenceStanceBonus(p);
 
-  let defFactor: [number, number] | null = null;
-  let defMagicFactor: [number, number] | null = null;
-
-  for (const pr of p.prayers) {
-    const data = PrayerMap[pr];
-    if (data?.factorDefence) {
-      if (!defFactor || (data.factorDefence[0] / data.factorDefence[1]) > (defFactor[0] / defFactor[1])) {
-        defFactor = data.factorDefence;
-      }
-    }
-    if (data?.factorDefenceMagic) {
-      if (!defMagicFactor || (data.factorDefenceMagic[0] / data.factorDefenceMagic[1]) > (defMagicFactor[0] / defMagicFactor[1])) {
-        defMagicFactor = data.factorDefenceMagic;
-      }
-    }
-  }
-
-  if (defFactor) {
-    defLevel = Math.floor(defLevel * defFactor[0] / defFactor[1]);
-  }
-  if (defMagicFactor) {
-    magicLevel = Math.floor(magicLevel * defMagicFactor[0] / defMagicFactor[1]);
-  }
-
-  // Apply stance-based defence bonuses (Defensive/Longrange: +3, Controlled: +1).
-  // These bonuses are applied after prayer modifiers, mirroring the in-game effective level formula.
-  let stanceBonus = 0;
-  switch (p.style.stance) {
-    case 'Defensive':
-    case 'Defensive Autocast':
-    case 'Longrange':
-      stanceBonus = 3;
-      break;
-    case 'Controlled':
-      stanceBonus = 1;
-      break;
-    default:
-      break;
-  }
-  defLevel += stanceBonus;
+  const physicalDefenceEffectiveLevel = defLevel + stanceBonus + 8;
+  const magicDefenceEffectiveLevel =
+    Math.trunc((magicLevel * 7 + defLevel * 3) / 10) + stanceBonus + 8;
 
   // Determine dragonfire protection (antifire potion or shield)
   const dragonfireShieldNames = [
@@ -78,9 +84,11 @@ export function playerToMonster(p: Player, id: number = -100): Monster {
     style: null,
     skills: {
       atk: p.skills.atk + (p.boosts.atk || 0),
-      def: defLevel,
+      // PlayerVsNPCCalc adds +9 to monster-shaped targets. Store values
+      // offset by 9 so PvP uses the player effective defence formula.
+      def: physicalDefenceEffectiveLevel - 9,
       hp: p.skills.hp + (p.boosts.hp || 0),
-      magic: magicLevel,
+      magic: magicDefenceEffectiveLevel - 9,
       ranged: p.skills.ranged + (p.boosts.ranged || 0),
       str: p.skills.str + (p.boosts.str || 0),
     },

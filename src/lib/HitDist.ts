@@ -262,10 +262,11 @@ export class HitDistribution {
     const d = new HitDistribution([]);
     const hitProb = accuracy / (maximum - minimum + 1);
     for (let i = minimum; i <= maximum; i++) {
-      d.addHit(new WeightedHit(hitProb, [new Hitsplat(i)]));
+      const damage = minimum === 0 && maximum > 0 ? Math.max(1, i) : i;
+      d.addHit(new WeightedHit(hitProb, [new Hitsplat(damage)]));
     }
     d.addHit(new WeightedHit(1 - accuracy, [Hitsplat.INACCURATE]));
-    return d;
+    return d.flatten();
   }
 
   public static single(accuracy: number, hitsplats: Hitsplat[]): HitDistribution {
