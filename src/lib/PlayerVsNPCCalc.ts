@@ -85,6 +85,23 @@ const VESTAS_LONGSWORDS = [
 
 const VOIDWAKERS = ["Voidwaker", "Corrupted voidwaker"];
 
+const DIAMOND_BOLT_EFFECT_AMMO = [
+  'Diamond bolts (e)',
+  'Diamond dragon bolts (e)',
+  'Diamond-tipped Fractured Bolts',
+];
+
+const ONYX_BOLT_EFFECT_AMMO = [
+  'Onyx bolts (e)',
+  'Onyx dragon bolts (e)',
+  'Onyx-tipped Fractured Bolts',
+];
+
+const FRACTURED_BOLT_EFFECT_AMMO = [
+  'Diamond-tipped Fractured Bolts',
+  'Onyx-tipped Fractured Bolts',
+];
+
 const PARTIALLY_IMPLEMENTED_SPECS: string[] = ["Ancient godsword"];
 
 // https://oldschool.runescape.wiki/w/Category:Weapons_with_Special_attacks
@@ -2476,6 +2493,8 @@ export default class PlayerVsNPCCalc extends BaseCalc {
     }
 
     // bolt effects
+    const usingDualWieldCrossbows = this.wearing('Dual-wield Crossbows');
+    const usingFracturedBoltEffect = this.wearing(FRACTURED_BOLT_EFFECT_AMMO);
     const boltContext: BoltContext = {
       maxHit: max,
       rangedLvl: this.player.skills.ranged + this.player.boosts.ranged,
@@ -2483,6 +2502,7 @@ export default class PlayerVsNPCCalc extends BaseCalc {
       spec: this.opts.usingSpecialAttack,
       kandarinDiary: this.player.buffs.kandarinDiary,
       monster: this.monster,
+      procChanceMultiplier: usingDualWieldCrossbows && usingFracturedBoltEffect ? 0.5 : 1.0,
     };
     if (
       this.player.style.type === "ranged" &&
@@ -2492,16 +2512,14 @@ export default class PlayerVsNPCCalc extends BaseCalc {
         dist = dist.transform(opalBolts(boltContext));
       } else if (this.wearing(["Pearl bolts (e)", "Pearl dragon bolts (e)"])) {
         dist = dist.transform(pearlBolts(boltContext));
-      } else if (
-        this.wearing(["Diamond bolts (e)", "Diamond dragon bolts (e)"])
-      ) {
+      } else if (this.wearing(DIAMOND_BOLT_EFFECT_AMMO)) {
         dist = dist.transform(diamondBolts(boltContext));
       } else if (
         this.wearing(["Dragonstone bolts (e)", "Dragonstone dragon bolts (e)"])
       ) {
         dist = dist.transform(dragonstoneBolts(boltContext));
       } else if (
-        this.wearing(["Onyx bolts (e)", "Onyx dragon bolts (e)"]) &&
+        this.wearing(ONYX_BOLT_EFFECT_AMMO) &&
         !mattrs.includes(MonsterAttribute.UNDEAD)
       ) {
         dist = dist.transform(onyxBolts(boltContext));
@@ -2581,12 +2599,12 @@ export default class PlayerVsNPCCalc extends BaseCalc {
         secondHitDist = secondHitDist.transform(opalBolts(reducedBoltContext));
       } else if (this.wearing(["Pearl bolts (e)", "Pearl dragon bolts (e)"])) {
         secondHitDist = secondHitDist.transform(pearlBolts(reducedBoltContext));
-      } else if (this.wearing(["Diamond bolts (e)", "Diamond dragon bolts (e)"])) {
+      } else if (this.wearing(DIAMOND_BOLT_EFFECT_AMMO)) {
         secondHitDist = secondHitDist.transform(diamondBolts(reducedBoltContext));
       } else if (this.wearing(["Dragonstone bolts (e)", "Dragonstone dragon bolts (e)"])) {
         secondHitDist = secondHitDist.transform(dragonstoneBolts(reducedBoltContext));
       } else if (
-        this.wearing(["Onyx bolts (e)", "Onyx dragon bolts (e)"]) &&
+        this.wearing(ONYX_BOLT_EFFECT_AMMO) &&
         !mattrs.includes(MonsterAttribute.UNDEAD)
       ) {
         secondHitDist = secondHitDist.transform(onyxBolts(reducedBoltContext));

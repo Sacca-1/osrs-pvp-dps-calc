@@ -777,7 +777,13 @@ export default class BaseCalc {
     if (this.wearing('Crimson bludgeon')) {
       this.addIssue(
         UserIssueType.WEAPON_PRERELEASE,
-        'Crimson bludgeon is a pre-release addition to the calculator and may change before the item is released.'
+        'Crimson bludgeon is a pre-release addition to the calculator and may change before the item is released.',
+      );
+    }
+    if (this.wearing('Dual-wield Crossbows')) {
+      this.addIssue(
+        UserIssueType.WEAPON_PRERELEASE,
+        'Dual-wield Crossbows are a pre-release addition to the calculator and may change before the item is released.',
       );
     }
   }

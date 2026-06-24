@@ -51,6 +51,126 @@ const manualEquipment: EquipmentPiece[] = [
     },
     isTwoHanded: true,
   },
+  {
+    name: 'Dual-wield Crossbows',
+    id: 300002,
+    version: '',
+    slot: 'weapon',
+    image: "Hunters' sunlight crossbow.png",
+    speed: 3,
+    category: EquipmentCategory.CROSSBOW,
+    bonuses: {
+      str: 0,
+      ranged_str: 0,
+      magic_str: 0,
+      prayer: 0,
+    },
+    offensive: {
+      stab: 0,
+      slash: 0,
+      crush: 0,
+      magic: 3,
+      ranged: 34,
+    },
+    defensive: {
+      stab: -7,
+      slash: -5,
+      crush: 0,
+      magic: 10,
+      ranged: 0,
+    },
+    isTwoHanded: true,
+  },
+  {
+    name: 'Fractured Bolts',
+    id: 300003,
+    version: '',
+    slot: 'ammo',
+    image: 'Runite bolts 5.png',
+    speed: 0,
+    category: EquipmentCategory.NONE,
+    bonuses: {
+      str: 0,
+      ranged_str: 53,
+      magic_str: 0,
+      prayer: 0,
+    },
+    offensive: {
+      stab: 0,
+      slash: 0,
+      crush: 0,
+      magic: 0,
+      ranged: 0,
+    },
+    defensive: {
+      stab: 0,
+      slash: 0,
+      crush: 0,
+      magic: 0,
+      ranged: 0,
+    },
+    isTwoHanded: false,
+  },
+  {
+    name: 'Diamond-tipped Fractured Bolts',
+    id: 300004,
+    version: '',
+    slot: 'ammo',
+    image: 'Diamond bolts (e) 5.png',
+    speed: 0,
+    category: EquipmentCategory.NONE,
+    bonuses: {
+      str: 0,
+      ranged_str: 58,
+      magic_str: 0,
+      prayer: 0,
+    },
+    offensive: {
+      stab: 0,
+      slash: 0,
+      crush: 0,
+      magic: 0,
+      ranged: 0,
+    },
+    defensive: {
+      stab: 0,
+      slash: 0,
+      crush: 0,
+      magic: 0,
+      ranged: 0,
+    },
+    isTwoHanded: false,
+  },
+  {
+    name: 'Onyx-tipped Fractured Bolts',
+    id: 300005,
+    version: '',
+    slot: 'ammo',
+    image: 'Onyx bolts (e) 5.png',
+    speed: 0,
+    category: EquipmentCategory.NONE,
+    bonuses: {
+      str: 0,
+      ranged_str: 58,
+      magic_str: 0,
+      prayer: 0,
+    },
+    offensive: {
+      stab: 0,
+      slash: 0,
+      crush: 0,
+      magic: 0,
+      ranged: 0,
+    },
+    defensive: {
+      stab: 0,
+      slash: 0,
+      crush: 0,
+      magic: 0,
+      ranged: 0,
+    },
+    isTwoHanded: false,
+  },
 ];
 
 export const availableEquipment = [
@@ -282,6 +402,7 @@ const ammoForRangedWeapons: { [weapon: number]: number[] } = {
   21012: commonAmmoCategories().cb_t64, // Dragon hunter crossbow
   11785: commonAmmoCategories().cb_t64, // Armadyl crossbow
   26374: commonAmmoCategories().cb_t64, // Zaryte crossbow
+  300002: [300003, 300004, 300005], // Dual-wield Crossbows
   12924: [], // Toxic blowpipe (empty)
   12926: [], // Toxic blowpipe (charged)
   22547: [], // Craw's bow (empty)
