@@ -54,7 +54,7 @@ const Changelog: React.FC = () => {
             </li>
             <li>
               Added support for PvP-relevant specials and weapons including Vesta&apos;s longsword, Arkan blade, Aquanite
-              crossbow, and Crimson bludgeon.
+              crossbow, and Crimson kisten.
             </li>
             <li>
               Updated branding, footer links, feedback contact, and removed the PvM/PvP mode switcher for this fork.

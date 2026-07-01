@@ -169,8 +169,9 @@ describe('PvP KO chance', () => {
     const m = getTestMonster();
     const attacker = getTestPlayer(m, {
       equipment: {
-        weapon: findEquipment('Crimson bludgeon'),
+        weapon: findEquipment('Crimson kisten'),
       },
+      style: { name: 'Smash', type: 'crush', stance: 'Aggressive' },
     });
     const defender = getTestPlayer(m, {
       skills: {

@@ -75,7 +75,7 @@ import {
   rubyBolts,
 } from "@/lib/dists/bolts";
 import { burningClawDoT, burningClawSpec, dClawDist } from "@/lib/dists/claws";
-import { crimsonBludgeonSpec } from "@/lib/dists/crimsonBludgeon";
+import { crimsonKistenSpec } from "@/lib/dists/crimsonKisten";
 
 const VESTAS_LONGSWORDS = [
   "Vesta's blighted longsword",
@@ -84,6 +84,8 @@ const VESTAS_LONGSWORDS = [
 ];
 
 const VOIDWAKERS = ["Voidwaker", "Corrupted voidwaker"];
+
+const CRIMSON_KISTEN = ["Crimson kisten", "Crimson bludgeon"];
 
 const DIAMOND_BOLT_EFFECT_AMMO = [
   'Diamond bolts (e)',
@@ -1829,7 +1831,7 @@ export default class PlayerVsNPCCalc extends BaseCalc {
 
   public getHitChance() {
     if (this.opts.overrides?.accuracy) {
-      if (this.opts.usingSpecialAttack && this.wearing("Crimson bludgeon")) {
+      if (this.opts.usingSpecialAttack && this.wearing(CRIMSON_KISTEN)) {
         return this.track(
           DetailKey.PLAYER_ACCURACY_FINAL,
           1 - (1 - this.opts.overrides.accuracy) ** 4
@@ -1996,7 +1998,7 @@ export default class PlayerVsNPCCalc extends BaseCalc {
       // If previousAttack === "not_splashed", no bonus is applied (normal accuracy)
     }
 
-    if (this.opts.usingSpecialAttack && this.wearing("Crimson bludgeon")) {
+    if (this.opts.usingSpecialAttack && this.wearing(CRIMSON_KISTEN)) {
       return this.track(
         DetailKey.PLAYER_ACCURACY_FINAL,
         1 - (1 - hitChance) ** 4
@@ -2227,7 +2229,7 @@ export default class PlayerVsNPCCalc extends BaseCalc {
       } else if (this.wearing(["Bone claws", "Burning claws"])) {
         accurateZeroApplicable = false;
         dist = burningClawSpec(acc, max);
-      } else if (this.wearing("Crimson bludgeon")) {
+      } else if (this.wearing(CRIMSON_KISTEN)) {
         accurateZeroApplicable = false;
         const singleRollAccuracy = this.opts.overrides?.accuracy ?? this.track(
           DetailKey.PLAYER_ACCURACY_BASE,
@@ -2236,7 +2238,7 @@ export default class PlayerVsNPCCalc extends BaseCalc {
             this.getNPCDefenceRoll()
           )
         );
-        dist = crimsonBludgeonSpec(singleRollAccuracy, max);
+        dist = crimsonKistenSpec(singleRollAccuracy, max);
       }
     }
 

@@ -28,7 +28,7 @@ const binomialCoefficient = (n: number, k: number): number => {
   return result;
 };
 
-export const crimsonBludgeonSpec = (
+export const crimsonKistenSpec = (
   singleRollAccuracy: number,
   max: number
 ): AttackDistribution => {

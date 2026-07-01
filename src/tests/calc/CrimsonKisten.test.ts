@@ -6,18 +6,26 @@ import {
   getTestMonster,
   getTestPlayer,
 } from "@/tests/utils/TestUtils";
+import { EquipmentCategory } from "@/enums/EquipmentCategory";
 
 const m = getTestMonster();
+const crimsonKisten = findEquipment("Crimson kisten");
+const smashStyle = { name: "Smash", type: "crush", stance: "Aggressive" } as const;
 
-describe("Crimson bludgeon", () => {
-  test("should be selectable in test fixtures", () => {
-    expect(findEquipment("Crimson bludgeon")).toBeDefined();
+describe("Crimson kisten", () => {
+  test("should use released stats and icon", () => {
+    expect(crimsonKisten.id).toBe(33631);
+    expect(crimsonKisten.image).toBe("Crimson kisten.png");
+    expect(crimsonKisten.speed).toBe(4);
+    expect(crimsonKisten.category).toBe(EquipmentCategory.AXE);
+    expect(crimsonKisten.offensive.crush).toBe(80);
+    expect(crimsonKisten.bonuses.str).toBe(56);
   });
 
-  test("should show a pre-release warning when equipped", () => {
+  test("should not show a pre-release warning when equipped", () => {
     const p = getTestPlayer(m, {
       equipment: {
-        weapon: findEquipment("Crimson bludgeon"),
+        weapon: crimsonKisten,
       },
     });
 
@@ -25,14 +33,15 @@ describe("Crimson bludgeon", () => {
 
     expect(
       calc.userIssues.some((issue) => issue.type === UserIssueType.WEAPON_PRERELEASE)
-    ).toBe(true);
+    ).toBe(false);
   });
 
   test("should use four-roll overall accuracy for the special attack", () => {
     const p = getTestPlayer(m, {
       equipment: {
-        weapon: findEquipment("Crimson bludgeon"),
+        weapon: crimsonKisten,
       },
+      style: smashStyle,
     });
 
     const calc = new PlayerVsNPCCalc(p, m, {
@@ -48,8 +57,9 @@ describe("Crimson bludgeon", () => {
   test("should use the 130-170% damage band with a -1 max cap when all four rolls succeed", () => {
     const p = getTestPlayer(m, {
       equipment: {
-        weapon: findEquipment("Crimson bludgeon"),
+        weapon: crimsonKisten,
       },
+      style: smashStyle,
     });
 
     const normalMax = new PlayerVsNPCCalc(p, m).getMax();
@@ -72,8 +82,9 @@ describe("Crimson bludgeon", () => {
   test("should combine the success-count damage bands using the four roll distribution", () => {
     const p = getTestPlayer(m, {
       equipment: {
-        weapon: findEquipment("Crimson bludgeon"),
+        weapon: crimsonKisten,
       },
+      style: smashStyle,
     });
 
     const normalMax = new PlayerVsNPCCalc(p, m).getMax();
