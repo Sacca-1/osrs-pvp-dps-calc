@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@/state';
 import { calculateCombatLevel } from '@/utils';
@@ -9,6 +9,8 @@ import WikiSyncButton from '@/app/components/player/WikiSyncButton';
 
 const PlayerContainer: React.FC = observer(() => {
   const store = useStore();
+  const [draggedLoadout, setDraggedLoadout] = useState<number | null>(null);
+  const didDragLoadout = useRef(false);
   const {
     attackerLoadouts: loadouts,
     player,
@@ -29,10 +31,36 @@ const PlayerContainer: React.FC = observer(() => {
           {loadouts.map((l, ix) => (
             <button
               type="button"
+              draggable
               // eslint-disable-next-line react/no-array-index-key
               key={ix}
-              className={`min-w-[40px] text-left first:md:rounded-tl px-4 py-1 border-l-2 first:border-l-0 last:rounded-tr border-body-100 dark:border-dark-300 transition-colors ${selectedLoadout === ix ? 'bg-orange-400 dark:bg-orange-700' : 'bg-btns-400 dark:bg-dark-400'}`}
+              className={`min-w-[40px] text-left first:md:rounded-tl px-4 py-1 border-l-2 first:border-l-0 last:rounded-tr border-body-100 dark:border-dark-300 transition-colors cursor-grab active:cursor-grabbing ${draggedLoadout === ix ? 'opacity-60' : ''} ${selectedLoadout === ix ? 'bg-orange-400 dark:bg-orange-700' : 'bg-btns-400 dark:bg-dark-400'}`}
+              onDragStart={(event) => {
+                event.dataTransfer.effectAllowed = 'move';
+                event.dataTransfer.setData('text/plain', ix.toString());
+                didDragLoadout.current = false;
+                setDraggedLoadout(ix);
+              }}
+              onDragOver={(event) => {
+                event.preventDefault();
+                event.dataTransfer.dropEffect = 'move';
+                if (draggedLoadout !== null && draggedLoadout !== ix) {
+                  didDragLoadout.current = true;
+                  store.reorderLoadout(draggedLoadout, ix, 'attacker');
+                  setDraggedLoadout(ix);
+                }
+              }}
+              onDrop={(event) => {
+                event.preventDefault();
+              }}
+              onDragEnd={() => {
+                setDraggedLoadout(null);
+                window.setTimeout(() => {
+                  didDragLoadout.current = false;
+                }, 0);
+              }}
               onClick={() => {
+                if (didDragLoadout.current) return;
                 store.setSelectedLoadout(ix);
               }}
             >
@@ -60,7 +88,7 @@ const PlayerContainer: React.FC = observer(() => {
           className="px-5 py-3 border-b-body-400 dark:border-b-dark-200 border-b flex justify-between items-center font-serif"
         >
           <div className="min-w-0">
-            <LoadoutName name={loadouts[selectedLoadout].name} renameLoadout={(i,n)=>renameLoadout(i,n,'attacker')} index={selectedLoadout} />
+            <LoadoutName name={loadouts[selectedLoadout].name} renameLoadout={(i, n) => renameLoadout(i, n, 'attacker')} index={selectedLoadout} />
             <div className="text-xs font-bold text-gray-500 dark:text-gray-300">
               Level
               {' '}

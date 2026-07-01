@@ -999,6 +999,48 @@ class GlobalState implements State {
     this.selectedDefender = ix;
   }
 
+  reorderLoadout(
+    fromIx: number,
+    toIx: number,
+    side: "attacker" | "defender" = "attacker"
+  ) {
+    const list =
+      side === "attacker" ? this.attackerLoadouts : this.defenderLoadouts;
+
+    if (
+      fromIx === toIx ||
+      fromIx < 0 ||
+      toIx < 0 ||
+      fromIx >= list.length ||
+      toIx >= list.length
+    ) {
+      return;
+    }
+
+    const reordered = [...list];
+    const [moved] = reordered.splice(fromIx, 1);
+    reordered.splice(toIx, 0, moved);
+
+    const currentSelection =
+      side === "attacker" ? this.selectedAttacker : this.selectedDefender;
+    let nextSelection = currentSelection;
+    if (currentSelection === fromIx) {
+      nextSelection = toIx;
+    } else if (fromIx < currentSelection && currentSelection <= toIx) {
+      nextSelection = currentSelection - 1;
+    } else if (toIx <= currentSelection && currentSelection < fromIx) {
+      nextSelection = currentSelection + 1;
+    }
+
+    if (side === "attacker") {
+      this.attackerLoadouts = reordered;
+      this.selectedAttacker = nextSelection;
+    } else {
+      this.defenderLoadouts = reordered;
+      this.selectedDefender = nextSelection;
+    }
+  }
+
   deleteLoadout(ix: number, side: "attacker" | "defender" = "attacker") {
     const list =
       side === "attacker" ? this.attackerLoadouts : this.defenderLoadouts;
