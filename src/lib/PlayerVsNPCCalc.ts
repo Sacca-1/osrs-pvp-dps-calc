@@ -55,7 +55,11 @@ import {
 import { EquipmentCategory } from "@/enums/EquipmentCategory";
 import { DetailKey } from "@/lib/CalcDetails";
 import { Factor, iLerp, MinMax } from "@/lib/Math";
-import { calculateAttackSpeed, WEAPON_SPEC_COSTS } from "@/lib/Equipment";
+import {
+  calculateAttackSpeed,
+  isSeekingArrowName,
+  WEAPON_SPEC_COSTS,
+} from "@/lib/Equipment";
 import BaseCalc, { CalcOpts, InternalOpts } from "@/lib/BaseCalc";
 import { scaleMonster, scaleMonsterHpOnly } from "@/lib/MonsterScaling";
 import {
@@ -2538,6 +2542,18 @@ export default class PlayerVsNPCCalc extends BaseCalc {
       dist = dist.transform(
         (h) =>
           HitDistribution.single(1.0, [new Hitsplat(Math.max(h.damage, 1))]),
+        { transformInaccurate: false }
+      );
+    }
+
+    if (
+      this.player.style.type === "ranged" &&
+      isSeekingArrowName(this.player.equipment.ammo?.name)
+    ) {
+      this.track(DetailKey.MIN_HIT_SEEKER_ARROW, 3);
+      dist = dist.transform(
+        (h) =>
+          HitDistribution.single(1.0, [new Hitsplat(Math.max(h.damage, 3))]),
         { transformInaccurate: false }
       );
     }

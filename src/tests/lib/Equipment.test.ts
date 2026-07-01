@@ -3,6 +3,24 @@ import { describe, expect, test } from '@jest/globals';
 import { calculateEquipmentBonusesFromGear } from '@/lib/Equipment';
 
 describe('calculateEquipmentBonusesFromGear', () => {
+  describe('regenerated equipment data', () => {
+    test('keeps Avernic treads variants on distinct images and IDs', () => {
+      expect(findEquipment('Avernic treads').id).toBe(31088);
+      expect(findEquipment('Avernic treads (pr)').image).toBe('Avernic treads (pr).png');
+      expect(findEquipment('Avernic treads (pe)').image).toBe('Avernic treads (pe).png');
+      expect(findEquipment('Avernic treads (et)').image).toBe('Avernic treads (et).png');
+      expect(findEquipment('Avernic treads (max)').id).toBe(31097);
+    });
+
+    test('includes Necklace of rupture', () => {
+      const necklace = findEquipment('Necklace of rupture');
+
+      expect(necklace.id).toBe(33639);
+      expect(necklace.slot).toBe('neck');
+      expect(necklace.image).toBe('Necklace of rupture.png');
+    });
+  });
+
   describe("with Dizana's quiver", () => {
     describe('with weapon using ammo slot', () => {
       test('applies bonus when charged', () => {

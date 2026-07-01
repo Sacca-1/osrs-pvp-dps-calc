@@ -17,6 +17,21 @@ export type EquipmentBonuses = Pick<
   "bonuses" | "offensive" | "defensive" | "attackSpeed"
 >;
 
+export const SEEKING_ARROW_NAMES = [
+  "Seeking bronze arrow",
+  "Seeking iron arrow",
+  "Seeking steel arrow",
+  "Seeking mithril arrow",
+  "Seeking adamant arrow",
+  "Seeking rune arrow",
+  "Seeking amethyst arrow",
+  "Seeking dragon arrow",
+  "Seeking broad arrows",
+];
+
+export const isSeekingArrowName = (name?: string): boolean =>
+  name !== undefined && SEEKING_ARROW_NAMES.includes(name);
+
 /**
  * All available equipment that a player can equip.
  */
@@ -206,6 +221,17 @@ export const equipmentAliases = generatedEquipmentAliases as {
 };
 
 const commonAmmoCategories = () => {
+  const seeking = {
+    bronze: 33553,
+    iron: 33559,
+    steel: 33565,
+    mithril: 33571,
+    adamant: 33577,
+    rune: 33583,
+    amethyst: 33589,
+    dragon: 33595,
+    broad: 33601,
+  };
   const ret: { [k: string]: number[] } = {
     bow_t1: [
       882,
@@ -220,6 +246,8 @@ const commonAmmoCategories = () => {
       5623,
       2532,
       2533, // Iron arrow + variants
+      seeking.bronze,
+      seeking.iron,
       22227,
       22228,
       22229,
@@ -270,10 +298,10 @@ const commonAmmoCategories = () => {
   };
 
   // Bows
-  ret.bow_t5 = [...ret.bow_t1, 886, 887, 5618, 5624, 2534, 2535]; // Steel arrow + variants
-  ret.bow_t20 = [...ret.bow_t5, 888, 889, 5619, 5625, 2536, 2537]; // Mithril arrow + variants
-  ret.bow_t30 = [...ret.bow_t20, 890, 891, 5620, 5626, 2538, 2539]; // Adamant arrow + variants
-  ret.bow_t40 = [...ret.bow_t30, 892, 893, 5621, 5627, 78, 2540, 2541]; // Rune arrow + variants, ice arrows
+  ret.bow_t5 = [...ret.bow_t1, 886, 887, 5618, 5624, 2534, 2535, seeking.steel]; // Steel arrow + variants
+  ret.bow_t20 = [...ret.bow_t5, 888, 889, 5619, 5625, 2536, 2537, seeking.mithril]; // Mithril arrow + variants
+  ret.bow_t30 = [...ret.bow_t20, 890, 891, 5620, 5626, 2538, 2539, seeking.adamant]; // Adamant arrow + variants
+  ret.bow_t40 = [...ret.bow_t30, 892, 893, 5621, 5627, 78, 2540, 2541, seeking.rune]; // Rune arrow + variants, ice arrows
   ret.bow_t50 = [
     ...ret.bow_t40,
     21326,
@@ -283,8 +311,10 @@ const commonAmmoCategories = () => {
     4160,
     21328,
     21330,
+    seeking.amethyst,
+    seeking.broad,
   ]; // Amethyst arrow + variants, broad arrows
-  ret.bow_t60 = [...ret.bow_t50, 11212, 11227, 11228, 11229, 11217, 11222]; // Dragon arrow + variants
+  ret.bow_t60 = [...ret.bow_t50, 11212, 11227, 11228, 11229, 11217, 11222, seeking.dragon]; // Dragon arrow + variants
 
   // Bolts
   ret.cb_t16 = [...ret.cb_t1, 9139, 9286, 9293, 9300, 9335, 9237]; // Blurite bolts + variants, jade bolts + (e)

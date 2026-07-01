@@ -1,6 +1,10 @@
 import { EquipmentPiece, Player } from '@/types/Player';
 import { BurnImmunity, Monster } from '@/types/Monster';
-import { AmmoApplicability, ammoApplicability, getCanonicalEquipment } from '@/lib/Equipment';
+import {
+  AmmoApplicability,
+  ammoApplicability,
+  getCanonicalEquipment,
+} from '@/lib/Equipment';
 import UserIssueType from '@/enums/UserIssueType';
 import { MonsterAttribute } from '@/enums/MonsterAttribute';
 import {
