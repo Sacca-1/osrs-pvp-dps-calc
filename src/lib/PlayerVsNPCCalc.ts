@@ -1273,7 +1273,10 @@ export default class PlayerVsNPCCalc extends BaseCalc {
 
     if (this.opts.usingSpecialAttack) {
       if (this.wearing("Dark bow")) {
-        const descentOfDragons = this.wearing("Dragon arrow");
+        const descentOfDragons = this.wearing([
+          "Dragon arrow",
+          "Seeking dragon arrow",
+        ]);
         minHit = this.track(DetailKey.MIN_HIT_SPEC, descentOfDragons ? 8 : 5);
         const dmgFactor = descentOfDragons ? 15 : 13;
         maxHit = this.trackFactor(DetailKey.MAX_HIT_SPEC, maxHit, [

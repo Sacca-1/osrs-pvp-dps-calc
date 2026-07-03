@@ -34,6 +34,26 @@ const playerWithAmmo = (ammoName: string) => {
   return player;
 };
 
+const darkBowPlayerWithAmmo = (ammoName: string) => {
+  const player = getTestPlayer(monster, {
+    equipment: {
+      weapon: findEquipment('Dark bow', 'Regular'),
+      ammo: findEquipment(ammoName),
+    },
+    skills: {
+      ranged: 99,
+    },
+    style: {
+      name: 'Accurate',
+      type: 'ranged',
+      stance: 'Accurate',
+    },
+  });
+
+  player.attackSpeed = calculateAttackSpeed(player, monster);
+  return player;
+};
+
 describe('Seeking arrows', () => {
   test('should be selectable as upgraded standard arrow tiers', () => {
     expect(findEquipment('Seeking bronze arrow')).toBeDefined();
@@ -84,6 +104,39 @@ describe('Seeking arrows', () => {
 
     expect(missChance).toBeCloseTo(0.5);
     expect(Math.min(...accurateHits.map((hit) => hit.getSum()))).toBe(3);
+  });
+
+  test('should use dark bow dragon special behavior with seeking dragon arrows', () => {
+    const dragonCalc = new PlayerVsNPCCalc(darkBowPlayerWithAmmo('Dragon arrow'), monster, {
+      overrides: { accuracy: 0.5 },
+      usingSpecialAttack: true,
+    });
+    const seekingCalc = new PlayerVsNPCCalc(darkBowPlayerWithAmmo('Seeking dragon arrow'), monster, {
+      overrides: { accuracy: 0.5 },
+      usingSpecialAttack: true,
+    });
+    const accurateHits = seekingCalc.getDistribution().dists
+      .flatMap((hitDist) => hitDist.hits)
+      .filter((hit) => hit.anyAccurate());
+
+    expect(Math.min(...accurateHits.map((hit) => hit.getSum()))).toBe(8);
+    expect(seekingCalc.getDistribution().getExpectedDamage()).toBeCloseTo(
+      dragonCalc.getDistribution().getExpectedDamage(),
+    );
+
+    const naturalDragonCalc = new PlayerVsNPCCalc(darkBowPlayerWithAmmo('Dragon arrow'), monster, {
+      usingSpecialAttack: true,
+    });
+    const naturalSeekingCalc = new PlayerVsNPCCalc(darkBowPlayerWithAmmo('Seeking dragon arrow'), monster, {
+      usingSpecialAttack: true,
+    });
+
+    expect(naturalSeekingCalc.getMaxAttackRoll()).toBeGreaterThan(
+      naturalDragonCalc.getMaxAttackRoll(),
+    );
+    expect(naturalSeekingCalc.getDistribution().getExpectedDamage()).toBeGreaterThan(
+      naturalDragonCalc.getDistribution().getExpectedDamage(),
+    );
   });
 
   test('should not show a pre-release warning when equipped from regenerated wiki data', () => {
