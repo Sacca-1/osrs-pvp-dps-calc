@@ -2224,7 +2224,9 @@ export default class PlayerVsNPCCalc extends BaseCalc {
     if (style === "ranged" && this.wearing("Dark bow")) {
       dist = new AttackDistribution([standardHitDist, standardHitDist]);
       if (this.opts.usingSpecialAttack) {
-        dist = dist.transform(flatLimitTransformer(48, min));
+        dist = dist.transform(flatLimitTransformer(48, min), {
+          transformInaccurate: false,
+        });
       }
     }
 
