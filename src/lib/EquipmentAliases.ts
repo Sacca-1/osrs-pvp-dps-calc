@@ -308,6 +308,7 @@ const equipmentAliases = {
   11665: [24185, 27007, 26477], // Void melee helm#Normal
   11664: [24184, 27006, 26475], // Void ranger helm#Normal
   27690: [29607], // Voidwaker
+  28338: [33335], // Soulreaper axe
   24424: [29609], // Volatile nightmare staff
   11772: [26769, 25262], // Warrior ring (i)#Nightmare Zone
   1171: [20166], // Wooden shield

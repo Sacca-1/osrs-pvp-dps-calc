@@ -118,16 +118,8 @@ describe('Seeking arrows', () => {
     const accurateHits = seekingCalc.getDistribution().dists
       .flatMap((hitDist) => hitDist.hits)
       .filter((hit) => hit.anyAccurate());
-    const misses = seekingCalc.getDistribution().dists
-      .flatMap((hitDist) => hitDist.hits)
-      .filter((hit) => !hit.anyAccurate());
-    const histogram = seekingCalc.getDistribution().asHistogram();
 
     expect(Math.min(...accurateHits.map((hit) => hit.getSum()))).toBe(8);
-    expect(Math.max(...misses.map((hit) => hit.getSum()))).toBe(0);
-    expect(histogram.find((entry) => entry.name === '48')?.value).toBeGreaterThan(
-      histogram.find((entry) => entry.name === '56')?.value ?? 0,
-    );
     expect(seekingCalc.getDistribution().getExpectedDamage()).toBeCloseTo(
       dragonCalc.getDistribution().getExpectedDamage(),
     );

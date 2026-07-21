@@ -39,6 +39,8 @@ import {
   ONE_HIT_MONSTERS,
   P2_WARDEN_IDS,
   SECONDS_PER_TICK,
+  SOULREAPER_MAX_STACKS,
+  SOULREAPER_STACK_BONUS_PERCENT,
   TEKTON_IDS,
   TITAN_BOSS_IDS,
   TITAN_ELEMENTAL_IDS,
@@ -535,14 +537,11 @@ export default class PlayerVsNPCCalc extends BaseCalc {
           [5, 4]
         );
       } else if (this.wearing("Soulreaper axe")) {
-        const stacks = Math.max(
-          0,
-          Math.min(5, this.player.buffs.soulreaperStacks)
-        );
+        const stacks = this.getSoulreaperStacks();
         attackRoll = this.trackFactor(
           DetailKey.PLAYER_ACCURACY_SPEC,
           attackRoll,
-          [100 + 6 * stacks, 100]
+          [100 + SOULREAPER_STACK_BONUS_PERCENT * stacks, 100]
         );
       } else if (this.wearing("Brine sabre")) {
         attackRoll = this.trackFactor(
@@ -600,11 +599,11 @@ export default class PlayerVsNPCCalc extends BaseCalc {
 
     if (this.wearing("Soulreaper axe") && !this.opts.usingSpecialAttack) {
       // does not stack multiplicatively with prayers
-      const stacks = Math.max(0, Math.min(5, buffs.soulreaperStacks));
+      const stacks = this.getSoulreaperStacks();
       const bonus = this.trackFactor(
         DetailKey.DAMAGE_LEVEL_SOULREAPER_BONUS,
         baseLevel,
-        [stacks * 6, 100]
+        [stacks * SOULREAPER_STACK_BONUS_PERCENT, 100]
       );
       effectiveLevel = this.trackAdd(
         DetailKey.DAMAGE_LEVEL_SOULREAPER,
@@ -843,12 +842,9 @@ export default class PlayerVsNPCCalc extends BaseCalc {
         minHit = this.trackFactor(DetailKey.MIN_HIT_SPEC, maxHit, [1, 4]);
         maxHit = this.trackAdd(DetailKey.MAX_HIT_SPEC, maxHit, minHit);
       } else if (this.wearing("Soulreaper axe")) {
-        const stacks = Math.max(
-          0,
-          Math.min(5, this.player.buffs.soulreaperStacks)
-        );
+        const stacks = this.getSoulreaperStacks();
         maxHit = this.trackFactor(DetailKey.MAX_HIT_SPEC, maxHit, [
-          100 + 6 * stacks,
+          100 + SOULREAPER_STACK_BONUS_PERCENT * stacks,
           100,
         ]);
       } else if (this.wearing("Arkan blade")) {
@@ -2224,9 +2220,7 @@ export default class PlayerVsNPCCalc extends BaseCalc {
     if (style === "ranged" && this.wearing("Dark bow")) {
       dist = new AttackDistribution([standardHitDist, standardHitDist]);
       if (this.opts.usingSpecialAttack) {
-        dist = dist.transform(flatLimitTransformer(48, min), {
-          transformInaccurate: false,
-        });
+        dist = dist.transform(flatLimitTransformer(48, min));
       }
     }
 
@@ -3069,8 +3063,7 @@ export default class PlayerVsNPCCalc extends BaseCalc {
   public getSpecDps(): number {
     if (this.wearing("Soulreaper axe")) {
       // assumes using spec every time you reach the current stack count
-      const ticksPerSpec =
-        this.getAttackSpeed() * this.player.buffs.soulreaperStacks;
+      const ticksPerSpec = this.getAttackSpeed() * this.getSoulreaperStacks();
       return (this.getDps() * this.getExpectedAttackSpeed()) / ticksPerSpec;
     }
 
@@ -3348,6 +3341,13 @@ export default class PlayerVsNPCCalc extends BaseCalc {
     return this.wearing(VOIDWAKERS);
   }
 
+  private getSoulreaperStacks(): number {
+    return Math.max(
+      0,
+      Math.min(SOULREAPER_MAX_STACKS, this.player.buffs.soulreaperStacks),
+    );
+  }
+
   isSpecSupported(): FeatureStatus {
     const weaponName = this.player.equipment.weapon?.name;
     if (!weaponName) {
@@ -3358,7 +3358,7 @@ export default class PlayerVsNPCCalc extends BaseCalc {
       return FeatureStatus.NOT_APPLICABLE;
     }
     if (this.wearing("Soulreaper axe")) {
-      return this.player.buffs.soulreaperStacks === 0
+      return this.getSoulreaperStacks() === 0
         ? FeatureStatus.NOT_APPLICABLE
         : FeatureStatus.IMPLEMENTED;
     }

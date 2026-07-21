@@ -399,6 +399,9 @@ export const UNDERWATER_MONSTERS = [
 
 export const YAMA_VOID_FLARE_IDS = [14179];
 
+export const SOULREAPER_MAX_STACKS = 3;
+export const SOULREAPER_STACK_BONUS_PERCENT = 10;
+
 export const ACCURACY_PRECISION = 2;
 export const DPS_PRECISION = 3;
 export const EXPECTED_HIT_PRECISION = 1;

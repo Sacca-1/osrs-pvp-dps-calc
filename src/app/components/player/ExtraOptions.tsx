@@ -6,6 +6,7 @@ import diary from "@/public/img/misc/diary.png";
 import soulreaper_axe from "@/public/img/misc/soulreaper_axe.png";
 import NumberInput from "@/app/components/generic/NumberInput";
 import Select from "@/app/components/generic/Select";
+import { SOULREAPER_MAX_STACKS } from "@/lib/constants";
 import Toggle from "../generic/Toggle";
 
 // Direct image path for burn hitsplat icon.
@@ -61,7 +62,7 @@ const ExtraOptions: React.FC = observer(() => {
                 className="form-control w-12"
                 required
                 min={0}
-                max={5}
+                max={SOULREAPER_MAX_STACKS}
                 value={player.buffs.soulreaperStacks}
                 onChange={(v) =>
                   store.updatePlayer(
