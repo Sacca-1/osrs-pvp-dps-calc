@@ -5,7 +5,8 @@ import {
 import { Prayer } from '@/enums/Prayer';
 import {
   SOULREAPER_MAX_STACKS,
-  SOULREAPER_STACK_BONUS_PERCENT,
+  SOULREAPER_SPEC_ACCURACY_BONUS_PERCENT,
+  SOULREAPER_SPEC_MIN_HIT_PERCENT,
 } from '@/lib/constants';
 import { Player } from '@/types/Player';
 import { PartialDeep } from 'type-fest';
@@ -27,9 +28,11 @@ describe('Soulreaper axe', () => {
   describe('Level 118, Gear bonus 188', () => {
     [
       [0, 61],
-      [1, 66],
-      [2, 70],
-      [3, 75],
+      [1, 64],
+      [2, 67],
+      [3, 70],
+      [4, 72],
+      [5, 75],
     ].forEach(([stacks, max]) => {
       test(`${stacks} stacks`, () => {
         const player = getTestPlayer(monster, {
@@ -62,7 +65,7 @@ describe('Soulreaper axe', () => {
           str: 188,
         },
         buffs: {
-          soulreaperStacks: 5,
+          soulreaperStacks: 10,
         },
       });
 
@@ -71,7 +74,7 @@ describe('Soulreaper axe', () => {
     });
   });
 
-  test('special attack accuracy increases by 10% per stack', () => {
+  test('special attack gains 12% accuracy and 6% minimum hit per stack', () => {
     const normalPlayer = getTestPlayer(monster, basePlayer);
     const normalAttackRoll = calculatePlayerVsNpc(monster, normalPlayer).maxAttackRoll;
 
@@ -82,12 +85,19 @@ describe('Soulreaper axe', () => {
           soulreaperStacks: stacks,
         },
       });
-      const { maxAttackRoll } = calculatePlayerVsNpc(monster, player, {
+      const { dist, maxAttackRoll, maxHit } = calculatePlayerVsNpc(monster, player, {
         usingSpecialAttack: true,
       });
+      const accurateHits = dist.dists
+        .flatMap((hitDist) => hitDist.hits)
+        .filter((hit) => hit.anyAccurate());
 
       expect(maxAttackRoll).toBe(Math.trunc(
-        normalAttackRoll * (100 + stacks * SOULREAPER_STACK_BONUS_PERCENT) / 100,
+        normalAttackRoll * (100 + stacks * SOULREAPER_SPEC_ACCURACY_BONUS_PERCENT) / 100,
+      ));
+      expect(Math.min(...accurateHits.map((hit) => hit.getSum()))).toBe(Math.max(
+        1,
+        Math.trunc(maxHit * stacks * SOULREAPER_SPEC_MIN_HIT_PERCENT / 100),
       ));
     }
   });

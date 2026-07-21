@@ -40,7 +40,9 @@ import {
   P2_WARDEN_IDS,
   SECONDS_PER_TICK,
   SOULREAPER_MAX_STACKS,
-  SOULREAPER_STACK_BONUS_PERCENT,
+  SOULREAPER_SPEC_ACCURACY_BONUS_PERCENT,
+  SOULREAPER_SPEC_MIN_HIT_PERCENT,
+  SOULREAPER_STACK_DAMAGE_BONUS_PERCENT,
   TEKTON_IDS,
   TITAN_BOSS_IDS,
   TITAN_ELEMENTAL_IDS,
@@ -541,7 +543,7 @@ export default class PlayerVsNPCCalc extends BaseCalc {
         attackRoll = this.trackFactor(
           DetailKey.PLAYER_ACCURACY_SPEC,
           attackRoll,
-          [100 + SOULREAPER_STACK_BONUS_PERCENT * stacks, 100]
+          [100 + SOULREAPER_SPEC_ACCURACY_BONUS_PERCENT * stacks, 100]
         );
       } else if (this.wearing("Brine sabre")) {
         attackRoll = this.trackFactor(
@@ -603,7 +605,7 @@ export default class PlayerVsNPCCalc extends BaseCalc {
       const bonus = this.trackFactor(
         DetailKey.DAMAGE_LEVEL_SOULREAPER_BONUS,
         baseLevel,
-        [stacks * SOULREAPER_STACK_BONUS_PERCENT, 100]
+        [stacks * SOULREAPER_STACK_DAMAGE_BONUS_PERCENT, 100]
       );
       effectiveLevel = this.trackAdd(
         DetailKey.DAMAGE_LEVEL_SOULREAPER,
@@ -844,7 +846,11 @@ export default class PlayerVsNPCCalc extends BaseCalc {
       } else if (this.wearing("Soulreaper axe")) {
         const stacks = this.getSoulreaperStacks();
         maxHit = this.trackFactor(DetailKey.MAX_HIT_SPEC, maxHit, [
-          100 + SOULREAPER_STACK_BONUS_PERCENT * stacks,
+          100 + SOULREAPER_STACK_DAMAGE_BONUS_PERCENT * stacks,
+          100,
+        ]);
+        minHit = this.trackFactor(DetailKey.MIN_HIT_SPEC, maxHit, [
+          SOULREAPER_SPEC_MIN_HIT_PERCENT * stacks,
           100,
         ]);
       } else if (this.wearing("Arkan blade")) {
