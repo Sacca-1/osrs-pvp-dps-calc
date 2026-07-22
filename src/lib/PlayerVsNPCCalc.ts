@@ -95,6 +95,10 @@ const VOIDWAKERS = ["Voidwaker", "Corrupted voidwaker"];
 
 const CRIMSON_KISTEN = ["Crimson kisten", "Crimson bludgeon"];
 
+const AQUANITE_HOPPER_PROC_CHANCE = 0.11;
+const AQUANITE_HOPPER_SECOND_HIT_ACCURACY_FACTOR = 2 / 3;
+const AQUANITE_HOPPER_SECOND_HIT_OTHER_FACTOR = 0.33;
+
 const DIAMOND_BOLT_EFFECT_AMMO = [
   'Diamond bolts (e)',
   'Diamond dragon bolts (e)',
@@ -2606,17 +2610,22 @@ export default class PlayerVsNPCCalc extends BaseCalc {
       this.player.equipment.weapon?.name.includes("rossbow") &&
       this.wearing("Aquanite hopper")
     ) {
-      // 10% chance to duplicate a shot from a crossbow, with 67% reduced accuracy, damage, and chance of triggering a special effect from an enchanted bolt
+      // 11% chance to duplicate a crossbow shot. The accuracy penalty is halved,
+      // while damage and enchanted bolt effect chance remain reduced by 67%.
       const acc = this.getHitChance();
       const [min, max] = this.getMinAndMax();
 
-      const secondHitAcc = acc * 0.33;
+      const secondHitAcc =
+        acc * AQUANITE_HOPPER_SECOND_HIT_ACCURACY_FACTOR;
       
       // Start with full damage range, then scale down after applying bolt effects
       let secondHitDist = HitDistribution.linear(secondHitAcc, min, max);
 
       // Apply bolt effects to second hit with reduced chance
-      const reducedBoltContext = { ...boltContext, chanceMultiplier: 0.33 };
+      const reducedBoltContext = {
+        ...boltContext,
+        chanceMultiplier: AQUANITE_HOPPER_SECOND_HIT_OTHER_FACTOR,
+      };
 
       if (this.wearing(["Opal bolts (e)", "Opal dragon bolts (e)"])) {
         secondHitDist = secondHitDist.transform(opalBolts(reducedBoltContext));
@@ -2642,12 +2651,15 @@ export default class PlayerVsNPCCalc extends BaseCalc {
       secondHitDist = secondHitDist.scaleDamage(33, 100);
 
       // Combine with first hit
-      // 90% chance: [h1]
-      // 10% chance: [h1, h2]
+      // 89% chance: [h1]
+      // 11% chance: [h1, h2]
       dist = dist.transform((h1) => {
-        const noProc = new WeightedHit(0.9, [h1]);
+        const noProc = new WeightedHit(1 - AQUANITE_HOPPER_PROC_CHANCE, [h1]);
         const procHits = secondHitDist.hits.map(wh2 => {
-           return new WeightedHit(0.1 * wh2.probability, [h1, ...wh2.hitsplats]);
+           return new WeightedHit(
+             AQUANITE_HOPPER_PROC_CHANCE * wh2.probability,
+             [h1, ...wh2.hitsplats]
+           );
         });
         return new HitDistribution([noProc, ...procHits]);
       }, { transformInaccurate: true });

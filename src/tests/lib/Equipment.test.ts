@@ -19,6 +19,29 @@ describe('calculateEquipmentBonusesFromGear', () => {
       expect(necklace.slot).toBe('neck');
       expect(necklace.image).toBe('Necklace of rupture.png');
     });
+
+    test('gives every Ancient sceptre variant 10% Magic Damage', () => {
+      const variants = [
+        ['Ancient sceptre', 'Normal'],
+        ['Ancient sceptre', 'Locked'],
+        ['Blood ancient sceptre', 'Broken'],
+        ['Blood ancient sceptre', 'Normal'],
+        ['Blood ancient sceptre', 'Locked'],
+        ['Ice ancient sceptre', 'Broken'],
+        ['Ice ancient sceptre', 'Normal'],
+        ['Ice ancient sceptre', 'Locked'],
+        ['Shadow ancient sceptre', 'Broken'],
+        ['Shadow ancient sceptre', 'Normal'],
+        ['Shadow ancient sceptre', 'Locked'],
+        ['Smoke ancient sceptre', 'Broken'],
+        ['Smoke ancient sceptre', 'Normal'],
+        ['Smoke ancient sceptre', 'Locked'],
+      ];
+
+      variants.forEach(([name, version]) => {
+        expect(findEquipment(name, version).bonuses.magic_str).toBe(100);
+      });
+    });
   });
 
   describe("with Dizana's quiver", () => {
