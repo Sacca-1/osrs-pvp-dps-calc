@@ -56,6 +56,7 @@ export enum Prayer {
   PROTECT_MAGIC = 21,
   PROTECT_MISSILES = 22,
   PROTECT_MELEE = 23,
+  ZEAL = 24,
   // PROTECT_MAGIC,
   // PROTECT_RANGED,
   // PROTECT_MELEE,
@@ -66,13 +67,14 @@ export enum Prayer {
 
 export const DEFENSIVE_PRAYERS: Prayer[] = [
   Prayer.THICK_SKIN, Prayer.ROCK_SKIN, Prayer.STEEL_SKIN,
-  Prayer.CHIVALRY, Prayer.PIETY, Prayer.RIGOUR, Prayer.AUGURY,
+  Prayer.CHIVALRY, Prayer.PIETY, Prayer.RIGOUR, Prayer.AUGURY, Prayer.ZEAL,
 ];
 
 export const OFFENSIVE_PRAYERS: Prayer[] = [
   Prayer.BURST_OF_STRENGTH, Prayer.CLARITY_OF_THOUGHT, Prayer.SHARP_EYE, Prayer.MYSTIC_WILL, Prayer.SUPERHUMAN_STRENGTH,
   Prayer.IMPROVED_REFLEXES, Prayer.HAWK_EYE, Prayer.MYSTIC_LORE, Prayer.ULTIMATE_STRENGTH, Prayer.INCREDIBLE_REFLEXES,
   Prayer.EAGLE_EYE, Prayer.MYSTIC_MIGHT, Prayer.DEADEYE, Prayer.MYSTIC_VIGOUR, Prayer.CHIVALRY, Prayer.PIETY, Prayer.RIGOUR, Prayer.AUGURY,
+  Prayer.ZEAL,
 ];
 
 export const BRAIN_PRAYERS: Prayer[] = [
@@ -103,10 +105,22 @@ export interface PrayerData {
   // there aren't currently any prayers that have distinct factorDefence and factorDefenceMagic,
   // but it could happen in the future, and we have no actual idea how that would work
   factorDefenceMagic?: Factor,
+  preRelease?: boolean,
 }
 
 // Factors must be given as a denominator of 100 such that additive prayers are calculated correctly
 export const PrayerMap: { [k in Prayer]: PrayerData } = {
+  [Prayer.ZEAL]: {
+    renderOrder: 93,
+    name: 'Zeal (pre-release)',
+    image: Piety,
+    drainRate: 1,
+    combatStyle: 'melee',
+    factorAccuracy: [125, 100],
+    factorStrength: [128, 100],
+    factorDefence: [125, 100],
+    preRelease: true,
+  },
   [Prayer.BURST_OF_STRENGTH]: {
     renderOrder: 1,
     name: 'Burst of Strength',
