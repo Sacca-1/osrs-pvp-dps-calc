@@ -5,7 +5,7 @@ import {
   getTestPlayer,
 } from '@/tests/utils/TestUtils';
 import { DetailKey } from '@/lib/CalcDetails';
-import { Prayer } from '@/enums/Prayer';
+import { Prayer, PrayerMap } from '@/enums/Prayer';
 import { PartialDeep } from 'type-fest';
 import { Player } from '@/types/Player';
 
@@ -13,15 +13,16 @@ describe('Prayers', () => {
   const monster = getTestMonster('Abyssal demon', 'Standard');
 
   describe('Zeal', () => {
-    test('boosts melee attack and strength by 5%', () => {
+    test('boosts melee attack and strength 5 percentage points above Piety', () => {
       const player = getTestPlayer(monster, {
         prayers: [Prayer.ZEAL],
         skills: { atk: 99, str: 99 },
       });
       const { details } = calculatePlayerVsNpc(monster, player);
 
-      expect(details.find((d) => d.label === DetailKey.PLAYER_ACCURACY_LEVEL_PRAYER)?.value).toBe(103);
-      expect(details.find((d) => d.label === DetailKey.DAMAGE_LEVEL_PRAYER)?.value).toBe(103);
+      expect(details.find((d) => d.label === DetailKey.PLAYER_ACCURACY_LEVEL_PRAYER)?.value).toBe(123);
+      expect(details.find((d) => d.label === DetailKey.DAMAGE_LEVEL_PRAYER)?.value).toBe(126);
+      expect(PrayerMap[Prayer.ZEAL].factorDefence).toEqual([125, 100]);
     });
   });
 

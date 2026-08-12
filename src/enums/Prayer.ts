@@ -67,7 +67,7 @@ export enum Prayer {
 
 export const DEFENSIVE_PRAYERS: Prayer[] = [
   Prayer.THICK_SKIN, Prayer.ROCK_SKIN, Prayer.STEEL_SKIN,
-  Prayer.CHIVALRY, Prayer.PIETY, Prayer.RIGOUR, Prayer.AUGURY,
+  Prayer.CHIVALRY, Prayer.PIETY, Prayer.RIGOUR, Prayer.AUGURY, Prayer.ZEAL,
 ];
 
 export const OFFENSIVE_PRAYERS: Prayer[] = [
@@ -116,8 +116,9 @@ export const PrayerMap: { [k in Prayer]: PrayerData } = {
     image: Piety,
     drainRate: 1,
     combatStyle: 'melee',
-    factorAccuracy: [105, 100],
-    factorStrength: [105, 100],
+    factorAccuracy: [125, 100],
+    factorStrength: [128, 100],
+    factorDefence: [125, 100],
     preRelease: true,
   },
   [Prayer.BURST_OF_STRENGTH]: {
