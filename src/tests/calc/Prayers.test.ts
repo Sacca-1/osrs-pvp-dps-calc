@@ -5,7 +5,7 @@ import {
   getTestPlayer,
 } from '@/tests/utils/TestUtils';
 import { DetailKey } from '@/lib/CalcDetails';
-import { Prayer, PrayerMap } from '@/enums/Prayer';
+import { Prayer, PrayerMap, SortedPrayers } from '@/enums/Prayer';
 import { PartialDeep } from 'type-fest';
 import { Player } from '@/types/Player';
 
@@ -23,6 +23,10 @@ describe('Prayers', () => {
       expect(details.find((d) => d.label === DetailKey.PLAYER_ACCURACY_LEVEL_PRAYER)?.value).toBe(123);
       expect(details.find((d) => d.label === DetailKey.DAMAGE_LEVEL_PRAYER)?.value).toBe(126);
       expect(PrayerMap[Prayer.ZEAL].factorDefence).toEqual([125, 100]);
+    });
+
+    test('appears at the bottom of the prayer list', () => {
+      expect(SortedPrayers.at(-1)?.[0]).toBe(String(Prayer.ZEAL));
     });
   });
 

@@ -111,7 +111,7 @@ export interface PrayerData {
 // Factors must be given as a denominator of 100 such that additive prayers are calculated correctly
 export const PrayerMap: { [k in Prayer]: PrayerData } = {
   [Prayer.ZEAL]: {
-    renderOrder: 0,
+    renderOrder: 93,
     name: 'Zeal (pre-release)',
     image: Piety,
     drainRate: 1,
