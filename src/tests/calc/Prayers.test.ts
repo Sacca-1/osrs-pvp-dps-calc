@@ -12,6 +12,19 @@ import { Player } from '@/types/Player';
 describe('Prayers', () => {
   const monster = getTestMonster('Abyssal demon', 'Standard');
 
+  describe('Zeal', () => {
+    test('boosts melee attack and strength by 5%', () => {
+      const player = getTestPlayer(monster, {
+        prayers: [Prayer.ZEAL],
+        skills: { atk: 99, str: 99 },
+      });
+      const { details } = calculatePlayerVsNpc(monster, player);
+
+      expect(details.find((d) => d.label === DetailKey.PLAYER_ACCURACY_LEVEL_PRAYER)?.value).toBe(103);
+      expect(details.find((d) => d.label === DetailKey.DAMAGE_LEVEL_PRAYER)?.value).toBe(103);
+    });
+  });
+
   describe('Burst of Strength', () => {
     const basePlayer: PartialDeep<Player> = { prayers: [Prayer.BURST_OF_STRENGTH] };
 
