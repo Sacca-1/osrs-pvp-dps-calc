@@ -29,6 +29,7 @@ const Prayers: React.FC = observer(() => {
               name={v.name}
               image={v.image}
               active={prayers.includes(parseInt(k))}
+              warning={v.preRelease}
               onClick={(p: Prayer) => store.togglePlayerPrayer(p, side)}
             />
           ))

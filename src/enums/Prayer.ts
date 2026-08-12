@@ -113,7 +113,7 @@ export const PrayerMap: { [k in Prayer]: PrayerData } = {
   [Prayer.ZEAL]: {
     renderOrder: 0,
     name: 'Zeal (pre-release)',
-    image: BurstOfStrength,
+    image: Piety,
     drainRate: 1,
     combatStyle: 'melee',
     factorAccuracy: [105, 100],
