@@ -72,7 +72,7 @@ describe('PvP KO chance', () => {
     const m = getTestMonster();
     const attacker = getTestPlayer(m, {
       equipment: {
-        weapon: findEquipment('Trident of the seas'),
+        weapon: findEquipment('Trident of the Seas'),
       },
     });
     const defender = getTestPlayer(m, {
@@ -134,7 +134,7 @@ describe('PvP KO chance', () => {
 
     const fire = new PlayerVsPlayerCalc(
       getTestPlayer(m, {
-        equipment: { shield: findEquipment('Tome of fire', 'Charged') },
+        equipment: { shield: findEquipment('Tome of Fire', 'Charged') },
         spell: findSpell('Fire Bolt'),
         style: magicStyle,
       }),
@@ -143,7 +143,7 @@ describe('PvP KO chance', () => {
     );
     const water = new PlayerVsPlayerCalc(
       getTestPlayer(m, {
-        equipment: { shield: findEquipment('Tome of water', 'Charged') },
+        equipment: { shield: findEquipment('Tome of Water', 'Charged') },
         spell: findSpell('Water Bolt'),
         style: magicStyle,
       }),
@@ -152,7 +152,7 @@ describe('PvP KO chance', () => {
     );
     const earth = new PlayerVsPlayerCalc(
       getTestPlayer(m, {
-        equipment: { shield: findEquipment('Tome of earth', 'Charged') },
+        equipment: { shield: findEquipment('Tome of Earth', 'Charged') },
         spell: findSpell('Earth Bolt'),
         style: magicStyle,
       }),

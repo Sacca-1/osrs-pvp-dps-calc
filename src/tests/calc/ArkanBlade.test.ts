@@ -39,11 +39,13 @@ describe('Arkan blade special attack (Flames of Ralos)', () => {
     const specCalc = new PlayerVsNPCCalc(p, m, { usingSpecialAttack: true });
 
     const normalMaxHit = normalCalc.getMax();
-    const specMaxHit = specCalc.getMax();
+    const specMaxHit = specCalc.getDistribution().getMax();
 
     // Special attack should have higher max hit (50% increase)
     expect(specMaxHit).toBeGreaterThan(normalMaxHit);
     expect(specMaxHit).toBe(Math.floor(normalMaxHit * 1.5));
+    expect(specCalc.getDoTMax()).toBe(10);
+    expect(specCalc.getMax()).toBe(specMaxHit + 10);
   });
 
   test('should use slash defence style when special attacking', () => {

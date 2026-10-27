@@ -12,7 +12,7 @@ import Toggle from '@/app/components/generic/Toggle';
 import { observer } from 'mobx-react-lite';
 import { max } from 'd3-array';
 import { toJS } from 'mobx';
-import { ChartEntry } from '@/types/State';
+import { ChartEntry } from '@/types/Charts';
 
 const CustomTooltip: React.FC<TooltipProps<ValueType, NameType>> = ({ active, payload, label }) => {
   if (active && payload && payload.length) {

@@ -12,10 +12,10 @@ import {
 const m = getTestMonster();
 
 describe("Voidwaker special attack (Disrupt)", () => {
-  test("should support the corrupted voidwaker variant", () => {
+  test("should support the Deadman Voidwaker variant", () => {
     const p = getTestPlayer(m, {
       equipment: {
-        weapon: findEquipment("Corrupted voidwaker"),
+        weapon: findEquipment("Voidwaker (Deadman)"),
       },
     });
 
@@ -26,10 +26,10 @@ describe("Voidwaker special attack (Disrupt)", () => {
     expect(calc.getSpecCalc()).not.toBeNull();
   });
 
-  test("should use guaranteed 50% to 150% melee max damage for corrupted voidwaker", () => {
+  test("should use guaranteed 50% to 150% melee max damage for Deadman Voidwaker", () => {
     const p = getTestPlayer(m, {
       equipment: {
-        weapon: findEquipment("Corrupted voidwaker"),
+        weapon: findEquipment("Voidwaker (Deadman)"),
       },
     });
 
@@ -53,7 +53,7 @@ describe("Voidwaker special attack (Disrupt)", () => {
   test("should reduce voidwaker special damage with Protect from Magic in PvP", () => {
     const attacker = getTestPlayer(m, {
       equipment: {
-        weapon: findEquipment("Corrupted voidwaker"),
+        weapon: findEquipment("Voidwaker (Deadman)"),
       },
     });
     const defender = getTestPlayer(m);

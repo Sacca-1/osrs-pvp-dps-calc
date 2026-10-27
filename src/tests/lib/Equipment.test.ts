@@ -65,7 +65,7 @@ describe('calculateEquipmentBonusesFromGear', () => {
         const monster = getTestMonster('Abyssal demon', 'Standard');
         const playerWithChargedQuiver = getTestPlayer(monster, {
           equipment: {
-            cape: findEquipment("Blessed dizana's quiver", 'Normal'),
+            cape: findEquipment("Blessed Dizana's quiver", 'Normal'),
             weapon: findEquipment('Twisted bow'),
             ammo: findEquipment('Dragon arrow', 'Unpoisoned'),
           },
@@ -122,7 +122,7 @@ describe('calculateEquipmentBonusesFromGear', () => {
         const monster = getTestMonster('Abyssal demon', 'Standard');
         const playerWithChargedQuiver = getTestPlayer(monster, {
           equipment: {
-            cape: findEquipment("Blessed dizana's quiver", 'Normal'),
+            cape: findEquipment("Blessed Dizana's quiver", 'Normal'),
             weapon: findEquipment('Dragon dart'),
           },
           offensive: {

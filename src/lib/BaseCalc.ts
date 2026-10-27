@@ -9,6 +9,8 @@ import UserIssueType from '@/enums/UserIssueType';
 import { MonsterAttribute } from '@/enums/MonsterAttribute';
 import {
   CAST_STANCES,
+  DREADNOTH_JELLY_ID,
+  ICE_DEMON_IDS,
   IMMUNE_TO_BURN_DAMAGE_NPC_IDS,
   YAMA_IDS,
   YAMA_VOID_FLARE_IDS,
@@ -20,6 +22,8 @@ import { scaleMonster } from '@/lib/MonsterScaling';
 import { getCombatStylesForCategory, isDefined } from '@/utils';
 import { EquipmentCategory } from '@/enums/EquipmentCategory';
 import { getRangedDamageType } from '@/types/PlayerCombatStyle';
+import { AttackDistribution, HitDistribution } from '@/lib/HitDist';
+import { Spellement } from '@/types/Spell';
 
 export interface CalcOpts {
   loadoutName?: string,
@@ -120,7 +124,7 @@ export default class BaseCalc {
 
   protected trackAdd(label: Parameters<CalcDetails['track']>[0], base: number, addend: number): number {
     const result = Math.trunc(base + addend);
-    this.track(label, result, `${base} ${addend >= 0 ? `+${addend}` : `-${-addend}`} = ${result}`);
+    this.track(label, result, `${base} ${addend >= 0 ? `+ ${addend}` : `- ${-addend}`} = ${result}`);
     return result;
   }
 
@@ -133,11 +137,16 @@ export default class BaseCalc {
     return result;
   }
 
+  protected trackDist<T extends AttackDistribution | HitDistribution>(label: Parameters<CalcDetails['track']>[0], dist: T, textOverride?: Parameters<CalcDetails['track']>[2]): T {
+    this.track(label, dist, textOverride);
+    return dist;
+  }
+
   get details(): DetailEntry[] {
     return this._details?.lines || [];
   }
 
-  private canonicalizeEquipment() {
+  protected canonicalizeEquipment() {
     this.player = {
       ...this.player,
       equipment: getCanonicalEquipment(this.player.equipment),
@@ -174,6 +183,33 @@ export default class BaseCalc {
     if (atk >= 0 && def < 0) return 1 - 1 / (-def + 1) / (atk + 1);
     if (atk < 0 && def >= 0) return 0;
     if (atk < 0 && def < 0) return rvRoll(-def, -atk);
+    return 0;
+  }
+
+  public static getConflictionGauntletsAccuracyRoll(atk: number, def: number): number {
+    const singleRoll = this.getNormalAccuracyRoll(atk, def);
+    const doubleRoll = this.getFangAccuracyRoll(atk, def);
+    return doubleRoll / (1 + doubleRoll - singleRoll);
+  }
+
+  /**
+   * Helper function that calculates the hit chance for mechanics that force a specific attack roll, but still use a random defence roll.
+   * @param atk Attack roll of the player
+   * @param def Max defence roll of the NPC
+   * @returns Hit chance of the attack
+   */
+  public static getFixedAttackHitChance(atk: number, def: number): number {
+    const stdRoll = (attack: number, defence: number) => ((attack > defence)
+      ? 1
+      : attack / (defence + 1));
+
+    if (atk < 0) atk = Math.min(0, atk + 2);
+    if (def < 0) def = Math.min(0, def + 2);
+
+    if (atk >= 0 && def >= 0) return stdRoll(atk, def);
+    if (atk >= 0 && def < 0) return 1;
+    if (atk < 0 && def >= 0) return 0;
+    if (atk < 0 && def < 0) return stdRoll(-def, -atk);
     return 0;
   }
 
@@ -285,7 +321,7 @@ export default class BaseCalc {
    * @see https://oldschool.runescape.wiki/w/Black_mask_(i)
    */
   protected isWearingImbuedBlackMask(): boolean {
-    return this.wearing(['Black mask (i)', 'Slayer helmet (i)']);
+    return this.wearing(['Black mask (i)', 'Slayer helmet (i)', 'V\'s helm']);
   }
 
   /**
@@ -325,7 +361,7 @@ export default class BaseCalc {
    * @see https://oldschool.runescape.wiki/w/Crystal_bow
    */
   protected isWearingCrystalBow(): boolean {
-    return this.wearing('Crystal bow') || this.allEquippedItems.some((ei) => ei.includes('Bow of faerdhinen'));
+    return this.wearing('Crystal bow') || this.allEquippedItems.some((ei) => ei.includes('Bow of Faerdhinen'));
   }
 
   /**
@@ -353,7 +389,7 @@ export default class BaseCalc {
    * @see https://oldschool.runescape.wiki/w/Scythe_of_vitur
    */
   protected isWearingScythe(): boolean {
-    return this.wearing('Scythe of vitur') || this.allEquippedItems.some((ei) => ei.includes('of vitur'));
+    return this.wearing('Scythe of Vitur') || this.allEquippedItems.some((ei) => (ei.includes('of vitur') || ei.includes('of Vitur')));
   }
 
   /**
@@ -364,6 +400,7 @@ export default class BaseCalc {
       "Torag's hammers",
       'Sulphur blades',
       'Glacial temotli',
+      'Earthbound tecpatl',
     ]);
   }
 
@@ -405,7 +442,7 @@ export default class BaseCalc {
    */
 
   protected isWearingAhrims(): boolean {
-    return this.wearingAll(["Ahrim's staff", "Ahrim's hood", "Ahrim's robetop", "Ahrim's robeskirt", 'Amulet of the damned']);
+    return this.wearingAll(["Ahrim's staff", "Ahrim's hood", "Ahrim's robetop", "Ahrim's robeskirt", 'Amulet of the Damned']);
   }
 
   /**
@@ -413,11 +450,11 @@ export default class BaseCalc {
    * @see https://oldschool.runescape.wiki/w/Torag_the_Corrupted%27s_equipment
    */
   protected isWearingTorags(): boolean {
-    return this.wearingAll(["Torag's helm", "Torag's platebody", "Torag's platelegs", "Torag's hammers", 'Amulet of the damned']);
+    return this.wearingAll(["Torag's helm", "Torag's platebody", "Torag's platelegs", "Torag's hammers", 'Amulet of the Damned']);
   }
 
   protected isWearingBloodMoonSet(): boolean {
-    return this.wearingAll(['Dual macuahuitl', 'Blood moon helm', 'Blood moon chestplate', 'Blood moon tassets']);
+    return this.wearingAll(['Dual macuahuitl', 'Blood Moon helm', 'Blood Moon chestplate', 'Blood Moon tassets']);
   }
 
   protected isWearingEclipseMoonSet(): boolean {
@@ -430,8 +467,13 @@ export default class BaseCalc {
    */
 
   protected isWearingSilverWeapon(): boolean {
-    if (this.player.equipment.ammo?.name.startsWith('Silver bolts')
-      && this.player.style.type === 'ranged') {
+    if (this.player.style.type === 'ranged' && this.wearing([
+      'Silver bolts#Unpoisoned',
+      'Silver bolts#Poison',
+      'Silver bolts#Poison+',
+      'Silver bolts#Poison++',
+      'Blisterwood stake',
+    ])) {
       return true;
     }
 
@@ -439,6 +481,7 @@ export default class BaseCalc {
       'Blessed axe',
       'Ivandis flail',
       'Blisterwood flail',
+      'Hallowed flail',
       'Silver sickle',
       'Silver sickle (b)',
       'Emerald sickle',
@@ -450,7 +493,7 @@ export default class BaseCalc {
       'Silverlight',
       'Darklight',
       'Arclight',
-      'Rod of ivandis',
+      'Rod of Ivandis',
       'Wolfbane',
     ]);
   }
@@ -461,12 +504,17 @@ export default class BaseCalc {
    */
   protected wearingVampyrebane(tier: MonsterAttribute.VAMPYRE_2 | MonsterAttribute.VAMPYRE_3): boolean {
     const t2 = tier === MonsterAttribute.VAMPYRE_2;
+    if (this.player.style.type === 'ranged' && this.player.equipment.weapon?.name === 'Blisterwood stake') {
+      return true;
+    }
     return (t2 || this.isUsingMeleeStyle())
       && this.wearing([
-        ...(t2 ? ['Rod of ivandis'] : []),
+        ...(t2 ? ['Rod of Ivandis'] : []),
         'Ivandis flail',
         'Blisterwood sickle',
         'Blisterwood flail',
+        'Hallowed flail',
+        'Sunspear',
       ]);
   }
 
@@ -500,6 +548,7 @@ export default class BaseCalc {
         'Broad arrows',
         'Broad bolts',
         'Amethyst broad bolts',
+        'Seeking broad arrows',
       ])
       && this.player.style.type === 'ranged'
     ) {
@@ -529,7 +578,7 @@ export default class BaseCalc {
     }
 
     // https://twitter.com/JagexAsh/status/1777673598099968104
-    if (weapon.name.includes('spear') && weapon.name !== 'Blue moon spear') {
+    if (weapon.name.includes('spear') && weapon.name !== 'Blue Moon spear') {
       return isStab;
     }
 
@@ -576,14 +625,37 @@ export default class BaseCalc {
 
     switch (this.player.spell?.name) {
       case 'Saradomin Strike':
-        return this.wearing(['Saradomin cape', 'Imbued saradomin cape', 'Saradomin max cape', 'Imbued saradomin max cape']);
+        return this.wearing(['Saradomin cape', 'Imbued Saradomin cape', 'Saradomin max cape', 'Imbued Saradomin max cape']);
       case 'Claws of Guthix':
-        return this.wearing(['Guthix cape', 'Imbued guthix cape', 'Guthix max cape', 'Imbued guthix max cape']);
+        return this.wearing(['Guthix cape', 'Imbued Guthix cape', 'Guthix max cape', 'Imbued Guthix max cape']);
       case 'Flames of Zamorak':
-        return this.wearing(['Zamorak cape', 'Imbued zamorak cape', 'Zamorak max cape', 'Imbued zamorak max cape']);
+        return this.wearing(['Zamorak cape', 'Imbued Zamorak cape', 'Zamorak max cape', 'Imbued Zamorak max cape']);
       default:
         return false;
     }
+  }
+
+  protected getSpellement(): Spellement | null {
+    return this.player.spell?.element ?? null;
+  }
+
+  protected hasMatchingElementalAmulet(): boolean {
+    const spellement = this.getSpellement();
+    if (!spellement) {
+      return false;
+    }
+    if (this.wearing('Elemental amulet')) {
+      return true;
+    }
+
+    const amuletByElement: Record<Spellement, string> = {
+      air: 'Amulet of air',
+      water: 'Amulet of water',
+      earth: 'Amulet of earth',
+      fire: 'Amulet of fire',
+    };
+
+    return this.wearing(amuletByElement[spellement]);
   }
 
   /**
@@ -614,6 +686,10 @@ export default class BaseCalc {
   protected isUsingAbyssal(): boolean {
     return this.isUsingMeleeStyle()
       && this.wearing(['Abyssal bludgeon', 'Abyssal dagger', 'Abyssal whip', 'Abyssal tentacle']);
+  }
+
+  protected isWearingOgreBow(): boolean {
+    return this.wearing(['Ogre bow', 'Comp ogre bow']);
   }
 
   protected tdUnshieldedBonusApplies(): boolean {
@@ -650,6 +726,10 @@ export default class BaseCalc {
       || IMMUNE_TO_BURN_DAMAGE_NPC_IDS.includes(this.monster.id);
   }
 
+  protected isSlayerMonster(): boolean {
+    return this.monster.is_slayer_monster || this.monster.id === -1;
+  }
+
   protected addIssue(type: UserIssueType, message: string) {
     this.userIssues.push({ type, message, loadout: this.opts.loadoutName });
   }
@@ -657,12 +737,24 @@ export default class BaseCalc {
   protected demonbaneVulnerability(): number {
     if (this.monster.id === -1 && this.monster.inputs.demonbaneVulnerability !== undefined) {
       return this.monster.inputs.demonbaneVulnerability;
-    } if (this.monster.name === 'Duke Sucellus') {
+    }
+    if (this.monster.name === 'Duke Sucellus') {
       return 70;
-    } if (YAMA_IDS.includes(this.monster.id)) {
+    }
+    if (['Ocellus', 'Xarth'].includes(this.monster.name)) {
+      return 80;
+    }
+    if (this.monster.name === 'Dreadnoth the Jellied' || this.monster.id === DREADNOTH_JELLY_ID) {
+      return 25;
+    }
+    if (YAMA_IDS.includes(this.monster.id)) {
       return 120;
-    } if (YAMA_VOID_FLARE_IDS.includes(this.monster.id)) {
+    }
+    if (YAMA_VOID_FLARE_IDS.includes(this.monster.id)) {
       return 200;
+    }
+    if (ICE_DEMON_IDS.includes(this.monster.id)) {
+      return 115;
     }
 
     return 100;
@@ -670,6 +762,13 @@ export default class BaseCalc {
 
   private sanitizeInputs() {
     const eq = this.player.equipment;
+
+    if (this.player.equipment.shield?.name === 'Rondache') {
+      this.addIssue(UserIssueType.EQUIPMENT_SHIELD_EFFECT_UNSUPPORTED, "The Rondache's special attack is not yet implemented.");
+    }
+    if (this.player.equipment.weapon?.name === "Zorya's tome") {
+      this.addIssue(UserIssueType.EQUIPMENT_WEAPON_EFFECT_UNSUPPORTED, "The bonus follow up attacks from Zorya's tome's special attack are not implemented.");
+    }
 
     if (this.monster.attributes.includes(MonsterAttribute.DEMON)) {
       // make sure demonbane effectiveness is set and uses the right value
@@ -704,7 +803,7 @@ export default class BaseCalc {
       }
 
       // these staves use a built-in spell for their spec
-      if (['Accursed sceptre (a)', 'Eldritch nightmare staff', 'Volatile nightmare staff'].includes(eq.weapon?.name || '')) {
+      if (['Accursed sceptre (a)', 'Eldritch Nightmare staff', 'Volatile Nightmare staff'].includes(eq.weapon?.name || '')) {
         this.player = {
           ...this.player,
           style: getCombatStylesForCategory(EquipmentCategory.POWERED_STAFF)[0],
@@ -733,10 +832,10 @@ export default class BaseCalc {
     const spellName = this.player.spell?.name;
     if (
       (spellName === 'Iban Blast' && !this.wearing(['Iban\'s staff', 'Iban\'s staff (u)']))
-      || (spellName === 'Saradomin Strike' && !this.wearing(['Saradomin staff', 'Staff of light']))
-      || (spellName === 'Claws of Guthix' && !this.wearing(['Guthix staff', 'Void knight mace', 'Staff of balance']))
-      || (spellName === 'Flames of Zamarok' && !this.wearing(['Zamorak staff', 'Staff of the dead', 'Toxic staff of the dead', 'Thammaron\'s sceptre (a)', 'Accursed sceptre (a)']))
-      || (spellName === 'Magic Dart' && !this.wearing(['Slayer\'s staff', 'Slayer\'s staff (e)', 'Staff of the dead', 'Toxic staff of the dead', 'Staff of light', 'Staff of balance']))
+      || (spellName === 'Saradomin Strike' && !this.wearing(['Saradomin staff', 'Staff of Light']))
+      || (spellName === 'Claws of Guthix' && !this.wearing(['Guthix staff', 'Void knight mace', 'Staff of Balance']))
+      || (spellName === 'Flames of Zamarok' && !this.wearing(['Zamorak staff', 'Staff of the Dead', 'Toxic Staff of the Dead', 'Thammaron\'s sceptre (a)', 'Accursed sceptre (a)']))
+      || (spellName === 'Magic Dart' && !this.wearing(['Slayer\'s staff', 'Slayer\'s staff (e)', 'Staff of the Dead', 'Toxic Staff of the Dead', 'Staff of Light', 'Staff of Balance']))
     ) {
       this.player = {
         ...this.player,
@@ -767,8 +866,8 @@ export default class BaseCalc {
 
     // Some set effects are currently not accounted for
     if (
-      this.wearingAll(['Blue moon helm', 'Blue moon chestplate', 'Blue moon tassets', 'Blue moon spear'])
-      || this.wearingAll(['Eclipse moon helm', 'Eclipse moon chestplate', 'Eclipse moon tassets', 'Eclipse atlatl'])
+      this.wearingAll(['Blue Moon helm', 'Blue Moon chestplate', 'Blue Moon tassets', 'Blue Moon spear'])
+      || this.wearingAll(['Eclipse Moon helm', 'Eclipse Moon chestplate', 'Eclipse Moon tassets', 'Eclipse atlatl'])
     ) {
       this.addIssue(UserIssueType.EQUIPMENT_SET_EFFECT_UNSUPPORTED, 'The calculator currently does not account for your equipment set effect.');
     }

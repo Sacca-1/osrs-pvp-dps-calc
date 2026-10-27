@@ -13,6 +13,7 @@ import MysticMight from '@/public/img/prayers/Mystic_Might.png';
 import Deadeye from '@/public/img/prayers/Deadeye.png';
 import MysticVigour from '@/public/img/prayers/Mystic_Vigour.png';
 import Chivalry from '@/public/img/prayers/Chivalry.png';
+import Zeal from '@/public/img/prayers/Zeal.png';
 import Piety from '@/public/img/prayers/Piety.png';
 import Rigour from '@/public/img/prayers/Rigour.png';
 import Augury from '@/public/img/prayers/Augury.png';
@@ -112,14 +113,13 @@ export interface PrayerData {
 export const PrayerMap: { [k in Prayer]: PrayerData } = {
   [Prayer.ZEAL]: {
     renderOrder: 93,
-    name: 'Zeal (pre-release)',
-    image: Piety,
-    drainRate: 1,
+    name: 'Zeal',
+    image: Zeal,
+    drainRate: 24,
     combatStyle: 'melee',
     factorAccuracy: [125, 100],
     factorStrength: [128, 100],
     factorDefence: [125, 100],
-    preRelease: true,
   },
   [Prayer.BURST_OF_STRENGTH]: {
     renderOrder: 1,

@@ -1,8 +1,8 @@
-import { EquipmentCategory } from "@/enums/EquipmentCategory";
-import { Prayer } from "@/enums/Prayer";
-import Potion from "@/enums/Potion";
-import { Spell } from "@/types/Spell";
-import { PlayerCombatStyle } from "@/types/PlayerCombatStyle";
+import { EquipmentCategory } from '@/enums/EquipmentCategory';
+import { Prayer } from '@/enums/Prayer';
+import Potion from '@/enums/Potion';
+import { Spell } from '@/types/Spell';
+import { PlayerCombatStyle } from '@/types/PlayerCombatStyle';
 
 export interface PlayerSkills {
   atk: number;
@@ -14,11 +14,13 @@ export interface PlayerSkills {
   str: number;
   mining: number;
   herblore: number;
+  farming: number;
 }
 
 export interface EquipmentPiece extends EquipmentStats {
   name: string;
   id: number;
+  weight: number;
   version: string;
   slot: keyof PlayerEquipment;
   image: string;
@@ -162,10 +164,12 @@ export interface Player extends EquipmentStats {
      * Confliction gauntlets previous magic attack state.
      * @see https://oldschool.runescape.wiki/w/Confliction_gauntlets
      */
-    conflictionGauntletsPreviousMagicAttack:
-      | "average"
-      | "splashed"
-      | "not_splashed";
+    conflictionGauntletsPreviousMagicAttack: 'average' | 'splashed' | 'not_splashed';
+
+    fragmentOfWind: boolean;
+    fragmentOfWater: boolean;
+    fragmentOfEarth: boolean;
+    fragmentOfFire: boolean;
   };
   spell: Spell | null;
 }

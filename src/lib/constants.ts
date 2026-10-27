@@ -3,51 +3,42 @@ import { CombatStyleStance } from '@/types/PlayerCombatStyle';
 export const BLOWPIPE_IDS: number[] = [
   12926, // regular
   28688, // blazing
+  31575, // camphor
+  31579, // ironwood
+  31583, // rosewood
 ];
 
 // The maximum number of loadouts that users can have. Do not lower it, else it will cause share link issues.
 export const NUMBER_OF_LOADOUTS = 6;
 
-export const AKKHA_IDS = [
-  11789, 11790, 11791, 11792, 11793, 11794, 11795, 11796,
-];
+export const AKKHA_IDS = [11789, 11790, 11791, 11792, 11793, 11794, 11795, 11796];
 
-export const AKKHA_SHADOW_IDS = [
-  11797, 11798, 11799,
-];
+export const AKKHA_SHADOW_IDS = [11797, 11798, 11799];
 
-export const BABA_IDS = [
-  11778, 11779, 11780,
-];
+export const BABA_IDS = [11778, 11779, 11780];
 
-export const KEPHRI_SHIELDED_IDS = [
-  11719,
-];
+export const KEPHRI_SHIELDED_IDS = [11719];
 // ^v todo these two might be swapped ^v
-export const KEPHRI_UNSHIELDED_IDS = [
-  11721,
-];
+export const KEPHRI_UNSHIELDED_IDS = [11721];
 
-export const KEPHRI_OVERLORD_IDS = [
-  11724, 11725, 11726,
-];
+export const KEPHRI_OVERLORD_IDS = [11724, 11725, 11726];
 
-export const ZEBAK_IDS = [
-  11730, 11732, 11733,
-];
+export const ZEBAK_IDS = [11730, 11732, 11733];
 
-export const TOA_OBELISK_IDS = [
-  11750, 11751, 11752,
-];
+export const TOA_OBELISK_IDS = [11751, 11750, 11752];
 
 export const P2_WARDEN_IDS = [
-  11753, 11754, // elidinis
-  11756, 11757, // tumeken
+  11753,
+  11754, // elidinis
+  11756,
+  11757, // tumeken
 ];
 
 export const P3_WARDEN_IDS = [
-  11761, 11763, // elidinis
-  11762, 11764, // tumeken
+  11761,
+  11763, // elidinis
+  11762,
+  11764, // tumeken
 ];
 
 export const TOA_WARDEN_CORE_EJECTED_IDS = [
@@ -78,63 +69,193 @@ export const TOMBS_OF_AMASCUT_MONSTER_IDS = [
 ];
 
 export const VERZIK_P1_IDS = [
-  10830, 10831, 10832, // em
-  8369, 8370, 8371, // norm
-  10847, 10848, 10849, // hmt
+  10830,
+  10831,
+  10832, // em
+  8369,
+  8370,
+  8371, // norm
+  10847,
+  10848,
+  10849, // hmt
 ];
 
 export const VERZIK_IDS = [
   ...VERZIK_P1_IDS,
-  10833, 10834, 10835, // verzik entry mode
-  8372, 8373, 8374, // verzik normal mode
-  10850, 10851, 10852, // verzik hard mode
+  10833,
+  10834,
+  10835, // verzik entry mode
+  8372,
+  8373,
+  8374, // verzik normal mode
+  10850,
+  10851,
+  10852, // verzik hard mode
 ];
 
 export const SOTETSEG_IDS = [
-  8387, 8388, // normal
-  10867, 10868, // hard
+  8387,
+  8388, // normal
+  10867,
+  10868, // hard
 ];
 
 /** IDs of monsters that are present in Theatre of Blood * */
 export const TOB_MONSTER_IDS = [
   ...VERZIK_P1_IDS,
   // normal
-  8360, 8361, 8362, 8363, 8364, 8365, // maiden
-  8366, 8367, // maiden crab + blood spawn
+  8360,
+  8361,
+  8362,
+  8363,
+  8364,
+  8365, // maiden
+  8366,
+  8367, // maiden crab + blood spawn
   8359, // bloat
-  8342, 8343, 8344, 8345, 8346, 8347, 8348, 8349, 8350, 8351, 8352, 8353, // nylos
-  8355, 8356, 8357, // nylo boss
+  8342,
+  8343,
+  8344,
+  8345,
+  8346,
+  8347,
+  8348,
+  8349,
+  8350,
+  8351,
+  8352,
+  8353, // nylos
+  8355,
+  8356,
+  8357, // nylo boss
   ...SOTETSEG_IDS,
-  8339, 8340, // xarpus
-  8372, 8373, 8374, // verzik
-  8376, 8381, 8382, 8383, 8384, 8385, // verzik web + nylos
+  8339,
+  8340, // xarpus
+  8372,
+  8373,
+  8374, // verzik
+  8376,
+  8381,
+  8382,
+  8383,
+  8384,
+  8385, // verzik web + nylos
 
   // hmt
-  10822, 10823, 10824, 10825, 10826, 10827, // maiden
-  10828, 10829, // maiden crab + blood spawn
+  10822,
+  10823,
+  10824,
+  10825,
+  10826,
+  10827, // maiden
+  10828,
+  10829, // maiden crab + blood spawn
   10813, // bloat
-  10791, 10792, 10793, 10794, 10795, 10796, 10797, 10798, 10799, 10800, 10801, 10802, // nylos
-  10804, 10805, 10806, // nylo demi-boss
-  10808, 10809, 10810, // nylo boss
+  10791,
+  10792,
+  10793,
+  10794,
+  10795,
+  10796,
+  10797,
+  10798,
+  10799,
+  10800,
+  10801,
+  10802, // nylos
+  10804,
+  10805,
+  10806, // nylo demi-boss
+  10808,
+  10809,
+  10810, // nylo boss
   // sote is above
-  10770, 10771, 10772, // xarpus (i think there's an extra one here because of its different p3 behaviour?)
-  10850, 10851, 10852, // verzik
-  10854, 10858, 10859, 10860, 10861, 10862, // verzik web + nylos
+  10770,
+  10771,
+  10772, // xarpus (i think there's an extra one here because of its different p3 behaviour?)
+  10850,
+  10851,
+  10852, // verzik
+  10854,
+  10858,
+  10859,
+  10860,
+  10861,
+  10862, // verzik web + nylos
 ];
 
 /** IDs of monsters that are present in Theatre of Blood Entry Mode.
  * Separated from norm + hmt due to different health scaling rules. * */
 export const TOB_EM_MONSTER_IDS = [
-  10814, 10815, 10816, 10817, 10818, 10819, // maiden
-  10820, 10821, // maiden crab + blood spawn
+  10814,
+  10815,
+  10816,
+  10817,
+  10818,
+  10819, // maiden
+  10820,
+  10821, // maiden crab + blood spawn
   10812, // bloat
-  10774, 10775, 10776,
-  10777, 10778, 10779, 10780, 10781, 10782, 10783, 10784, 10785, // nylos
-  10787, 10788, 10789, // nylo boss
-  10864, 10865, // sote
-  10767, 10768, // xarpus
-  10833, 10834, 10835, // verzik
-  10837, 10841, 10842, 10843, 10844, 10845, // verzik web + nylos
+  10774,
+  10775,
+  10776,
+  10777,
+  10778,
+  10779,
+  10780,
+  10781,
+  10782,
+  10783,
+  10784,
+  10785, // nylos
+  10787,
+  10788,
+  10789, // nylo boss
+  10864,
+  10865, // sote
+  10767,
+  10768, // xarpus
+  10833,
+  10834,
+  10835, // verzik
+  10837,
+  10841,
+  10842,
+  10843,
+  10844,
+  10845, // verzik web + nylos
+];
+
+/** IDs of monsters that are present in The Gauntlet.
+ * Used to sort equipment
+ */
+export const GAUNTLET_MONSTER_IDS = [
+  9021, // Crystalline Hunllef
+  9026, // Crystalline Rat
+  9027, // Crystalline Spider
+  9028, // Crystalline Bat
+  9029, // Crystalline Unicorn
+  9030, // Crystalline Scorpion
+  9031, // Crystalline Wolf
+  9032, // Crystalline Bear
+  9033, // Crystalline Dragon
+  9034, // Crystalline Dark Beast
+];
+
+/** IDs of monsters that are present in The Corrupted Gauntlet.
+ * Used to sort equipment
+ */
+export const CORRUPTED_GAUNTLET_MONSTER_IDS = [
+  9035, // Corrupted Hunllef
+  9040, // Corrupted Rat
+  9041, // Corrupted Spider
+  9042, // Corrupted Bat
+  9043, // Corrupted Unicorn
+  9044, // Corrupted Scorpion
+  9045, // Corrupted Wolf
+  9046, // Corrupted Bear
+  9047, // Corrupted Dragon
+  9048, // Corrupted Dark Beast
 ];
 
 /**
@@ -142,8 +263,10 @@ export const TOB_EM_MONSTER_IDS = [
  * Separated due to different defence scaling rules.
  */
 export const TEKTON_IDS = [
-  7540, 7543, // reg
-  7544, 7545, // cm
+  7540,
+  7543, // reg
+  7544,
+  7545, // cm
 ];
 
 /**
@@ -151,8 +274,10 @@ export const TEKTON_IDS = [
  * Separated due to different health scaling rules.
  */
 export const GUARDIAN_IDS = [
-  7569, 7571, // reg
-  7570, 7572, // cm
+  7569,
+  7571, // reg
+  7570,
+  7572, // cm
 ];
 
 /**
@@ -184,35 +309,25 @@ export const OLM_MAGE_HAND_IDS = [
  * IDs of the Great Olm from the Chambers of Xeric.
  * Separated due to different health, offence, and defence scaling rules.
  */
-export const OLM_IDS = [
-  ...OLM_HEAD_IDS,
-  ...OLM_MELEE_HAND_IDS,
-  ...OLM_MAGE_HAND_IDS,
-];
+export const OLM_IDS = [...OLM_HEAD_IDS, ...OLM_MELEE_HAND_IDS, ...OLM_MAGE_HAND_IDS];
 
 /**
  * IDs of Scavenger beasts from the Chambers of Xeric.
  * Separated due to different health scaling rules.
  */
-export const SCAVENGER_BEAST_IDS = [
-  7548, 7549,
-];
+export const SCAVENGER_BEAST_IDS = [7548, 7549];
 
 /**
  * IDs of Vespula's Abyssal portal from the Chambers of Xeric.
  * Separated due to different offence scaling rules.
  */
-export const ABYSSAL_PORTAL_IDS = [
-  7533,
-];
+export const ABYSSAL_PORTAL_IDS = [7533];
 
 /**
  * IDs of Vasa's Glowing crystal from the Chambers of Xeric.
  * Separated due to different health and defence scaling rules.
  */
-export const GLOWING_CRYSTAL_IDS = [
-  7568,
-];
+export const GLOWING_CRYSTAL_IDS = [7568];
 
 /**
  * IDs of the Ice demon from the Chambers of Xeric.
@@ -222,17 +337,14 @@ export const ICE_DEMON_IDS = [
   7585, // cm
 ];
 
-export const VESPINE_SOLDIER_IDS = [
-  7538, 7539,
-];
+export const VESPINE_SOLDIER_IDS = [7538, 7539];
 
-export const DEATHLY_RANGER_IDS = [ // cox tightrope rangers
+export const DEATHLY_RANGER_IDS = [
+  // cox tightrope rangers
   7559,
 ];
 
-export const VESPULA_IDS = [
-  7530, 7531, 7532,
-];
+export const VESPULA_IDS = [7530, 7531, 7532];
 
 export const COX_MAGIC_IS_DEFENSIVE_IDS = [
   ...DEATHLY_RANGER_IDS,
@@ -244,21 +356,38 @@ export const COX_MAGIC_IS_DEFENSIVE_IDS = [
   ...OLM_MAGE_HAND_IDS,
 ];
 
-export const COX_USE_SINGLES_SCALING_IDS = [
-  ...SCAVENGER_BEAST_IDS,
-  ...VESPINE_SOLDIER_IDS,
-];
+export const COX_USE_SINGLES_SCALING_IDS = [...SCAVENGER_BEAST_IDS, ...VESPINE_SOLDIER_IDS];
 
 /**
  * IDs of the Fragment of Seren.
  */
-export const FRAGMENT_OF_SEREN_IDS = [
-  8917, 8918, 8919, 8920,
-];
+export const FRAGMENT_OF_SEREN_IDS = [8917, 8918, 8919, 8920];
 
 export const NIGHTMARE_IDS = [
-  378, 9425, 9426, 9427, 9428, 9429, 9430, 9431, 9432, 9433, 9460, // nightmare
-  377, 9423, 9416, 9417, 9418, 9419, 9420, 9421, 9422, 9424, 11153, 11154, 11155, // phosani's
+  378,
+  9425,
+  9426,
+  9427,
+  9428,
+  9429,
+  9430,
+  9431,
+  9432,
+  9433,
+  9460, // nightmare
+  377,
+  9423,
+  9416,
+  9417,
+  9418,
+  9419,
+  9420,
+  9421,
+  9422,
+  9424,
+  11153,
+  11154,
+  11155, // phosani's
 ];
 
 /**
@@ -267,14 +396,9 @@ export const NIGHTMARE_IDS = [
  *
  * @see https://oldschool.runescape.wiki/w/Totem_(The_Nightmare)#Uncharged
  */
-export const NIGHTMARE_TOTEM_IDS = [
-  9434, 9437, 9440, 9443,
-  9435, 9438, 9441, 9444,
-];
+export const NIGHTMARE_TOTEM_IDS = [9434, 9437, 9440, 9443, 9435, 9438, 9441, 9444];
 
-export const NEX_IDS = [
-  11278, 11279, 11280, 11281, 11282,
-];
+export const NEX_IDS = [11278, 11279, 11280, 11281, 11282];
 
 /**
  * IDs of monsters that calculate their magical defence using the defence stat.
@@ -284,7 +408,8 @@ export const USES_DEFENCE_LEVEL_FOR_MAGIC_DEFENCE_NPC_IDS = [
   ...ICE_DEMON_IDS,
   ...VERZIK_IDS,
   ...FRAGMENT_OF_SEREN_IDS,
-  11709, 11712, // baboon brawler
+  11709,
+  11712, // baboon brawler
   9118, // rabbit (prifddinas)
 ];
 
@@ -292,19 +417,33 @@ export const USES_DEFENCE_LEVEL_FOR_MAGIC_DEFENCE_NPC_IDS = [
  * IDs of Dusk.
  */
 const DUSK_IDS = [
-  7851, 7854, 7855, 7882, 7883, 7886, // dusk first form
-  7887, 7888, 7889, // dusk second form
+  7851,
+  7854,
+  7855,
+  7882,
+  7883,
+  7886, // dusk first form
+  7887,
+  7888,
+  7889, // dusk second form
 ];
 
 const WARRIORS_GUILD_CYCLOPES = [
-  2463, 2465, 2467, // L56
-  2464, 2466, 2468, // L76
-  2137, 2138, 2139, 2140, 2141, 2142, // L106
+  2463,
+  2465,
+  2467, // L56
+  2464,
+  2466,
+  2468, // L76
+  2137,
+  2138,
+  2139,
+  2140,
+  2141,
+  2142, // L106
 ];
 
-export const ZULRAH_IDS = [
-  2042, 2043, 2044,
-];
+export const ZULRAH_IDS = [2042, 2043, 2044];
 
 /**
  * Monsters immune to melee damage.
@@ -314,12 +453,28 @@ export const IMMUNE_TO_MELEE_DAMAGE_NPC_IDS = [
   ...ABYSSAL_PORTAL_IDS,
   7706, // zuk
   7708, // Jal-MejJak
-  12214, 12215, 12219, // leviathan
+  12214,
+  12215,
+  12219, // leviathan
   ...ZULRAH_IDS,
 ];
 
 export const IMMUNE_TO_NON_SALAMANDER_MELEE_DAMAGE_NPC_IDS = [
-  3169, 3170, 3171, 3172, 3173, 3174, 3175, 3176, 3177, 3178, 3179, 3180, 3181, 3182, 3183, // aviansie
+  3169,
+  3170,
+  3171,
+  3172,
+  3173,
+  3174,
+  3175,
+  3176,
+  3177,
+  3178,
+  3179,
+  3180,
+  3181,
+  3182,
+  3183, // aviansie
   7037, // reanimated aviansie
 ];
 
@@ -344,10 +499,7 @@ export const IMMUNE_TO_BURN_DAMAGE_NPC_IDS = [
 /**
  * Monsters immune to magic damage.
  */
-export const IMMUNE_TO_MAGIC_DAMAGE_NPC_IDS = [
-  ...DUSK_IDS,
-  ...WARRIORS_GUILD_CYCLOPES,
-];
+export const IMMUNE_TO_MAGIC_DAMAGE_NPC_IDS = [...DUSK_IDS, ...WARRIORS_GUILD_CYCLOPES];
 
 export const PARTY_SIZE_REQUIRED_MONSTER_IDS = [
   ...TOMBS_OF_AMASCUT_MONSTER_IDS,
@@ -357,28 +509,10 @@ export const PARTY_SIZE_REQUIRED_MONSTER_IDS = [
 
 export const BA_ATTACKER_MONSTERS = [
   // fighters
-  1667,
-  5739,
-  5740,
-  5741,
-  5742,
-  5743,
-  5744,
-  5745,
-  5746,
-  5747,
+  1667, 5739, 5740, 5741, 5742, 5743, 5744, 5745, 5746, 5747,
 
   // rangers
-  1668,
-  5757,
-  5758,
-  5759,
-  5760,
-  5761,
-  5762,
-  5763,
-  5764,
-  5765,
+  1668, 5757, 5758, 5759, 5760, 5761, 5762, 5763, 5764, 5765,
 ];
 
 export const VARDORVIS_IDS = [12223, 12224, 12228, 12425, 12426, 13656];
@@ -425,23 +559,30 @@ export const ONE_HIT_MONSTERS: number[] = [
  */
 export const ALWAYS_MAX_HIT_MONSTERS = {
   melee: [
-    11710, 11713, // baboon thrower
+    11710,
+    11713, // baboon thrower
     12814, // frem warband archer
     ...TOA_WARDEN_CORE_EJECTED_IDS,
     ...YAMA_VOID_FLARE_IDS,
+    14180, // Judge of Yama
   ],
   ranged: [
-    11711, 11714, // baboon mage
+    11711,
+    11714, // baboon mage
     12815, // frem warband seer
     11717, // cursed baboon
     11715, // baboon shaman
     ...YAMA_VOID_FLARE_IDS,
+    14180, // Judge of Yama
   ],
   magic: [
-    11709, 11712, // baboon brawler
+    11709,
+    11712, // baboon brawler
     12816, // frem warband berserker
-    14151, 14150, // Royal titans elementals
+    14151,
+    14150, // Royal titans elementals
     ...YAMA_VOID_FLARE_IDS,
+    14180, // Judge of Yama
   ],
 };
 
@@ -450,6 +591,7 @@ export const ALWAYS_MAX_HIT_MONSTERS = {
  */
 export const GUARANTEED_ACCURACY_MONSTERS: number[] = [
   5916, // Spawn (abyssal sire)
+  14180, // Judge of Yama
 ];
 
 /**
@@ -476,34 +618,48 @@ export const NPC_HARDCODED_MAX_HIT: { [npcId: number]: number } = {
 export const MONSTER_PHASES_BY_ID: { [k: number]: string[] } = {};
 export const TD_IDS = [13599, 13600, 13601, 13602, 13603, 13604, 13605, 13606];
 export const TD_PHASES = ['Shielded', 'Shielded (Defenceless)', 'Unshielded'];
-TD_IDS.forEach((id) => { MONSTER_PHASES_BY_ID[id] = TD_PHASES; });
+TD_IDS.forEach((id) => {
+  MONSTER_PHASES_BY_ID[id] = TD_PHASES;
+});
 
 export const ARAXXOR_IDS = [13668];
 export const ARAXXOR_PHASES = ['Standard', 'Enraged'];
-ARAXXOR_IDS.forEach((id) => { MONSTER_PHASES_BY_ID[id] = ARAXXOR_PHASES; });
+ARAXXOR_IDS.forEach((id) => {
+  MONSTER_PHASES_BY_ID[id] = ARAXXOR_PHASES;
+});
 
 export const HUEYCOATL_HEAD_IDS = [14009, 14010, 14013];
 export const HUEYCOATL_BODY_IDS = [14017];
 export const HUEYCOATL_TAIL_IDS = [14014];
-export const HUEYCOATL_IDS = [
-  ...HUEYCOATL_HEAD_IDS,
-  ...HUEYCOATL_BODY_IDS,
-  ...HUEYCOATL_TAIL_IDS,
-];
+export const HUEYCOATL_IDS = [...HUEYCOATL_HEAD_IDS, ...HUEYCOATL_BODY_IDS, ...HUEYCOATL_TAIL_IDS];
 export const HUEYCOATL_PHASES = ['Without Pillar', 'With Pillar'];
 export const HUEYCOATL_PHASE_IDS = [...HUEYCOATL_HEAD_IDS, ...HUEYCOATL_TAIL_IDS]; // body can't receive pillar buff
-HUEYCOATL_PHASE_IDS.forEach((id) => { MONSTER_PHASES_BY_ID[id] = HUEYCOATL_PHASES; });
+HUEYCOATL_PHASE_IDS.forEach((id) => {
+  MONSTER_PHASES_BY_ID[id] = HUEYCOATL_PHASES;
+});
 
 export const ROYAL_TITANS_PHASES = ['In Melee Range', 'Out of Melee Range'];
-TITAN_BOSS_IDS.forEach((id) => { MONSTER_PHASES_BY_ID[id] = ROYAL_TITANS_PHASES; });
+TITAN_BOSS_IDS.forEach((id) => {
+  MONSTER_PHASES_BY_ID[id] = ROYAL_TITANS_PHASES;
+});
+
+export const DOOM_OF_MOKHAIOTL_IDS = [14707];
+export const DOOM_OF_MOKHAIOTL_PHASES = ['Normal', 'Shielded', 'Burrowing'];
+DOOM_OF_MOKHAIOTL_IDS.forEach((id) => {
+  MONSTER_PHASES_BY_ID[id] = DOOM_OF_MOKHAIOTL_PHASES;
+});
 
 export const ABYSSAL_SIRE_PHASES = ['Standard', 'Transition'];
 export const ABYSSAL_SIRE_TRANSITION_IDS = [5886, 5889, 5891];
-ABYSSAL_SIRE_TRANSITION_IDS.forEach((id) => { MONSTER_PHASES_BY_ID[id] = ABYSSAL_SIRE_PHASES; });
+ABYSSAL_SIRE_TRANSITION_IDS.forEach((id) => {
+  MONSTER_PHASES_BY_ID[id] = ABYSSAL_SIRE_PHASES;
+});
 
 export const YAMA_IDS = [14176];
 export const YAMA_PHASES = ['Tank using magic', 'Tank not using magic'];
-YAMA_IDS.forEach((id) => { MONSTER_PHASES_BY_ID[id] = YAMA_PHASES; });
+YAMA_IDS.forEach((id) => {
+  MONSTER_PHASES_BY_ID[id] = YAMA_PHASES;
+});
 
 // -------------------------------
 // PvP-specific constants
@@ -524,3 +680,48 @@ export const BLOCKED_PVP_WEAPONS: string[] = [
  * 40 % of damage is taken, i.e. damage is multiplied by 0.6.
  */
 export const PROTECTION_PRAYER_DAMAGE_REDUCTION: [number, number] = [60, 100]; // multiply by 60/100
+export const MAGGOT_KING_ID = [15742];
+export const MAGGOT_KING_PHASES = ['Standard', 'Melee Punish'];
+MAGGOT_KING_ID.forEach((id) => {
+  MONSTER_PHASES_BY_ID[id] = MAGGOT_KING_PHASES;
+});
+
+export const MAD_ANGEL_IDS = [16309, 16315, 16305, 16314];
+export const MAD_ANGEL_PHASES = ['Standard', 'Sword Cleave', 'Perfect Lightning'];
+MAD_ANGEL_IDS.forEach((id) => {
+  MONSTER_PHASES_BY_ID[id] = MAD_ANGEL_PHASES;
+});
+
+export const INFINITE_HEALTH_MONSTERS: number[] = [
+  14779, // gemstone crab
+];
+
+export const ECLIPSE_MOON_IDS = [13012];
+
+export const BORK_IDS = [16640];
+export const BORK_PHASES = [
+  'Smork HP 100% - 75%',
+  'Smork HP 75% - 50%',
+  'Smork HP 50% - 25%',
+  'Smork HP 25% - 0%',
+  'Stunned',
+];
+BORK_IDS.forEach((id) => {
+  MONSTER_PHASES_BY_ID[id] = BORK_PHASES;
+});
+
+export const TFA_DEF_FLOOR_NPCS = [
+  16659,
+  16660, // Archive Guardian
+  ...BORK_IDS, // Bork
+  16652, // Ezekiel
+  16667, // Moia
+  16684, // Xarth
+  16673,
+  16674,
+  16677, // Ocellus
+];
+
+export const DREADNOTH_JELLY_ID = 16666;
+
+export const TANGLEFOOT_IDS = [5848, 5853, 5854, 6291, 6353];

@@ -1,8 +1,9 @@
-import { PartialDeep } from "type-fest";
-import { Player } from "@/types/Player";
-import { Monster } from "@/types/Monster";
-import UserIssueType from "@/enums/UserIssueType";
-import { DetailEntry } from "@/lib/CalcDetails";
+import { PartialDeep } from 'type-fest';
+import { Player } from '@/types/Player';
+import { Monster } from '@/types/Monster';
+import UserIssueType from '@/enums/UserIssueType';
+import { DetailEntry } from '@/lib/CalcDetails';
+import { ChartEntry } from '@/types/Charts';
 
 export interface UserIssue {
   type: UserIssueType;
@@ -34,17 +35,7 @@ export interface Preferences {
   hitDistsHideZeros: boolean; // legacy name
   hitDistShowSpec: boolean;
   resultsExpanded: boolean;
-  calcMode: "pvm" | "pvp";
-}
-
-export interface ChartEntry {
-  name: string | number;
-  [k: string]: string | number;
-}
-
-export interface ChartAnnotation {
-  value: number;
-  label: string;
+  calcMode: 'pvm' | 'pvp';
 }
 
 /**
@@ -100,7 +91,7 @@ export interface Calculator {
  * or any of its subproperties, are updated in a non-backwards-compatible manner,
  * or also in any manner that could affect the migrations required on load.
  */
-export const IMPORT_VERSION = 10 as const;
+export const IMPORT_VERSION = 12 as const;
 
 /**
  * This is the state that can be exported and imported (through shortlinks).
@@ -133,5 +124,5 @@ export interface State extends ImportableData {
   /**
    * All monsters that a player can fight.
    */
-  availableMonsters: Omit<Monster, "inputs">[];
+  availableMonsters: Omit<Monster, 'inputs'>[];
 }

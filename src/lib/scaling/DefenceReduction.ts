@@ -9,7 +9,7 @@ import {
   NEX_IDS,
   NIGHTMARE_IDS,
   P3_WARDEN_IDS,
-  SOTETSEG_IDS,
+  SOTETSEG_IDS, TFA_DEF_FLOOR_NPCS,
   TOA_OBELISK_IDS,
   VARDORVIS_IDS,
   VERZIK_IDS, YAMA_IDS,
@@ -58,6 +58,9 @@ export const getDefenceFloor = (m: Monster): number => {
   }
   if (YAMA_IDS.includes(m.id)) {
     return 145;
+  }
+  if (TFA_DEF_FLOOR_NPCS.includes(m.id)) {
+    return Math.trunc(m.skills.def * 6 / 10);
   }
 
   // no limit
@@ -123,7 +126,7 @@ const applyDefenceReductions = (m: Monster): Monster => {
 
   for (let i = 0; i < reductions.tonalztic; i++) {
     m = newSkills(m, {
-      def: m.skills.def - Math.trunc(m.skills.magic / 10),
+      def: m.skills.def - Math.trunc(m.skills.magic / 8),
     });
   }
 
@@ -153,6 +156,17 @@ const applyDefenceReductions = (m: Monster): Monster => {
     m = applyBgsDmg(m, 'atk');
     m = applyBgsDmg(m, 'magic');
     m = applyBgsDmg(m, 'ranged');
+  }
+
+  if (reductions.ayak > 0 && m.defensive.magic > 0) {
+    const newMagicDef = Math.max(0, m.defensive.magic - reductions.ayak);
+    m = {
+      ...m,
+      defensive: {
+        ...m.defensive,
+        magic: newMagicDef,
+      },
+    };
   }
 
   return m;

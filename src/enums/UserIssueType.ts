@@ -2,6 +2,8 @@ enum UserIssueType {
   EQUIPMENT_MISSING_AMMO = 'equipment_slot_ammo_missing',
   EQUIPMENT_WRONG_AMMO = 'equipment_slot_ammo_wrong',
   EQUIPMENT_SET_EFFECT_UNSUPPORTED = 'equipment_slot_body_unsupported_set_effect',
+  EQUIPMENT_SHIELD_EFFECT_UNSUPPORTED = 'equipment_slot_shield_unsupported_effect',
+  EQUIPMENT_WEAPON_EFFECT_UNSUPPORTED = 'equipment_slot_weapon_unsupported_effect',
   WEAPON_WRONG_MONSTER = 'equipment_slot_weapon_wrong_monster',
   EQUIPMENT_SPEC_UNSUPPORTED = 'pvm_results_weapon_unsupported_spec',
   SPELL_WRONG_WEAPON = 'spell_wrong_weapon',
@@ -10,6 +12,7 @@ enum UserIssueType {
   RING_RECOIL_UNSUPPORTED = 'equipment_slot_ring_recoil',
   FEET_RECOIL_UNSUPPORTED = 'equipment_slot_feet_recoil',
   WEAPON_PRERELEASE = 'equipment_slot_weapon_prerelease',
+  HANDS_EFFECT_UNSUPPORTED = 'equipment_slot_hands_effect',
 }
 
 export default UserIssueType;

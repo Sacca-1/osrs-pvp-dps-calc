@@ -17,7 +17,7 @@ describe("Crimson kisten", () => {
     expect(crimsonKisten.id).toBe(33631);
     expect(crimsonKisten.image).toBe("Crimson kisten.png");
     expect(crimsonKisten.speed).toBe(4);
-    expect(crimsonKisten.category).toBe(EquipmentCategory.AXE);
+    expect(crimsonKisten.category).toBe(EquipmentCategory.SPIKED);
     expect(crimsonKisten.offensive.crush).toBe(80);
     expect(crimsonKisten.bonuses.str).toBe(56);
   });

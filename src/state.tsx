@@ -7,10 +7,12 @@ import {
   makeAutoObservable,
   reaction,
   toJS,
-} from "mobx";
-import React, { createContext, useContext } from "react";
-import { PartialDeep } from "type-fest";
-import * as localforage from "localforage";
+} from 'mobx';
+import React, { createContext, useContext } from 'react';
+import { PartialDeep } from 'type-fest';
+import * as localforage from 'localforage';
+import merge from 'lodash.mergewith';
+import { toast } from 'react-toastify';
 import {
   CalculatedLoadout,
   Calculator,
@@ -21,38 +23,33 @@ import {
   State,
   UI,
   UserIssue,
-} from "@/types/State";
-import merge from "lodash.mergewith";
-import {
-  EquipmentPiece,
-  Player,
-  PlayerEquipment,
-  PlayerSkills,
-} from "@/types/Player";
-import { Monster } from "@/types/Monster";
-import { MonsterAttribute } from "@/enums/MonsterAttribute";
-import { toast } from "react-toastify";
+} from '@/types/State';
+import { EquipmentPiece, Player, PlayerEquipment, PlayerSkills } from '@/types/Player';
+import { Monster } from '@/types/Monster';
+import { MonsterAttribute } from '@/enums/MonsterAttribute';
 import {
   fetchPlayerSkills,
   fetchShortlinkData,
   getCombatStylesForCategory,
+  getDefaultCombatStyle,
   isDefined,
   PotionMap,
-} from "@/utils";
+} from '@/utils';
 import {
   ComputeBasicRequest,
   ComputeReverseRequest,
   WorkerRequestType,
-} from "@/worker/CalcWorkerTypes";
-import { getMonsters, INITIAL_MONSTER_INPUTS } from "@/lib/Monsters";
+} from '@/worker/CalcWorkerTypes';
+import { getMonsters, INITIAL_MONSTER_INPUTS } from '@/lib/Monsters';
+import { availableEquipment, calculateEquipmentBonusesFromGear } from '@/lib/Equipment';
+import { CalcWorker } from '@/worker/CalcWorker';
+import { spellByName } from '@/types/Spell';
 import {
-  availableEquipment,
-  calculateEquipmentBonusesFromGear,
-} from "@/lib/Equipment";
-import { CalcWorker } from "@/worker/CalcWorker";
-import { spellByName } from "@/types/Spell";
-import { DEFAULT_ATTACK_SPEED, NUMBER_OF_LOADOUTS } from "@/lib/constants";
-import { EquipmentCategory } from "./enums/EquipmentCategory";
+  DEFAULT_ATTACK_SPEED,
+  INFINITE_HEALTH_MONSTERS,
+  NUMBER_OF_LOADOUTS,
+} from '@/lib/constants';
+import { EquipmentCategory } from './enums/EquipmentCategory';
 import {
   ARM_PRAYERS,
   BRAIN_PRAYERS,
@@ -60,11 +57,10 @@ import {
   OFFENSIVE_PRAYERS,
   OVERHEAD_PRAYERS,
   Prayer,
-} from "./enums/Prayer";
-import Potion from "./enums/Potion";
-import { startPollingForRuneLite, WikiSyncer } from "./wikisync/WikiSyncer";
-import { sum, max } from "d3-array";
-import PlayerVsPlayerCalc from "@/lib/PlayerVsPlayerCalc";
+} from './enums/Prayer';
+import Potion from './enums/Potion';
+import { sum, max } from 'd3-array';
+import PlayerVsPlayerCalc from '@/lib/PlayerVsPlayerCalc';
 
 const EMPTY_CALC_LOADOUT = {} as CalculatedLoadout;
 
@@ -86,8 +82,8 @@ const generateInitialEquipment = () => {
 };
 
 export const generateEmptyPlayer = (name?: string): Player => ({
-  name: name ?? "Loadout 1",
-  style: getCombatStylesForCategory(EquipmentCategory.NONE)[0],
+  name: name ?? 'Loadout 1',
+  style: getDefaultCombatStyle(EquipmentCategory.NONE),
   skills: {
     atk: 99,
     def: 99,
@@ -98,6 +94,7 @@ export const generateEmptyPlayer = (name?: string): Player => ({
     str: 99,
     mining: 99,
     herblore: 99,
+    farming: 99,
   },
   boosts: {
     atk: 0,
@@ -109,6 +106,7 @@ export const generateEmptyPlayer = (name?: string): Player => ({
     str: 0,
     mining: 0,
     herblore: 0,
+    farming: 0,
   },
   equipment: generateInitialEquipment(),
   overheadPrayer: null,
@@ -142,14 +140,18 @@ export const generateEmptyPlayer = (name?: string): Player => ({
     chargeSpell: false,
     markOfDarknessSpell: false,
     forinthrySurge: false,
-    soulreaperStacks: 0,
+    soulreaperStacks: 5,
     baAttackerLevel: 0,
     chinchompaDistance: 4, // 4 tiles is the optimal range for "medium fuse" (rapid), which is the default selected stance
     usingSunfireRunes: false,
     frozen: true,
     antifire: false,
     atlatlBurnStacks: 0,
-    conflictionGauntletsPreviousMagicAttack: "average",
+    conflictionGauntletsPreviousMagicAttack: 'average',
+    fragmentOfWind: false,
+    fragmentOfWater: false,
+    fragmentOfEarth: false,
+    fragmentOfFire: false,
   },
   spell: null,
 });
@@ -161,17 +163,15 @@ export const parseLoadoutsFromImportedData = (data: ImportableData) =>
       for (const [k, v] of Object.entries(loadout.equipment)) {
         if (v === null) continue;
         let item: EquipmentPiece | undefined;
-        if (Object.hasOwn(v, "id")) {
+        if (Object.hasOwn(v, 'id')) {
           item = availableEquipment.find((eq) => eq.id === v.id);
           if (item) {
             // include the hidden itemVars inputs that are not present on the availableEquipment store
-            if (Object.hasOwn(v, "itemVars")) {
+            if (Object.hasOwn(v, 'itemVars')) {
               item = { ...item, itemVars: v.itemVars };
             }
           } else {
-            console.warn(
-              `[parseLoadoutsFromImportedData] No item found for item ID ${v.id}`
-            );
+            console.warn(`[parseLoadoutsFromImportedData] No item found for item ID ${v.id}`);
           }
         }
         // The following line will remove the item entirely if it seems to no longer exist.
@@ -192,12 +192,12 @@ class GlobalState implements State {
 
   monster: Monster = {
     id: 415,
-    name: "Abyssal demon",
-    version: "Standard",
-    image: "Abyssal demon.png",
+    name: 'Abyssal demon',
+    version: 'Standard',
+    image: 'Abyssal demon.png',
     size: 1,
     speed: 4,
-    style: "stab",
+    style: 'stab',
     skills: {
       atk: 97,
       def: 135,
@@ -229,12 +229,13 @@ class GlobalState implements State {
     immunities: {
       burn: null,
     },
+    is_slayer_monster: true,
     inputs: { ...INITIAL_MONSTER_INPUTS },
   };
 
-  attackerLoadouts: Player[] = [generateEmptyPlayer("Attacker 1")];
+  attackerLoadouts: Player[] = [generateEmptyPlayer('Attacker 1')];
 
-  defenderLoadouts: Player[] = [generateEmptyPlayer("Defender 1")];
+  defenderLoadouts: Player[] = [generateEmptyPlayer('Defender 1')];
 
   // Attacker tab index
   selectedAttacker = 0;
@@ -245,7 +246,7 @@ class GlobalState implements State {
   ui: UI = {
     showPreferencesModal: false,
     showShareModal: false,
-    username: "",
+    username: '',
     isDefensiveReductionsExpanded: false,
   };
 
@@ -259,7 +260,7 @@ class GlobalState implements State {
     hitDistsHideZeros: false,
     hitDistShowSpec: false,
     resultsExpanded: false,
-    calcMode: "pvp",
+    calcMode: 'pvp',
   };
 
   calc: Calculator = {
@@ -288,13 +289,6 @@ class GlobalState implements State {
 
   private _debug: boolean = false;
 
-  /**
-   * Map of WikiSync instances (PORT -> WIKISYNCER) that we attempt to persistently connect to.
-   * The WikiSync RuneLite plugin includes a websocket server which exposes player information from the local
-   * RuneLite client to the DPS calculator.
-   */
-  wikisync: Map<number, WikiSyncer> = new Map();
-
   private storageUpdater?: IReactionDisposer;
 
   /**
@@ -302,7 +296,7 @@ class GlobalState implements State {
    * Set by Player/Defender containers on mouse-enter so that all child components automatically
    * act on the correct loadout without needing to thread a `side` prop through every component.
    */
-  activeSide: "attacker" | "defender" = "attacker";
+  activeSide: 'attacker' | 'defender' = 'attacker';
 
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
@@ -318,6 +312,7 @@ class GlobalState implements State {
         str: 0,
         mining: 0,
         herblore: 0,
+        farming: 0,
       };
 
       for (const p of this.player.buffs.potions) {
@@ -326,9 +321,7 @@ class GlobalState implements State {
           const r = result[k as keyof typeof result] as number;
           if (r > boosts[k as keyof typeof boosts]!) {
             // If this skill's boost is higher than what it already is, then change it
-            boosts[k as keyof typeof boosts] = result[
-              k as keyof typeof result
-            ] as number;
+            boosts[k as keyof typeof boosts] = result[k as keyof typeof result] as number;
           }
         }
       }
@@ -340,25 +333,17 @@ class GlobalState implements State {
       () => toJS(this.player.skills),
       () => toJS(this.player.buffs.potions),
     ];
-    potionTriggers.map((t) =>
-      reaction(t, recomputeBoosts, { fireImmediately: false })
-    );
+    potionTriggers.map((t) => reaction(t, recomputeBoosts, { fireImmediately: false }));
 
     // for toa monster + shadow handling
-    const equipmentTriggers: ((r: IReactionPublic) => unknown)[] = [
-      () => toJS(this.monster),
-    ];
+    const equipmentTriggers: ((r: IReactionPublic) => unknown)[] = [() => toJS(this.monster)];
     equipmentTriggers.map((t) =>
       reaction(t, () => {
         if (!this.prefs.manualMode) {
           this.recalculateEquipmentBonusesFromGearAll();
         }
-      })
+      }),
     );
-
-    if ((process.env.NEXT_PUBLIC_DISABLE_WS || "false") !== "true") {
-      this.wikisync = startPollingForRuneLite();
-    }
   }
 
   set debug(debug: boolean) {
@@ -424,8 +409,7 @@ class GlobalState implements State {
    * @see https://oldschool.runescape.wiki/w/Combat_Options
    */
   get availableCombatStyles() {
-    const cat =
-      this.player.equipment.weapon?.category || EquipmentCategory.NONE;
+    const cat = this.player.equipment.weapon?.category || EquipmentCategory.NONE;
     return getCombatStylesForCategory(cat);
   }
 
@@ -434,17 +418,7 @@ class GlobalState implements State {
    * In this case, we should hide UI elements relating to reverse DPS/damage taken metrics.
    */
   get isNonStandardMonster() {
-    return !["slash", "crush", "stab", "magic", "ranged"].includes(
-      this.monster.style || ""
-    );
-  }
-
-  /**
-   * Returns the WikiSyncer instances that have user information attached (AKA the user is logged in),
-   * rather than all of the instances that have an attempted connection.
-   */
-  get validWikiSyncInstances() {
-    return new Map([...this.wikisync].filter(([, v]) => v.username));
+    return !['slash', 'crush', 'stab', 'magic', 'ranged'].includes(this.monster.style || '');
   }
 
   /**
@@ -453,53 +427,43 @@ class GlobalState implements State {
    */
   startStorageUpdater() {
     if (this.storageUpdater) {
-      console.warn("[GlobalState] StorageUpdater is already set!");
+      console.warn('[GlobalState] StorageUpdater is already set!');
       return;
     }
     this.storageUpdater = autorun(() => {
       // Save their application state to browser storage
-      localforage
-        .setItem("dps-calc-state", toJS(this.asImportableData))
-        .catch(() => {});
+      localforage.setItem('dps-calc-state', toJS(this.asImportableData)).catch(() => {});
     });
   }
 
   setCalcWorker(worker: CalcWorker) {
     if (this.calcWorker) {
-      console.warn("[GlobalState] CalcWorker is already set!");
+      console.warn('[GlobalState] CalcWorker is already set!');
       this.calcWorker.shutdown();
     }
     worker.initWorker();
     this.calcWorker = worker;
   }
 
-  updateEquipmentBonuses(
-    loadoutIx?: number,
-    side: "attacker" | "defender" = this.activeSide
-  ) {
-    const list =
-      side === "attacker" ? this.attackerLoadouts : this.defenderLoadouts;
+  updateEquipmentBonuses(loadoutIx?: number, side: 'attacker' | 'defender' = this.activeSide) {
+    const list = side === 'attacker' ? this.attackerLoadouts : this.defenderLoadouts;
     loadoutIx =
       loadoutIx !== undefined
         ? loadoutIx
-        : side === "attacker"
-        ? this.selectedAttacker
-        : this.selectedDefender;
+        : side === 'attacker'
+          ? this.selectedAttacker
+          : this.selectedDefender;
 
     list[loadoutIx] = merge(
       list[loadoutIx],
-      calculateEquipmentBonusesFromGear(list[loadoutIx], this.monster)
+      calculateEquipmentBonusesFromGear(list[loadoutIx], this.monster),
     );
   }
 
   recalculateEquipmentBonusesFromGearAll() {
     // Recalculate for both attacker and defender loadouts
-    this.attackerLoadouts.forEach((_, i) =>
-      this.updateEquipmentBonuses(i, "attacker")
-    );
-    this.defenderLoadouts.forEach((_, i) =>
-      this.updateEquipmentBonuses(i, "defender")
-    );
+    this.attackerLoadouts.forEach((_, i) => this.updateEquipmentBonuses(i, 'attacker'));
+    this.defenderLoadouts.forEach((_, i) => this.updateEquipmentBonuses(i, 'defender'));
   }
 
   updateUIState(ui: PartialDeep<UI>) {
@@ -510,10 +474,7 @@ class GlobalState implements State {
     this.calc = merge(this.calc, calc);
   }
 
-  updateCalcTtkDist(
-    loadoutIx: number,
-    ttkDist: PlayerVsNPCCalculatedLoadout["ttkDist"]
-  ) {
+  updateCalcTtkDist(loadoutIx: number, ttkDist: PlayerVsNPCCalculatedLoadout['ttkDist']) {
     this.calc.loadouts[loadoutIx].ttkDist = ttkDist;
   }
 
@@ -537,18 +498,20 @@ class GlobalState implements State {
         this.updateImportedData(data);
       },
       {
-        pending: "Loading data from shared link...",
-        success: "Loaded data from shared link!",
-        error: "Failed to load shared link data. Please try again.",
+        pending: 'Loading data from shared link...',
+        success: 'Loaded data from shared link!',
+        error: 'Failed to load shared link data. Please try again.',
       },
       {
-        toastId: "shortlink",
-      }
+        toastId: 'shortlink',
+      },
     );
   }
 
   updateImportedData(data: ImportableData) {
     /* eslint-disable no-fallthrough */
+    /* eslint-disable @typescript-eslint/dot-notation */
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     switch (data.serializationVersion) {
       case 1:
         data.monster.inputs.phase = data.monster.inputs.tormentedDemonPhase;
@@ -558,21 +521,16 @@ class GlobalState implements State {
       case 4: // reserved: used during leagues 5
       case 5:
         data.loadouts.forEach((l) => {
-          /* eslint-disable @typescript-eslint/dot-notation */
-          /* eslint-disable @typescript-eslint/no-explicit-any */
-          if ((l as any)["leagues"]) {
-            delete (l as any)["leagues"];
+          if ((l as any)['leagues']) {
+            delete (l as any)['leagues'];
           }
-          /* eslint-enable @typescript-eslint/dot-notation */
-          /* eslint-enable @typescript-eslint/no-explicit-any */
         });
 
       case 6:
         // partyAvgMiningLevel becomes partySumMiningLevel
         if (isDefined(data.monster.inputs.partyAvgMiningLevel)) {
           data.monster.inputs.partySumMiningLevel =
-            data.monster.inputs.partyAvgMiningLevel *
-            data.monster.inputs.partySize;
+            data.monster.inputs.partyAvgMiningLevel * data.monster.inputs.partySize;
           delete data.monster.inputs.partyAvgMiningLevel;
         }
 
@@ -587,49 +545,37 @@ class GlobalState implements State {
       case 9:
         // Add default confliction gauntlets setting for existing loadouts
         data.loadouts.forEach((l) => {
-          if (
-            l.buffs &&
-            !isDefined(l.buffs.conflictionGauntletsPreviousMagicAttack)
-          ) {
-            l.buffs.conflictionGauntletsPreviousMagicAttack = "average";
+          if (l.buffs && !isDefined(l.buffs.conflictionGauntletsPreviousMagicAttack)) {
+            l.buffs.conflictionGauntletsPreviousMagicAttack = 'average';
           }
         });
         // Also handle defender loadouts if they exist
         if (data.defenderLoadouts) {
           data.defenderLoadouts.forEach((l) => {
-            if (
-              l.buffs &&
-              !isDefined(l.buffs.conflictionGauntletsPreviousMagicAttack)
-            ) {
-              l.buffs.conflictionGauntletsPreviousMagicAttack = "average";
+            if (l.buffs && !isDefined(l.buffs.conflictionGauntletsPreviousMagicAttack)) {
+              l.buffs.conflictionGauntletsPreviousMagicAttack = 'average';
             }
           });
         }
 
       default:
     }
-    /* eslint-enable no-fallthrough */
-    console.debug("IMPORT | ", data);
+    /* eslint-enable */
+    console.debug('IMPORT | ', data);
 
     if (data.monster) {
       let newMonster: PartialDeep<Monster> = {};
 
       if (data.monster.id > -1) {
-        const monstersById = getMonsters().filter(
-          (m) => m.id === data.monster.id
-        );
+        const monstersById = getMonsters().filter((m) => m.id === data.monster.id);
         if ((monstersById?.length || 0) === 0) {
-          throw new Error(
-            `Failed to find monster by id '${data.monster.id}' from shortlink`
-          );
+          throw new Error(`Failed to find monster by id '${data.monster.id}' from shortlink`);
         }
 
         if (monstersById.length === 1) {
           newMonster = monstersById[0];
         } else {
-          const version = monstersById.find(
-            (m) => m.version === data.monster.version
-          );
+          const version = monstersById.find((m) => m.version === data.monster.version);
           if (version) {
             newMonster = version;
           } else {
@@ -641,9 +587,7 @@ class GlobalState implements State {
       }
 
       // If the passed monster def reductions are different to the defaults, expand the UI section.
-      for (const [k, v] of Object.entries(
-        data.monster.inputs?.defenceReductions
-      )) {
+      for (const [k, v] of Object.entries(data.monster.inputs?.defenceReductions)) {
         if (
           v !== undefined &&
           v !==
@@ -688,9 +632,9 @@ class GlobalState implements State {
           for (const [slot, v] of Object.entries(loadout.equipment)) {
             if (v === null) continue;
             let item;
-            if (Object.hasOwn(v, "id")) {
+            if (Object.hasOwn(v, 'id')) {
               item = availableEquipment.find((eq) => eq.id === (v as any).id);
-              if (item && Object.hasOwn(v, "itemVars")) {
+              if (item && Object.hasOwn(v, 'itemVars')) {
                 item = { ...item, itemVars: (v as any).itemVars } as any;
               }
             }
@@ -702,7 +646,7 @@ class GlobalState implements State {
       defLoadouts.forEach((p, ix) => {
         if (this.defenderLoadouts[ix] === undefined)
           this.defenderLoadouts.push(generateEmptyPlayer());
-        this.updatePlayer(p, ix, "defender");
+        this.updatePlayer(p, ix, 'defender');
       });
 
       this.selectedDefender = data.selectedDefender || 0;
@@ -711,7 +655,7 @@ class GlobalState implements State {
 
   loadPreferences() {
     localforage
-      .getItem("dps-calc-prefs")
+      .getItem('dps-calc-prefs')
       .then((v) => {
         this.updatePreferences(v as PartialDeep<Preferences>);
       })
@@ -723,7 +667,7 @@ class GlobalState implements State {
 
   async fetchCurrentPlayerSkills(
     usernameOverride?: string,
-    side: "attacker" | "defender" = this.activeSide
+    side: 'attacker' | 'defender' = this.activeSide,
   ) {
     const username = usernameOverride ?? this.ui.username;
 
@@ -731,13 +675,13 @@ class GlobalState implements State {
       const res = await toast.promise(
         fetchPlayerSkills(username),
         {
-          pending: "Fetching player skills...",
+          pending: 'Fetching player skills...',
           success: `Successfully fetched player skills for ${username}!`,
-          error: "Error fetching player skills",
+          error: 'Error fetching player skills',
         },
         {
-          toastId: "skills-fetch",
-        }
+          toastId: 'skills-fetch',
+        },
       );
 
       if (res) this.updatePlayer({ skills: res }, undefined, side);
@@ -750,18 +694,18 @@ class GlobalState implements State {
     // Update local state store
     this.prefs = Object.assign(this.prefs, pref);
 
-    if (pref && Object.prototype.hasOwnProperty.call(pref, "manualMode")) {
+    if (pref && Object.prototype.hasOwnProperty.call(pref, 'manualMode')) {
       // Reset player bonuses to their worn equipment
       this.recalculateEquipmentBonusesFromGearAll();
     }
 
     // Save to browser storage
-    localforage.setItem("dps-calc-prefs", toJS(this.prefs)).catch((e) => {
+    localforage.setItem('dps-calc-prefs', toJS(this.prefs)).catch((e) => {
       console.error(e);
       // TODO something that isn't this
       // eslint-disable-next-line no-alert
       alert(
-        "Could not persist preferences to browser. Make sure our site has permission to do this."
+        'Could not persist preferences to browser. Make sure our site has permission to do this.',
       );
     });
   }
@@ -770,14 +714,9 @@ class GlobalState implements State {
    * Toggle a potion, with logic to remove from or add to the potions array depending on if it is already in there.
    * @param potion
    */
-  togglePlayerPotion(
-    potion: Potion,
-    side: "attacker" | "defender" = this.activeSide
-  ) {
-    const list =
-      side === "attacker" ? this.attackerLoadouts : this.defenderLoadouts;
-    const tgt =
-      list[side === "attacker" ? this.selectedAttacker : this.selectedDefender];
+  togglePlayerPotion(potion: Potion, side: 'attacker' | 'defender' = this.activeSide) {
+    const list = side === 'attacker' ? this.attackerLoadouts : this.defenderLoadouts;
+    const tgt = list[side === 'attacker' ? this.selectedAttacker : this.selectedDefender];
 
     const isToggled = tgt.buffs.potions.includes(potion);
     if (isToggled) {
@@ -811,14 +750,9 @@ class GlobalState implements State {
    * Toggle a prayer, with logic to remove from or add to the prayers array depending on if it is already in there.
    * @param prayer
    */
-  togglePlayerPrayer(
-    prayer: Prayer,
-    side: "attacker" | "defender" = this.activeSide
-  ) {
-    const list =
-      side === "attacker" ? this.attackerLoadouts : this.defenderLoadouts;
-    const tgt =
-      list[side === "attacker" ? this.selectedAttacker : this.selectedDefender];
+  togglePlayerPrayer(prayer: Prayer, side: 'attacker' | 'defender' = this.activeSide) {
+    const list = side === 'attacker' ? this.attackerLoadouts : this.defenderLoadouts;
+    const tgt = list[side === 'attacker' ? this.selectedAttacker : this.selectedDefender];
 
     const isToggled = tgt.prayers.includes(prayer);
     if (isToggled) {
@@ -854,8 +788,7 @@ class GlobalState implements State {
     }
 
     // Sync the dedicated overheadPrayer field used for PvP damage reduction logic
-    const activeOverhead =
-      tgt.prayers.find((p) => OVERHEAD_PRAYERS.includes(p)) || null;
+    const activeOverhead = tgt.prayers.find((p) => OVERHEAD_PRAYERS.includes(p)) || null;
     tgt.overheadPrayer = activeOverhead;
   }
 
@@ -866,9 +799,7 @@ class GlobalState implements State {
   toggleMonsterAttribute(attr: MonsterAttribute) {
     const isToggled = this.monster.attributes.includes(attr);
     if (isToggled) {
-      this.monster.attributes = this.monster.attributes.filter(
-        (a) => a !== attr
-      );
+      this.monster.attributes = this.monster.attributes.filter((a) => a !== attr);
     } else {
       this.monster.attributes = [...this.monster.attributes, attr];
     }
@@ -879,41 +810,51 @@ class GlobalState implements State {
    * @param player
    * @param loadoutIx Which loadout to update. Defaults to the current selected loadout.
    */
-  updatePlayer(
-    player: PartialDeep<Player>,
-    loadoutIx?: number,
-    side?: "attacker" | "defender"
-  ) {
+  updatePlayer(player: PartialDeep<Player>, loadoutIx?: number, side?: 'attacker' | 'defender') {
     side = side || this.activeSide;
 
-    const list =
-      side === "attacker" ? this.attackerLoadouts : this.defenderLoadouts;
+    const list = side === 'attacker' ? this.attackerLoadouts : this.defenderLoadouts;
 
     loadoutIx =
       loadoutIx !== undefined
         ? loadoutIx
-        : side === "attacker"
-        ? this.selectedAttacker
-        : this.selectedDefender;
+        : side === 'attacker'
+          ? this.selectedAttacker
+          : this.selectedDefender;
+
+    const currentShield = this.loadouts[loadoutIx].equipment.shield;
+    const newShield = player.equipment?.shield;
+
+    const currentWeapon = this.loadouts[loadoutIx].equipment.weapon;
+
+    // Special handling for if a shield is equipped, and we're using a two-handed weapon
+    if (player.equipment?.shield && newShield !== undefined && currentWeapon?.isTwoHanded) {
+      player = { ...player, equipment: { ...player.equipment, weapon: null } };
+    }
+    // ...and vice-versa
+    if (
+      player.equipment?.weapon &&
+      player.equipment?.weapon.isTwoHanded &&
+      currentShield?.name !== ''
+    ) {
+      player = { ...player, equipment: { ...player.equipment, shield: null } };
+    }
 
     const eq = player.equipment;
-    if (eq && (Object.hasOwn(eq, "weapon") || Object.hasOwn(eq, "shield"))) {
+    if (eq && (Object.hasOwn(eq, 'weapon') || Object.hasOwn(eq, 'shield'))) {
       const currentWeapon = list[loadoutIx].equipment.weapon;
       const newWeapon =
-        player.equipment?.weapon !== undefined
-          ? player.equipment.weapon
-          : currentWeapon;
+        player.equipment?.weapon !== undefined ? player.equipment.weapon : currentWeapon;
 
       // Reset combat style if weapon category actually changes
       if (player.equipment?.weapon !== undefined) {
         const oldWeaponCat = currentWeapon?.category || EquipmentCategory.NONE;
-        const newWeaponCat =
-          player.equipment.weapon?.category || EquipmentCategory.NONE;
+        const newWeaponCat = player.equipment.weapon?.category || EquipmentCategory.NONE;
         if (newWeaponCat !== oldWeaponCat && !player.style) {
           const styles = getCombatStylesForCategory(newWeaponCat);
           player.style =
-            styles.find((s) => s.stance === "Aggressive") ??
-            styles.find((s) => s.stance === "Rapid") ??
+            styles.find((s) => s.stance === 'Aggressive') ??
+            styles.find((s) => s.stance === 'Rapid') ??
             styles[0];
         }
       }
@@ -935,10 +876,7 @@ class GlobalState implements State {
     list[loadoutIx] = merge(list[loadoutIx], player);
     if (!this.prefs.manualMode) {
       // Recalculate equipment bonuses for whichever side was updated
-      const updatedBonuses = calculateEquipmentBonusesFromGear(
-        list[loadoutIx],
-        this.monster
-      );
+      const updatedBonuses = calculateEquipmentBonusesFromGear(list[loadoutIx], this.monster);
       list[loadoutIx] = merge(list[loadoutIx], updatedBonuses);
     }
   }
@@ -955,7 +893,7 @@ class GlobalState implements State {
     if (
       monster.id !== undefined &&
       monster.id !== this.monster.id &&
-      !Object.hasOwn(monster, "inputs")
+      !Object.hasOwn(monster, 'inputs')
     ) {
       monster = {
         ...monster,
@@ -976,10 +914,7 @@ class GlobalState implements State {
    * Clear an equipment slot, removing the item that was inside of it.
    * @param slot
    */
-  clearEquipmentSlot(
-    slot: keyof PlayerEquipment,
-    side: "attacker" | "defender" = this.activeSide
-  ) {
+  clearEquipmentSlot(slot: keyof PlayerEquipment, side: 'attacker' | 'defender' = this.activeSide) {
     this.updatePlayer(
       {
         equipment: {
@@ -987,7 +922,7 @@ class GlobalState implements State {
         },
       },
       undefined,
-      side
+      side,
     );
   }
 
@@ -999,21 +934,10 @@ class GlobalState implements State {
     this.selectedDefender = ix;
   }
 
-  reorderLoadout(
-    fromIx: number,
-    toIx: number,
-    side: "attacker" | "defender" = "attacker"
-  ) {
-    const list =
-      side === "attacker" ? this.attackerLoadouts : this.defenderLoadouts;
+  reorderLoadout(fromIx: number, toIx: number, side: 'attacker' | 'defender' = 'attacker') {
+    const list = side === 'attacker' ? this.attackerLoadouts : this.defenderLoadouts;
 
-    if (
-      fromIx === toIx ||
-      fromIx < 0 ||
-      toIx < 0 ||
-      fromIx >= list.length ||
-      toIx >= list.length
-    ) {
+    if (fromIx === toIx || fromIx < 0 || toIx < 0 || fromIx >= list.length || toIx >= list.length) {
       return;
     }
 
@@ -1021,8 +945,7 @@ class GlobalState implements State {
     const [moved] = reordered.splice(fromIx, 1);
     reordered.splice(toIx, 0, moved);
 
-    const currentSelection =
-      side === "attacker" ? this.selectedAttacker : this.selectedDefender;
+    const currentSelection = side === 'attacker' ? this.selectedAttacker : this.selectedDefender;
     let nextSelection = currentSelection;
     if (currentSelection === fromIx) {
       nextSelection = toIx;
@@ -1032,7 +955,7 @@ class GlobalState implements State {
       nextSelection = currentSelection + 1;
     }
 
-    if (side === "attacker") {
+    if (side === 'attacker') {
       this.attackerLoadouts = reordered;
       this.selectedAttacker = nextSelection;
     } else {
@@ -1041,34 +964,26 @@ class GlobalState implements State {
     }
   }
 
-  deleteLoadout(ix: number, side: "attacker" | "defender" = "attacker") {
-    const list =
-      side === "attacker" ? this.attackerLoadouts : this.defenderLoadouts;
+  deleteLoadout(ix: number, side: 'attacker' | 'defender' = 'attacker') {
+    const list = side === 'attacker' ? this.attackerLoadouts : this.defenderLoadouts;
     if (list.length === 1) {
       list[0] = generateEmptyPlayer();
       return;
     }
 
     const newList = list.filter((_, i) => i !== ix);
-    if (side === "attacker") this.attackerLoadouts = newList;
+    if (side === 'attacker') this.attackerLoadouts = newList;
     else this.defenderLoadouts = newList;
 
-    if (side === "attacker") {
+    if (side === 'attacker') {
       if (this.selectedAttacker >= ix && ix !== 0) this.selectedAttacker -= 1;
     } else if (this.selectedDefender >= ix && ix !== 0) {
       this.selectedDefender -= 1;
     }
   }
 
-  renameLoadout(
-    ix: number,
-    name: string,
-    side: "attacker" | "defender" = "attacker"
-  ) {
-    const loadout =
-      side === "attacker"
-        ? this.attackerLoadouts[ix]
-        : this.defenderLoadouts[ix];
+  renameLoadout(ix: number, name: string, side: 'attacker' | 'defender' = 'attacker') {
+    const loadout = side === 'attacker' ? this.attackerLoadouts[ix] : this.defenderLoadouts[ix];
 
     const trimmedName = name.trim();
     if (loadout) {
@@ -1079,7 +994,7 @@ class GlobalState implements State {
       }
     }
 
-    if (side === "attacker") {
+    if (side === 'attacker') {
       this.attackerLoadouts[ix] = {
         ...loadout,
         name: trimmedName,
@@ -1099,25 +1014,22 @@ class GlobalState implements State {
   createLoadout(
     selected?: boolean,
     cloneIndex?: number,
-    side: "attacker" | "defender" = "attacker"
+    side: 'attacker' | 'defender' = 'attacker',
   ) {
-    const list =
-      side === "attacker" ? this.attackerLoadouts : this.defenderLoadouts;
+    const list = side === 'attacker' ? this.attackerLoadouts : this.defenderLoadouts;
     if (list.length >= NUMBER_OF_LOADOUTS) return;
 
     const indexToClone = cloneIndex ?? 0;
     const deepClone = JSON.parse(JSON.stringify(list[indexToClone])) as Player;
     list.push({
       ...deepClone,
-      name: `${side === "attacker" ? "Attacker" : "Defender"} ${
-        list.length + 1
-      }`,
+      name: `${side === 'attacker' ? 'Attacker' : 'Defender'} ${list.length + 1}`,
     });
 
     this.recalculateEquipmentBonusesFromGearAll();
 
     if (selected) {
-      if (side === "attacker") this.setSelectedLoadout(list.length - 1);
+      if (side === 'attacker') this.setSelectedLoadout(list.length - 1);
       else this.selectedDefender = list.length - 1;
     }
   }
@@ -1125,22 +1037,17 @@ class GlobalState implements State {
   async doWorkerRecompute() {
     if (!this.calcWorker?.isReady()) {
       console.debug(
-        "[GlobalState] doWorkerRecompute called but worker is not ready, ignoring for now."
+        '[GlobalState] doWorkerRecompute called but worker is not ready, ignoring for now.',
       );
       return;
     }
 
     // clear existing loadout data
     const calculatedLoadouts: CalculatedLoadout[] = [];
-    this.attackerLoadouts.forEach(() =>
-      calculatedLoadouts.push(EMPTY_CALC_LOADOUT)
-    );
+    this.attackerLoadouts.forEach(() => calculatedLoadouts.push(EMPTY_CALC_LOADOUT));
     this.calc.loadouts = calculatedLoadouts;
 
-    const data: Extract<
-      ComputeBasicRequest["data"],
-      ComputeReverseRequest["data"]
-    > = {
+    const data: Extract<ComputeBasicRequest['data'], ComputeReverseRequest['data']> = {
       loadouts: toJS(this.attackerLoadouts),
       monster: toJS(this.monster),
       calcOpts: {
@@ -1150,41 +1057,36 @@ class GlobalState implements State {
       },
     };
     const request = async (
-      type: WorkerRequestType.COMPUTE_BASIC | WorkerRequestType.COMPUTE_REVERSE
+      type: WorkerRequestType.COMPUTE_BASIC | WorkerRequestType.COMPUTE_REVERSE,
     ) => {
       const resp = await this.calcWorker.do({
         type,
         data,
       });
 
-      console.log(
-        `[GlobalState] Calc response ${WorkerRequestType[type]}`,
-        resp.payload
-      );
+      console.log(`[GlobalState] Calc response ${WorkerRequestType[type]}`, resp.payload);
       this.updateCalcResults({ loadouts: resp.payload });
     };
 
     const promises: Promise<void>[] = [];
     promises.push(
       request(WorkerRequestType.COMPUTE_BASIC),
-      request(WorkerRequestType.COMPUTE_REVERSE)
+      request(WorkerRequestType.COMPUTE_REVERSE),
     );
 
-    if (this.prefs.showTtkComparison) {
+    if (this.prefs.showTtkComparison && !INFINITE_HEALTH_MONSTERS.includes(this.monster.id)) {
       promises.push(
-        (async () => {
-          const parallel = process.env.NEXT_PUBLIC_SERIAL_TTK !== "true";
+        (async (): Promise<void> => {
+          const parallel = process.env.NEXT_PUBLIC_SERIAL_TTK !== 'true';
           const resp = await this.calcWorker.do({
-            type: parallel
-              ? WorkerRequestType.COMPUTE_TTK_PARALLEL
-              : WorkerRequestType.COMPUTE_TTK,
+            type: parallel ? WorkerRequestType.COMPUTE_TTK_PARALLEL : WorkerRequestType.COMPUTE_TTK,
             data,
           });
 
           for (const [ix, loadout] of resp.payload.entries()) {
             this.updateCalcTtkDist(ix, loadout.ttkDist);
           }
-        })()
+        })(),
       );
     }
 
@@ -1192,20 +1094,16 @@ class GlobalState implements State {
   }
 
   get pvpCalc() {
-    if (
-      this.attackerLoadouts.length === 0 ||
-      this.defenderLoadouts.length === 0
-    )
-      return null;
+    if (this.attackerLoadouts.length === 0 || this.defenderLoadouts.length === 0) return null;
     const attacker = this.attackerLoadouts[this.selectedAttacker];
     const defender = this.defenderLoadouts[this.selectedDefender];
     const calc = new PlayerVsPlayerCalc(attacker, defender, {
       detailedOutput: false,
-      mode: "pvp",
+      mode: 'pvp',
     });
     const reverse = new PlayerVsPlayerCalc(defender, attacker, {
       detailedOutput: false,
-      mode: "pvp",
+      mode: 'pvp',
     });
     return {
       attackerDps: calc.getDps?.() ?? 0,
@@ -1229,7 +1127,7 @@ class GlobalState implements State {
     return this.selectedAttacker;
   }
 
-  setActiveSide(side: "attacker" | "defender") {
+  setActiveSide(side: 'attacker' | 'defender') {
     this.activeSide = side;
   }
 }

@@ -22,8 +22,9 @@ export function getMonsters(): Omit<Monster, 'inputs'>[] {
       attributes: m.attributes as MonsterAttribute[],
       weakness: <Monster['weakness']>m.weakness || null,
       immunities: {
-        burn: m.immunities.burn as BurnImmunity,
+        burn: m.immunities.burn as BurnImmunity | null,
       },
+      is_slayer_monster: m.is_slayer_monster || false,
     };
   });
 }
@@ -47,6 +48,7 @@ export const INITIAL_MONSTER_INPUTS: Monster['inputs'] = {
     bgs: 0,
     tonalztic: 0,
     seercull: 0,
+    ayak: 0,
   },
 };
 
@@ -89,6 +91,7 @@ export const CUSTOM_MONSTER_BASE: Monster = {
   immunities: {
     burn: null,
   },
+  is_slayer_monster: false,
   inputs: {
     ...INITIAL_MONSTER_INPUTS,
     monsterCurrentHp: 150,

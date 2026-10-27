@@ -39,6 +39,7 @@ export interface Monster {
   }
   defensive: {
     flat_armour: number;
+    magic_resistance?: number;
   } & {
     [k in Exclude<CombatStyleType, null | 'ranged'> | Exclude<RangedDamageType, 'mixed'>]: number;
   }
@@ -55,6 +56,7 @@ export interface Monster {
   immunities: {
     burn: BurnImmunity | null;
   }
+  is_slayer_monster: boolean;
 
   /**
    * Fields that users have control over in the UI, which may affect buff applicability, monster scaling, etc.
@@ -113,6 +115,7 @@ export interface Monster {
       bgs: number;
       tonalztic: number;
       seercull: number;
+      ayak: number;
     };
 
     demonbaneVulnerability?: number;

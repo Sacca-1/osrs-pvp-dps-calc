@@ -23,11 +23,12 @@ import LazyImage from '@/app/components/generic/LazyImage';
 import { CompareResult, CompareXAxis, CompareYAxis } from '@/lib/Comparator';
 import { CompareRequest, WorkerRequestType } from '@/worker/CalcWorkerTypes';
 import { keys } from '@/utils';
-import { ChartAnnotation } from '@/types/State';
 import { useCalc } from '@/worker/CalcWorker';
+import { ChartAnnotation } from '@/types/Charts';
 
 const XAxisOptions = [
   { label: 'Monster defence level', axisLabel: 'Level', value: CompareXAxis.MONSTER_DEF },
+  { label: 'Monster magic defence level', axisLabel: 'Level', value: CompareXAxis.MONSTER_MAGIC_DEF },
   { label: 'Monster magic level', axisLabel: 'Level', value: CompareXAxis.MONSTER_MAGIC },
   { label: 'Monster HP', axisLabel: 'Hitpoints', value: CompareXAxis.MONSTER_HP },
   { label: 'Player attack level', axisLabel: 'Level', value: CompareXAxis.PLAYER_ATTACK_LEVEL },
@@ -36,6 +37,9 @@ const XAxisOptions = [
   { label: 'Player ranged level', axisLabel: 'Level', value: CompareXAxis.PLAYER_RANGED_LEVEL },
   { label: 'Player magic level', axisLabel: 'Level', value: CompareXAxis.PLAYER_MAGIC_LEVEL },
   { label: 'Player stat decay', axisLabel: 'Minutes after boost', value: CompareXAxis.STAT_DECAY_RESTORE },
+  { label: 'Player melee strength bonus', axisLabel: 'Bonus', value: CompareXAxis.PLAYER_MELEE_STRENGTH_BONUS },
+  { label: 'Player ranged strength bonus', axisLabel: 'Bonus', value: CompareXAxis.PLAYER_RANGED_STRENGTH_BONUS },
+  { label: 'Player magic strength bonus', axisLabel: 'Bonus', value: CompareXAxis.PLAYER_MAGIC_STRENGTH_BONUS },
 ];
 
 const CustomTooltip: React.FC<TooltipProps<ValueType, NameType>> = ({ active, payload, label }) => {

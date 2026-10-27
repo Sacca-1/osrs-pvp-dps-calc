@@ -14,7 +14,7 @@ import PlayerVsPlayerCalc from '@/lib/PlayerVsPlayerCalc';
 import { Player } from '@/types/Player';
 import { max } from 'd3-array';
 import { FeatureStatus } from '@/utils';
-import { ChartEntry } from '@/types/State';
+import { ChartEntry } from '@/types/Charts';
 
 const CustomTooltip: React.FC<TooltipProps<ValueType, NameType>> = ({ active, payload, label }) => {
   if (active && payload && payload.length) {

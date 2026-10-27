@@ -4,6 +4,7 @@ import {
 import { MonsterAttribute } from '@/enums/MonsterAttribute';
 import { some } from 'd3-array';
 import { Monster } from '@/types/Monster';
+import { INFINITE_HEALTH_MONSTERS } from '@/lib/constants';
 
 export interface BoltContext {
   rangedLvl: number;
@@ -11,6 +12,7 @@ export interface BoltContext {
   zcb: boolean;
   spec: boolean;
   kandarinDiary: boolean;
+  ascensions: boolean;
   monster: Monster;
   chanceMultiplier?: number;
   procChanceMultiplier?: number;
@@ -20,6 +22,8 @@ export type BoltTransformer = (ctx: BoltContext) => HitTransformer;
 const kandarinFactor = ({ kandarinDiary, chanceMultiplier, procChanceMultiplier }: BoltContext): number => (
   (kandarinDiary ? 1.1 : 1.0) * (chanceMultiplier ?? 1.0) * (procChanceMultiplier ?? 1.0)
 );
+
+const ascensionsFactor = ({ ascensions }: BoltContext): number => (ascensions ? 0.5 : 1.0);
 
 const bonusDamageTransform = ({ zcb, spec }: BoltContext, chance: number, bonusDmg: number, accurateOnly: boolean): HitTransformer => (h) => {
   if (h.accurate && zcb && spec) {
@@ -55,7 +59,7 @@ export const diamondBolts: BoltTransformer = (ctx) => {
   const { maxHit, zcb, spec } = ctx;
   // In PvP, diamond bolts have 5% proc chance instead of 10%
   const baseChance = ctx.monster.attributes.includes(MonsterAttribute.PVP) ? 0.05 : 0.1;
-  const chance = baseChance * kandarinFactor(ctx);
+  const chance = baseChance * kandarinFactor(ctx) * ascensionsFactor(ctx);
   const effectMax = Math.trunc(maxHit * (zcb ? 126 : 115) / 100);
 
   const effectDist = HitDistribution.linear(1.0, 0, effectMax);
@@ -94,7 +98,7 @@ export const onyxBolts: BoltTransformer = (ctx) => {
     return (h) => new HitDistribution([new WeightedHit(1.0, [h])]);
   }
 
-  const chance = 0.11 * kandarinFactor(ctx);
+  const chance = 0.11 * kandarinFactor(ctx) * ascensionsFactor(ctx);
   const effectMax = Math.trunc(maxHit * (zcb ? 132 : 120) / 100);
 
   const effectDist = HitDistribution.linear(1.0, 0, effectMax);
@@ -114,9 +118,15 @@ export const onyxBolts: BoltTransformer = (ctx) => {
 
 export const rubyBolts: BoltTransformer = (ctx) => {
   const { zcb, spec, monster } = ctx;
-
   const chance = 0.06 * kandarinFactor(ctx);
-  const cap = zcb ? 110 : 100;
+  let cap;
+
+  if (INFINITE_HEALTH_MONSTERS.includes(ctx.monster.id)) {
+    cap = zcb ? 66 : 60;
+  } else {
+    cap = zcb ? 110 : 100;
+  }
+
   const effectDmg = Math.trunc(monster.inputs.monsterCurrentHp * (zcb ? 22 : 20) / 100);
   const effectHit = HitDistribution.single(1.0, [new Hitsplat(Math.min(cap, effectDmg))]);
 

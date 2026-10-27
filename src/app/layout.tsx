@@ -1,10 +1,11 @@
 import React, { PropsWithChildren } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
+import '@xyflow/react/dist/style.css';
 import '../globals.css';
 import { Metadata } from 'next';
 import { ibm, pts } from '@/fonts';
 import ClientProviders from '@/app/components/ClientProviders';
-import { Analytics } from '@vercel/analytics/next';
+import { Analytics } from '@vercel/analytics/react';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || ''),

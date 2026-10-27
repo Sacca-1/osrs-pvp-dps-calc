@@ -14,6 +14,7 @@ import strength from '@/public/img/bonuses/strength.png';
 import defence from '@/public/img/bonuses/defence.png';
 import mining from '@/public/img/bonuses/mining.png';
 import flat_armour from '@/public/img/bonuses/flat_armour.png';
+import magic_resistance from '@/public/img/bonuses/magic_resistance.png';
 import magicStrength from '@/public/img/bonuses/magic_strength.png';
 import rangedStrength from '@/public/img/bonuses/ranged_strength.png';
 import toaRaidLevel from '@/public/img/toa_raidlevel.webp';
@@ -27,6 +28,7 @@ import PresetAttributeButton from '@/app/components/monster/PresetAttributeButto
 import NumberInput from '@/app/components/generic/NumberInput';
 import {
   GUARDIAN_IDS,
+  INFINITE_HEALTH_MONSTERS,
   MONSTER_PHASES_BY_ID,
   PARTY_SIZE_REQUIRED_MONSTER_IDS,
   TOMBS_OF_AMASCUT_MONSTER_IDS,
@@ -108,7 +110,7 @@ const COMBAT_STYLE_OPTIONS: { label: string, value: MonsterCombatStyle }[] = [
 
 const MonsterContainer: React.FC = observer(() => {
   const store = useStore();
-  const { loadouts, monster } = store;
+  const { loadouts, monster, prefs } = store;
   const [attributesExpanded, setAttributesExpanded] = useState(false);
   const [optionsExpanded, setOptionsExpanded] = useState(true);
 
@@ -173,6 +175,27 @@ const MonsterContainer: React.FC = observer(() => {
               min={1}
               max={20}
               onChange={(s) => store.updateMonster({ speed: s })}
+              required
+            />
+          </div>
+        </div>,
+        <div key="max-hit">
+          <h4 className="font-bold font-serif">
+            Max hit
+            <span
+              className="align-super underline decoration-dotted cursor-help text-xs text-gray-300"
+              data-tooltip-id="tooltip"
+              data-tooltip-content="Overrides the calculated max hit based on the combat stats. Set to 0 to use the calculated value."
+            >
+              ?
+            </span>
+          </h4>
+          <div className="mt-2">
+            <NumberInput
+              value={monster.maxHit ? monster.maxHit : 0}
+              min={0}
+              max={200}
+              onChange={(h) => store.updateMonster({ maxHit: h })}
               required
             />
           </div>
@@ -318,7 +341,7 @@ const MonsterContainer: React.FC = observer(() => {
 
     if (phaseOptions) {
       comps.push(
-        <div key="td-phase">
+        <div key="td-phase" className="w-full">
           <h4 className="font-bold font-serif">
             Phase
           </h4>
@@ -455,16 +478,17 @@ const MonsterContainer: React.FC = observer(() => {
                       <AttributeInput
                         name="Hitpoints"
                         max={50000}
-                        disabled={!isCustomMonster}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
                         image={hitpoints}
                         value={displayMonster.skills.hp}
+                        displayValue={INFINITE_HEALTH_MONSTERS.includes(displayMonster.id) ? 'Inf.' : undefined}
                         onChange={(v) => store.updateMonster({ skills: { hp: v } })}
                         required
                       />
                       <AttributeInput
                         name="Attack"
-                        max={1000}
-                        disabled={!isCustomMonster}
+                        max={10000}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
                         image={attack}
                         value={displayMonster.skills.atk}
                         onChange={(v) => store.updateMonster({ skills: { atk: v } })}
@@ -472,8 +496,8 @@ const MonsterContainer: React.FC = observer(() => {
                       />
                       <AttributeInput
                         name="Strength"
-                        max={1000}
-                        disabled={!isCustomMonster}
+                        max={10000}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
                         image={strength}
                         value={displayMonster.skills.str}
                         onChange={(v) => store.updateMonster({ skills: { str: v } })}
@@ -482,7 +506,7 @@ const MonsterContainer: React.FC = observer(() => {
                       <AttributeInput
                         name="Defence"
                         max={40000}
-                        disabled={!isCustomMonster}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
                         image={defence}
                         value={displayMonster.skills.def}
                         onChange={(v) => store.updateMonster({ skills: { def: v } })}
@@ -490,8 +514,8 @@ const MonsterContainer: React.FC = observer(() => {
                       />
                       <AttributeInput
                         name="Magic"
-                        max={1000}
-                        disabled={!isCustomMonster}
+                        max={10000}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
                         image={magic}
                         value={displayMonster.skills.magic}
                         onChange={(v) => store.updateMonster({ skills: { magic: v } })}
@@ -499,8 +523,8 @@ const MonsterContainer: React.FC = observer(() => {
                       />
                       <AttributeInput
                         name="Ranged"
-                        max={1000}
-                        disabled={!isCustomMonster}
+                        max={10000}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
                         image={ranged}
                         value={displayMonster.skills.ranged}
                         onChange={(v) => store.updateMonster({ skills: { ranged: v } })}
@@ -509,7 +533,7 @@ const MonsterContainer: React.FC = observer(() => {
                       <AttributeInput
                         name="Flat Armour"
                         max={1000}
-                        disabled={!isCustomMonster}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
                         image={flat_armour}
                         value={displayMonster.defensive.flat_armour}
                         onChange={(v) => store.updateMonster({ defensive: { flat_armour: v } })}
@@ -522,8 +546,8 @@ const MonsterContainer: React.FC = observer(() => {
                     <div className="flex flex-col gap-2 mt-3 text-center">
                       <AttributeInput
                         name="Attack"
-                        max={1000}
-                        disabled={!isCustomMonster}
+                        max={10000}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
                         image={attack}
                         value={displayMonster.offensive.atk}
                         onChange={(v) => store.updateMonster({ offensive: { atk: v } })}
@@ -531,8 +555,8 @@ const MonsterContainer: React.FC = observer(() => {
                       />
                       <AttributeInput
                         name="Strength"
-                        max={1000}
-                        disabled={!isCustomMonster}
+                        max={10000}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
                         image={strength}
                         value={displayMonster.offensive.str}
                         onChange={(v) => store.updateMonster({ offensive: { str: v } })}
@@ -540,8 +564,8 @@ const MonsterContainer: React.FC = observer(() => {
                       />
                       <AttributeInput
                         name="Magic"
-                        max={1000}
-                        disabled={!isCustomMonster}
+                        max={10000}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
                         image={magic}
                         value={displayMonster.offensive.magic}
                         onChange={(v) => store.updateMonster({ offensive: { magic: v } })}
@@ -549,8 +573,8 @@ const MonsterContainer: React.FC = observer(() => {
                       />
                       <AttributeInput
                         name="Magic Strength"
-                        max={1000}
-                        disabled={!isCustomMonster}
+                        max={10000}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
                         image={magicStrength}
                         value={displayMonster.offensive.magic_str}
                         onChange={(v) => store.updateMonster({ offensive: { magic_str: v } })}
@@ -558,8 +582,8 @@ const MonsterContainer: React.FC = observer(() => {
                       />
                       <AttributeInput
                         name="Ranged"
-                        max={1000}
-                        disabled={!isCustomMonster}
+                        max={10000}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
                         image={ranged}
                         value={displayMonster.offensive.ranged}
                         onChange={(v) => store.updateMonster({ offensive: { ranged: v } })}
@@ -567,11 +591,20 @@ const MonsterContainer: React.FC = observer(() => {
                       />
                       <AttributeInput
                         name="Ranged Strength"
-                        max={1000}
-                        disabled={!isCustomMonster}
+                        max={10000}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
                         image={rangedStrength}
                         value={displayMonster.offensive.ranged_str}
                         onChange={(v) => store.updateMonster({ offensive: { ranged_str: v } })}
+                        required
+                      />
+                      <AttributeInput
+                        name="Magic Resistance"
+                        max={1000}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
+                        image={magic_resistance}
+                        value={displayMonster.defensive.magic_resistance ?? 0}
+                        onChange={(v) => store.updateMonster({ defensive: { magic_resistance: v } })}
                         required
                       />
                     </div>
@@ -581,8 +614,8 @@ const MonsterContainer: React.FC = observer(() => {
                     <div className="flex flex-col gap-2 mt-3 text-center">
                       <AttributeInput
                         name="Stab"
-                        max={1000}
-                        disabled={!isCustomMonster}
+                        max={10000}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
                         image={dagger}
                         value={displayMonster.defensive.stab}
                         onChange={(v) => store.updateMonster({ defensive: { stab: v } })}
@@ -590,8 +623,8 @@ const MonsterContainer: React.FC = observer(() => {
                       />
                       <AttributeInput
                         name="Slash"
-                        max={1000}
-                        disabled={!isCustomMonster}
+                        max={10000}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
                         image={scimitar}
                         value={displayMonster.defensive.slash}
                         onChange={(v) => store.updateMonster({ defensive: { slash: v } })}
@@ -599,8 +632,8 @@ const MonsterContainer: React.FC = observer(() => {
                       />
                       <AttributeInput
                         name="Crush"
-                        max={1000}
-                        disabled={!isCustomMonster}
+                        max={10000}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
                         image={warhammer}
                         value={displayMonster.defensive.crush}
                         onChange={(v) => store.updateMonster({ defensive: { crush: v } })}
@@ -608,8 +641,8 @@ const MonsterContainer: React.FC = observer(() => {
                       />
                       <AttributeInput
                         name="Magic"
-                        max={1000}
-                        disabled={!isCustomMonster}
+                        max={10000}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
                         image={magic}
                         value={displayMonster.defensive.magic}
                         onChange={(v) => store.updateMonster({ defensive: { magic: v } })}
@@ -617,8 +650,8 @@ const MonsterContainer: React.FC = observer(() => {
                       />
                       <AttributeInput
                         name="Ranged Light"
-                        max={1000}
-                        disabled={!isCustomMonster}
+                        max={10000}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
                         image={ranged_light}
                         value={displayMonster.defensive.light}
                         onChange={(v) => store.updateMonster({ defensive: { light: v } })}
@@ -626,8 +659,8 @@ const MonsterContainer: React.FC = observer(() => {
                       />
                       <AttributeInput
                         name="Ranged Standard"
-                        max={1000}
-                        disabled={!isCustomMonster}
+                        max={10000}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
                         image={ranged_standard}
                         value={displayMonster.defensive.standard}
                         onChange={(v) => store.updateMonster({ defensive: { standard: v } })}
@@ -635,8 +668,8 @@ const MonsterContainer: React.FC = observer(() => {
                       />
                       <AttributeInput
                         name="Ranged Heavy"
-                        max={1000}
-                        disabled={!isCustomMonster}
+                        max={10000}
+                        disabled={!(isCustomMonster || prefs.manualMode)}
                         image={ranged_heavy}
                         value={displayMonster.defensive.heavy}
                         onChange={(v) => store.updateMonster({ defensive: { heavy: v } })}
